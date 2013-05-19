@@ -23,6 +23,7 @@ struct VAR
 
 //functions
 void varinit();
+VAR* getvarptr();
 bool varnew(const char* name, void* value, VAR_TYPE type);
 bool varget(const char* name, void* value, VAR_TYPE* type);
 bool varset(const char* name, void* value);

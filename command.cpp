@@ -3,26 +3,21 @@
 
 bool cmdcontains(const char* cmd_list, const char* cmd)
 {
+    dbg("cmdcontains");
     char temp[deflen]="";
     strcpy(temp, cmd_list);
     int len=strlen(cmd_list);
     for(int i=0; i<len; i++)
-    {
         if(temp[i]==1)
-        {
             temp[i]=0;
-            break;
-        }
-    }
     if(scmp(temp, cmd))
         return true;
     int i=0;
-    while(cmd_list[i] and cmd_list[i+1])
+    for(int i=0; i<len; i++)
     {
-        if(cmd_list[i]==1)
-            if(scmp(cmd_list+i+1, cmd))
+        if(!temp[i])
+            if(scmp(temp+i+1, cmd))
                 return true;
-        i++;
     }
     return false;
 }

@@ -26,10 +26,33 @@ void formatarg(char* cmd)
         _strlwr(cmd);
         return;
     }
-    /*while(cmd[start]==' ') //remove prepended spaces
-        start++;*/
     while(cmd[start]==',') //remove prepended commas
         start++;
+
+    int quote_count=0;
+    for(int i=start; i<len; i++)
+        if(cmd[i]=='"' and cmd[i-1]!='\\')
+            quote_count++;
+
+    char temp0[deflen]="";
+    bool has_strings=false;
+    if(quote_count and !(quote_count%2))
+        has_strings=true;
+    int string_count=0;
+    if(has_strings)
+    {
+        string_count=quote_count/2;
+        for(int i=start,j=0; i<len; i++)
+        {
+            if(cmd[i]=='"' and cmd[i-1]!='\\')
+            {
+                //TODO: fix strings
+            }
+            else
+                j+=sprintf(temp0+j, "%c", cmd[i]);
+        }
+    }
+
     char temp1[deflen]="";
     for(int i=start,j=0; i<len; i++) //remove non-escaped spaces
         if(!(cmd[i]==' ' and cmd[i-1]!='\\'))

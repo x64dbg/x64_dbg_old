@@ -172,14 +172,14 @@ Process module . 175
 Dumper module  182 
 Dumper module constants . 183 
 Dumper module structures . 184 
-	DumpProcess function  186 
-	DumpProcessEx function  187 
-	DumpMemory function  188 
-	DumpMemoryEx function . 189 
-	DumpRegions function  190 
-	DumpRegionsEx function  191 
-	DumpModule function  192 
-	DumpModuleEx function  193 
+	*DumpProcess function  186 
+	*DumpProcessEx function  187 
+	*DumpMemory function  188 
+	*DumpMemoryEx function . 189 
+	*DumpRegions function  190 
+	*DumpRegionsEx function  191 
+	*DumpModule function  192 
+	*DumpModuleEx function  193 
 	PastePEHeader function . 194 
 	ExtractSection function . 195 
 	ResortFileSections function  196 
@@ -196,19 +196,19 @@ Dumper module structures . 184
 	GetSharedOverlay function. 207 
 	DeleteLastSection function . 208 
 	DeleteLastSectionEx function . 209 
-	GetPE32DataFromMappedFile function . 210 
-	GetPE32DataFromMappedFileEx function . 211 
-	GetPE32Data function . 212 
-	GetPE32DataEx function . 213 
-	SetPE32DataForMappedFile function . 214 
-	SetPE32DataForMappedFileEx function . 215 
-	SetPE32Data function . 216 
-	SetPE32DataEx function  217 
-	GetPE32SectionNumberFromVA function  218 
-	ConvertVAtoFileOffset function  219 
-	ConvertVAtoFileOffsetEx function  220 
-	ConvertFileOffsetToVA function . 221 
-	ConvertFileOffsetToVAEx function . 222 
+	*GetPE32DataFromMappedFile function . 210 
+	*GetPE32DataFromMappedFileEx function . 211 
+	*GetPE32Data function . 212 
+	*GetPE32DataEx function . 213 
+	*SetPE32DataForMappedFile function . 214 
+	*SetPE32DataForMappedFileEx function . 215 
+	*SetPE32Data function . 216 
+	*SetPE32DataEx function  217 
+	*GetPE32SectionNumberFromVA function  218 
+	*ConvertVAtoFileOffset function  219 
+	*ConvertVAtoFileOffsetEx function  220 
+	*ConvertFileOffsetToVA function . 221 
+	*ConvertFileOffsetToVAEx function . 222 
 Importer module . 223 
 Importer module structures . 224 
 	ImporterInit function  225 
@@ -261,20 +261,20 @@ Importer module structures . 224
 	ImporterAutoFixIATEx function  272 
 	ImporterAutoFixIAT function  274 
 Tracer module . 275 
-	TracerInit function  276 
-	TracerLevel1 function . 277 
-	HashTracerLevel1 function . 278 
-	TracerDetectRedirection function  279 
-	TracerFixKnownRedirection function . 280 
-	TracerFixRedirectionViaImpRecPlugin function 281 
+	**TracerInit function  276 
+	**TracerLevel1 function . 277 
+	**HashTracerLevel1 function . 278 
+	**TracerDetectRedirection function  279 
+	**TracerFixKnownRedirection function . 280 
+	**TracerFixRedirectionViaImpRecPlugin function 281 
 Realigner module  282 
 Realigner module structures and constants . 283 
 	RealignPE function  285 
 	RealignPEEx function . 286 
 	FixHeaderCheckSum function . 287 
 	WipeSection function  288 
-	IsFileDLL function  289 
-	IsPE32FileValidEx function  290 
+	*IsFileDLL function  289 
+	*IsPE32FileValidEx function  290 
 	FixBrokenPE32FileEx function . 291 
 Relocater module  292 
 	RelocaterInit function . 293 
@@ -329,30 +329,30 @@ Static module constants  328
 Handler module  344 
 Handler module constants  345 
 Handler module structures . 345 
-	HandlerGetActiveHandleCount function  346 
-	HandlerIsHandleOpen function  347 
-	HandlerGetHandleName function  348 
-	HandlerGetHandleDetails function . 349 
-	HandlerEnumerateOpenHandles function . 350 
-	HandlerIsFileLocked function  351 
-	HandlerCloseAllLockHandles function  352 
-	HandlerEnumerateLockHandles function . 353 
-	HandlerCloseRemoteHandle function  354 
-	HandlerEnumerateOpenMutexes function  355 
-	HandlerGetOpenMutexHandle function . 356 
-	HandlerGetProcessIdWhichCreatedMutex function  357 
+	**HandlerGetActiveHandleCount function  346 
+	**HandlerIsHandleOpen function  347 
+	**HandlerGetHandleName function  348 
+	**HandlerGetHandleDetails function . 349 
+	**HandlerEnumerateOpenHandles function . 350 
+	**HandlerIsFileLocked function  351 
+	**HandlerCloseAllLockHandles function  352 
+	**HandlerEnumerateLockHandles function . 353 
+	**HandlerCloseRemoteHandle function  354 
+	**HandlerEnumerateOpenMutexes function  355 
+	**HandlerGetOpenMutexHandle function . 356 
+	**HandlerGetProcessIdWhichCreatedMutex function  357 
 Extension module . 358 
 Guide to writing extensions for TitanEngine  359 
 Extension structure and function definitions . 359 
-	ExtensionManagerIsPluginLoaded function . 360 
-	ExtensionManagerIsPluginEnabled function  361 
-	ExtensionManagerDisablePlugin function  362 
-	ExtensionManagerDisableAllPlugins function  363 
-	ExtensionManagerEnablePlugin function . 364 
-	ExtensionManagerEnableAllPlugins function . 365 
-	ExtensionManagerUnloadPlugin function  366 
-	ExtensionManagerUnloadAllPlugins function  367 
-	ExtensionManagerGetPluginInfo function  368 
+	**ExtensionManagerIsPluginLoaded function . 360 
+	**ExtensionManagerIsPluginEnabled function  361 
+	**ExtensionManagerDisablePlugin function  362 
+	**ExtensionManagerDisableAllPlugins function  363 
+	**ExtensionManagerEnablePlugin function . 364 
+	**ExtensionManagerEnableAllPlugins function . 365 
+	**ExtensionManagerUnloadPlugin function  366 
+	**ExtensionManagerUnloadAllPlugins function  367 
+	**ExtensionManagerGetPluginInfo function  368 
 Engine module  369 
 	EngineCreateMissingDependencies function . 370 
 	EngineFakeMissingDependencies function  371 

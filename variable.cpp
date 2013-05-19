@@ -27,6 +27,11 @@ void varinit()
     varnew("res", 0, VAR_SYSTEM);
 }
 
+VAR* getvarptr()
+{
+    return vars;
+}
+
 bool varnew(const char* name_, void* value, VAR_TYPE type)
 {
     dbg("varnew");
@@ -248,7 +253,7 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
         void** val=(void**)value;
         *val=(void*)0xFFFFFFFF;
         if(value_size)
-        *value_size=0;
+            *value_size=0;
         return true;
     }
     char* temp=(char*)malloc(strlen(string)+1);
@@ -271,9 +276,9 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
     if(*string=='x')
         temp++;
     int len=strlen(temp);
-        for(int i=0; i<len; i++)
-            if(!isxdigit(temp[i]))
-                return false;
+    for(int i=0; i<len; i++)
+        if(!isxdigit(temp[i]))
+            return false;
     if(!*temp)
         return false;
     sscanf(temp, "%x", (unsigned int*)value);

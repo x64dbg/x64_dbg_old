@@ -107,3 +107,54 @@ void cbInstrMov(const char* cmd)
     else
         printf("%s=%X\n", arg1, value);
 }
+
+void cbInstrVarList(const char* cmd)
+{
+    dbg("varlist");
+    char arg1[deflen]="";
+    getarg(cmd, arg1, 0, true);
+    int filter=0;
+    if(!strcasecmp(arg1, "USER"))
+        filter=VAR_USER;
+    else if(!strcasecmp(arg1, "READONLY"))
+        filter=VAR_READONLY;
+    else if(!strcasecmp(arg1, "SYSTEM"))
+        filter=VAR_SYSTEM;
+    VAR* cur=getvarptr();
+    if(!cur)
+    {
+        puts("no variables");
+        return;
+    }
+    char* name=0;
+    unsigned int value=0;
+    bool bNext=true;
+    while(bNext)
+    {
+        name=cur->name;
+        if(name)
+        {
+            value=(unsigned int)cur->value;
+            if(filter)
+            {
+                if(cur->type==filter)
+                {
+                    if(value>15)
+                        printf("%s=%X (%ud)\n", name, value, value);
+                    else
+                        printf("%s=%X\n", name, value);
+                }
+            }
+            else
+            {
+                if(value>15)
+                    printf("%s=%X (%ud)\n", name, value, value);
+                else
+                    printf("%s=%X\n", name, value);
+            }
+        }
+        cur=cur->next;
+        if(!cur)
+            bNext=false;
+    }
+}

@@ -16,6 +16,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library=".\TitanEngine_x86.lib" />
 				</Linker>
 			</Target>
 		</Build>
@@ -23,12 +24,15 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="TitanEngine.h" />
 		<Unit filename="_global.cpp" />
 		<Unit filename="_global.h" />
 		<Unit filename="argument.cpp" />
 		<Unit filename="argument.h" />
 		<Unit filename="command.cpp" />
 		<Unit filename="command.h" />
+		<Unit filename="debugger.cpp" />
+		<Unit filename="debugger.h" />
 		<Unit filename="instruction.cpp" />
 		<Unit filename="instruction.h" />
 		<Unit filename="main.cpp" />
