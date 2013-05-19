@@ -29,6 +29,8 @@
 		<Unit filename="argument.h" />
 		<Unit filename="command.cpp" />
 		<Unit filename="command.h" />
+		<Unit filename="instruction.cpp" />
+		<Unit filename="instruction.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="variable.cpp" />
 		<Unit filename="variable.h" />

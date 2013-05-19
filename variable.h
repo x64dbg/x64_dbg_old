@@ -21,15 +21,12 @@ struct VAR
     VAR* next;
 };
 
-//variables
-extern VAR* vars;
-
 //functions
 void varinit();
 bool varnew(const char* name, void* value, VAR_TYPE type);
 bool varget(const char* name, void* value, VAR_TYPE* type);
 bool varset(const char* name, void* value);
 bool vardel(const char* name);
-bool getvaluefromstring(const char* string, void* value_);
+bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TYPE* var_type);
 
 #endif // _VARIABLE_H

@@ -1,11 +1,13 @@
 #include "variable.h"
 
-VAR* vars;
+static VAR* vars;
 
 static VAR* varfind(const char* name, VAR** link)
 {
     dbg("varfind");
     VAR* cur=vars;
+    if(!cur)
+        return 0;
     VAR* prev=cur;
     while(!scmp(cur->name, name))
     {
@@ -22,11 +24,7 @@ static VAR* varfind(const char* name, VAR** link)
 void varinit()
 {
     dbg("varinit");
-    vars=(VAR*)malloc(sizeof(VAR));
-    vars->name=(char*)"$res";
-    vars->type=VAR_SYSTEM;
-    vars->value=0;
-    vars->next=0;
+    varnew("res", 0, VAR_SYSTEM);
 }
 
 bool varnew(const char* name_, void* value, VAR_TYPE type)
@@ -225,7 +223,7 @@ bool isregister(const char* string)
     return false;
 }
 
-bool getvaluefromstring(const char* string, void* value)
+bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TYPE* var_type)
 {
     if(!*string)
     {
@@ -234,12 +232,14 @@ bool getvaluefromstring(const char* string, void* value)
         return true;
     }
     if(*string=='$') //variable
-        return varget(string, value, 0);
+        return varget(string, value, var_type);
     if(isregister(string)) //register
     {
         //TODO: getregister
         void** val=(void**)value;
         *val=(void*)0xFFFFFFFF;
+        if(value_size)
+            *value_size=sizeof(unsigned int);
         return true;
     }
     if(*string=='!') //flag
@@ -247,6 +247,8 @@ bool getvaluefromstring(const char* string, void* value)
         //TODO: getflag
         void** val=(void**)value;
         *val=(void*)0xFFFFFFFF;
+        if(value_size)
+        *value_size=0;
         return true;
     }
     char* temp=(char*)malloc(strlen(string)+1);
@@ -261,6 +263,8 @@ bool getvaluefromstring(const char* string, void* value)
         if(!*temp)
             return false;
         sscanf(temp, "%u", (unsigned int*)value);
+        if(value_size)
+            *value_size=sizeof(unsigned int);
         return true;
     }
     //hexadecimal value
@@ -273,5 +277,7 @@ bool getvaluefromstring(const char* string, void* value)
     if(!*temp)
         return false;
     sscanf(temp, "%x", (unsigned int*)value);
+    if(value_size)
+        *value_size=sizeof(unsigned int);
     return true;
 }

@@ -2,3 +2,5 @@
 obj/
 *.depend
 *.layout
+ODbgScript.chm
+ODbgScript.chw
