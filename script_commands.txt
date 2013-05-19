@@ -1,4 +1,4 @@
-odbgscript commands:
+odbgscript commands: 
 
 general purpose:
 $result
