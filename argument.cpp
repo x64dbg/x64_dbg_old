@@ -34,6 +34,8 @@ void formatarg(char* cmd)
             start=i+1;
             break;
         }
+    if(!start)
+        start=len;
     _strlwr(command);
     //printf("[DEBUG] 1:command: \"%s\"[%d]\n", command, strlen(command));
     char arguments_[deflen]="";
@@ -141,7 +143,10 @@ void formatarg(char* cmd)
             arguments[i+1]='\\';
         }
     //printf("[DEBUG] 11:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
-    sprintf(cmd, "%s %s", command, arguments);
+    if(strlen(arguments))
+        sprintf(cmd, "%s %s", command, arguments);
+    else
+        strcpy(cmd, command);
     //printf("[DEBUG] cmd: \"%s\"[%d]\n", cmd, strlen(cmd));
 }
 

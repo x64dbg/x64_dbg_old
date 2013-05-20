@@ -3,7 +3,6 @@
 
 bool cmdcontains(const char* cmd_list, const char* cmd)
 {
-    dbg("cmdcontains");
     char temp[deflen]="";
     strcpy(temp, cmd_list);
     int len=strlen(cmd_list);
