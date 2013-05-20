@@ -29,30 +29,6 @@ void formatarg(char* cmd)
     while(cmd[start]==',') //remove prepended commas
         start++;
 
-    int quote_count=0;
-    for(int i=start; i<len; i++)
-        if(cmd[i]=='"' and cmd[i-1]!='\\')
-            quote_count++;
-
-    char temp0[deflen]="";
-    bool has_strings=false;
-    if(quote_count and !(quote_count%2))
-        has_strings=true;
-    int string_count=0;
-    if(has_strings)
-    {
-        string_count=quote_count/2;
-        for(int i=start,j=0; i<len; i++)
-        {
-            if(cmd[i]=='"' and cmd[i-1]!='\\')
-            {
-                //TODO: fix strings
-            }
-            else
-                j+=sprintf(temp0+j, "%c", cmd[i]);
-        }
-    }
-
     char temp1[deflen]="";
     for(int i=start,j=0; i<len; i++) //remove non-escaped spaces
         if(!(cmd[i]==' ' and cmd[i-1]!='\\'))
@@ -61,7 +37,7 @@ void formatarg(char* cmd)
     while(temp1[len-1]==',' and temp1[len-2]!='\\') //remove appended (non-escaped) commas
         len--;
     temp1[len]=0;
-    //printf("[DEBUG] temp1, \"%s\"[%d]\n", temp1, strlen(temp1));
+    printf("[DEBUG] temp1, \"%s\"[%d]\n", temp1, strlen(temp1));
     char temp2[deflen]="";
     len=strlen(temp1);
     for(int i=0,j=0; i<len; i++)
@@ -70,14 +46,14 @@ void formatarg(char* cmd)
             i++;
         j+=sprintf(temp2+j, "%c", temp1[i]);
     }
-    //printf("[DEBUG] temp2: \"%s\"[%d]\n", temp2, strlen(temp2));
+    printf("[DEBUG] temp2: \"%s\"[%d]\n", temp2, strlen(temp2));
     _strlwr(cmd);
     if(strlen(temp2))
     {
         cmd[start-1]=' ';
         strcpy(cmd+start-minstart, temp2);
     }
-    //printf("[DEBUG] cmd: \"%s\"[%d]\n", cmd, strlen(cmd));
+    printf("[DEBUG] cmd: \"%s\"[%d]\n", cmd, strlen(cmd));
 }
 
 int getargcount(const char* cmd)

@@ -32,7 +32,7 @@ void cbBadCmd(const char* cmd)
             if(cmd_[i]==' ')
             {
                 cmd_[i]=0;
-                return;
+                break;
             }
         }
         if(*cmd_=='$')

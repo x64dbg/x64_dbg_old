@@ -12,7 +12,6 @@ bool cmdcontains(const char* cmd_list, const char* cmd)
             temp[i]=0;
     if(scmp(temp, cmd))
         return true;
-    int i=0;
     for(int i=0; i<len; i++)
     {
         if(!temp[i])
