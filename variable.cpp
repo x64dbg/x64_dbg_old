@@ -8,22 +8,26 @@ static VAR* varfind(const char* name, VAR** link)
     VAR* cur=vars;
     if(!cur)
         return 0;
-    VAR* prev=cur;
-    while(!arraycontains(cur->name, name))
+    VAR* prev=0;
+    while(cur)
     {
-        if(!cur->next)
-            return 0;
+        if(arraycontains(cur->name, name))
+        {
+            if(link)
+                *link=prev;
+            return cur;
+        }
         prev=cur;
         cur=cur->next;
     }
-    if(link)
-        *link=prev;
-    return cur;
+    return 0;
 }
 
 void varinit()
 {
     dbg("varinit");
+    vars=(VAR*)malloc(sizeof(VAR));
+    memset(vars, 0, sizeof(VAR));
     varnew("$res\1$result", 0, VAR_SYSTEM);
 }
 
@@ -35,6 +39,8 @@ VAR* vargetptr()
 bool varnew(const char* name_, void* value, VAR_TYPE type)
 {
     dbg("varnew");
+    if(!name_)
+        return false;
     char* name=(char*)malloc(strlen(name_)+2);
     if(*name_!='$')
     {
@@ -50,12 +56,26 @@ bool varnew(const char* name_, void* value, VAR_TYPE type)
         free(name);
         return false;
     }
-    VAR* var=(VAR*)malloc(sizeof(VAR));
+    VAR* var;
+    bool nonext=false;
+    if(!vars->name)
+    {
+        nonext=true;
+        var=vars;
+    }
+    else
+        var=(VAR*)malloc(sizeof(VAR));
+    memset(var, 0, sizeof(VAR));
     var->name=name;
     var->type=type;
     var->value=value;
-    var->next=vars;
-    vars=var;
+    if(!nonext)
+    {
+        VAR* cur=vars;
+        while(cur->next)
+            cur=cur->next;
+        cur->next=var;
+    }
     return true;
 }
 
@@ -108,8 +128,23 @@ bool vardel(const char* name_, bool delsystem)
     if(!delsystem and type!=VAR_USER)
         return false;
     free(found->name);
-    prev->next=found->next;
-    free(found);
+    if(found==vars)
+    {
+        VAR* next=vars->next;
+        if(next)
+        {
+            memcpy(vars, vars->next, sizeof(VAR));
+            vars->next=next->next;
+            free(next);
+        }
+        else
+            memset(vars, 0, sizeof(VAR));
+    }
+    else
+    {
+        prev->next=found->next;
+        free(found);
+    }
     return true;
 }
 
@@ -276,6 +311,7 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
         if(!*temp)
             return false;
         sscanf(temp, "%u", (unsigned int*)value);
+        free(temp);
         return true;
     }
     //hexadecimal value
@@ -290,5 +326,6 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
     sscanf(temp, "%x", (unsigned int*)value);
     if(value_size)
         *value_size=sizeof(unsigned int);
+    free(temp);
     return true;
 }

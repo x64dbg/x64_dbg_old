@@ -2,7 +2,7 @@
 #include "argument.h"
 #include "variable.h"
 
-void cbBadCmd(const char* cmd)
+bool cbBadCmd(const char* cmd)
 {
     unsigned int value=0;
     int valsize=0;
@@ -59,20 +59,21 @@ void cbBadCmd(const char* cmd)
         else
             printf("unknown command: \"%s\"\n", cmd_);
     }
+    return true;
 }
 
-void cbInstrVar(const char* cmd)
+bool cbInstrVar(const char* cmd)
 {
     char arg1[deflen]="";
     char arg2[deflen]="";
     if(!argget(cmd, arg1, 0, false)) //var name
-        return;
+        return true;
     argget(cmd, arg2, 1, true); //var value (optional)
     unsigned int value=0;
     if(!getvaluefromstring(arg2, &value, 0, 0, 0))
     {
         printf("invalid value \"%s\"\n", arg2);
-        return;
+        return true;
     }
     if(!varnew(arg1, (void*)value, VAR_USER))
         printf("error creating variable \"%s\"\n", arg1);
@@ -83,39 +84,41 @@ void cbInstrVar(const char* cmd)
         else
             printf("%s=%X\n", arg1, value);
     }
+    return true;
 }
 
-void cbInstrVarDel(const char* cmd)
+bool cbInstrVarDel(const char* cmd)
 {
     char arg1[deflen]="";
     if(!argget(cmd, arg1, 0, false)) //var name
-        return;
+        return true;
     if(!vardel(arg1, false))
         printf("could not delete variable \"%s\"\n", arg1);
     else
         printf("deleted variable \"%s\"\n", arg1);
+    return true;
 }
 
-void cbInstrMov(const char* cmd)
+bool cbInstrMov(const char* cmd)
 {
     char arg1[deflen]="";
     char arg2[deflen]="";
     if(!argget(cmd, arg1, 0, false)) //dest name
-        return;
+        return true;
     if(!argget(cmd, arg2, 1, false)) //src name
-        return;
+        return true;
     unsigned int set_value=0;
     if(!getvaluefromstring(arg2, &set_value, 0, 0, 0))
     {
         printf("invalid src \"%s\"\n", arg2);
-        return;
+        return true;
     }
     if(!varset(arg1, (void*)set_value, false))
     {
         if(*arg1!='$')
         {
             printf("invalid dest \"%s\"\n", arg1);
-            return;
+            return true;
         }
         varnew(arg1, (void*)set_value, VAR_USER);
     }
@@ -125,9 +128,10 @@ void cbInstrMov(const char* cmd)
         printf("%s=%X (%ud)\n", arg1, value, value);
     else
         printf("%s=%X\n", arg1, value);
+    return true;
 }
 
-void cbInstrVarList(const char* cmd)
+bool cbInstrVarList(const char* cmd)
 {
     dbg("varlist");
     char arg1[deflen]="";
@@ -143,16 +147,20 @@ void cbInstrVarList(const char* cmd)
     if(!cur)
     {
         puts("no variables");
-        return;
+        return true;
     }
-    char* name=0;
     unsigned int value=0;
     bool bNext=true;
     while(bNext)
     {
-        name=cur->name;
-        if(name)
+        if(cur->name)
         {
+            char name[deflen]="";
+            strcpy(name, cur->name);
+            int len=strlen(name);
+            for(int i=0; i<len; i++)
+                if(name[i]==1)
+                    name[i]='/';
             value=(unsigned int)cur->value;
             if(filter)
             {
@@ -176,4 +184,5 @@ void cbInstrVarList(const char* cmd)
         if(!cur)
             bNext=false;
     }
+    return true;
 }

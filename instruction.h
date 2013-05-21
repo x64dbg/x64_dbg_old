@@ -4,10 +4,10 @@
 #include "_global.h"
 
 //functions
-void cbBadCmd(const char* cmd);
-void cbInstrVar(const char* cmd);
-void cbInstrVarDel(const char* cmd);
-void cbInstrMov(const char* cmd);
-void cbInstrVarList(const char* cmd);
+bool cbBadCmd(const char* cmd);
+bool cbInstrVar(const char* cmd);
+bool cbInstrVarDel(const char* cmd);
+bool cbInstrMov(const char* cmd);
+bool cbInstrVarList(const char* cmd);
 
 #endif // _INSTRUCTIONS_H

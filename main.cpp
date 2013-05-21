@@ -4,66 +4,48 @@
 #include "variable.h"
 #include "instruction.h"
 
-static const char* commands[]=
+static bool cbStrLen(const char* cmd)
 {
-    "x\1exit", //1:quit debugger
-    "strlen\1charcount\1ccount", //2:get strlen, arg1:string
-    "var\1varnew", //3:make a variable arg1:name,[arg2:value]
-    "vardel", //4:delete a variable, arg1:variable name
-    "mov\1set", //5:mov a variable, arg1:dest,arg2:src
-    "cls", //6:clear the screen
-    "varlist", //7:list variables[arg1:type filter]
-    "InitDebugger\1init\1initdbg", //8:init debugger arg1:exefile,[arg2:commandline]
-};
-
-static void CharacterCount(const char* arg1)
-{
-    printf("\"%s\"[%d]\n", arg1, strlen(arg1));
+    char arg1[deflen]="";
+    if(argget(cmd, arg1, 0, false))
+        printf("\"%s\"[%d]\n", arg1, strlen(arg1));
+    return true;
 }
 
-static bool cbMainCommandLoop(const char* cmd, COMMAND_LIST* cmd_list)
+static bool cbExit(const char* cmd)
 {
-    //COMMAND_LIST cmd_list={sizeof(commands), commands};
-    switch(cmdnum(cmd, cmd_list))
-    {
-    case 7: //varlist
-        cbInstrVarList(cmd);
-        break;
-    case 6: //cls
-        system("cls");
-        break;
-    case 5: //mov
-        cbInstrMov(cmd);
-        break;
-    case 4: //vardel
-        cbInstrVarDel(cmd);
-        break;
-    case 3: //var
-        cbInstrVar(cmd);
-        break;
-    case 2: //strlen
-    {
-        char arg1[deflen]="";
-        if(!argget(cmd, arg1, 0, false))
-            break;
-        CharacterCount(arg1);
-    }
-    break;
-    case 1: //x
-        return false;
-        break;
-    case 0: //variable/unknown command
-        cbBadCmd(cmd);
-        break;
-    }
+    return false;
+}
+
+static bool cbCls(const char* cmd)
+{
+    system("cls");
     return true;
+}
+
+static COMMAND* command_list=0;
+
+static void registercommands()
+{
+
+    command_list=(COMMAND*)malloc(sizeof(COMMAND));
+    memset(command_list, 0, sizeof(COMMAND));
+    COMMAND* cmd=command_list;
+    cmdnew(cmd, "exit\1x", cbExit); //quit debugger
+    cmdnew(cmd, "strlen\1charcount\1ccount", cbStrLen); //get strlen, arg1:string
+    cmdnew(cmd, "varnew\1var", cbInstrVar); //make a variable arg1:name,[arg2:value]
+    cmdnew(cmd, "vardel", cbInstrVarDel); //delete a variable, arg1:variable name
+    cmdnew(cmd, "mov\1set", cbInstrMov); //mov a variable, arg1:dest,arg2:src
+    cmdnew(cmd, "cls", cbCls); //clear the screen
+    cmdnew(cmd, "varlist", cbInstrVarList); //list variables[arg1:type filter]
+    //cmdnew(cmd, "InitDebugger\1init\1initdbg", 0); //init debugger arg1:exefile,[arg2:commandline]
 }
 
 int main()
 {
     dbg("main");
     varinit();
-    COMMAND_LIST cmd_list={sizeof(commands), commands};
-    cmdloop(cbMainCommandLoop, &cmd_list);
+    registercommands();
+    cmdloop(command_list, cbBadCmd);
     return 0;
 }

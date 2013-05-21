@@ -3,18 +3,21 @@
 
 #include "_global.h"
 
-struct COMMAND_LIST
+//typedefs
+typedef bool (*CBCOMMAND)(const char*);
+
+struct COMMAND
 {
-    unsigned int size;
-    const char** commands;
+    char* name;
+    CBCOMMAND cbCommand;
+    COMMAND* next;
 };
 
-//typdefs
-typedef bool (*CBCOMMANDFATHER)(const char*, COMMAND_LIST*);
-typedef bool (*CBCOMMANDCHILD)(const char*);
-
 //functions
-int cmdnum(const char* cmd, COMMAND_LIST* command_list);
-void cmdloop(CBCOMMANDFATHER cbCommandFather, COMMAND_LIST* command_list);
+bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand);
+bool cmddel(COMMAND* command_list, const char* name);
+CBCOMMAND cmdget(COMMAND* command_list, const char* cmd);
+CBCOMMAND cmdset(COMMAND* command_list, const char* name, CBCOMMAND cbCommand);
+void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand);
 
 #endif // _COMMAND_H

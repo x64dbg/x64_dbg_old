@@ -2,6 +2,8 @@
 
 bool arraycontains(const char* cmd_list, const char* cmd)
 {
+    if(!cmd_list or !cmd)
+        return false;
     char temp[deflen]="";
     strcpy(temp, cmd_list);
     int len=strlen(cmd_list);

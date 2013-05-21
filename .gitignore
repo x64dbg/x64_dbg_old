@@ -4,3 +4,5 @@ obj/
 *.layout
 ODbgScript.chm
 ODbgScript.chw
+CppCheckResults.xml
+*.cscope_file_list
