@@ -94,31 +94,31 @@ Debugger module constants . 21
 	*HideDebugger function . 106 
 	*UnHideDebugger function  107 
 	*GetPEBLocation function  108 
-	SetEngineVariable function . 109 
+	**SetEngineVariable function . 109 
 Threader module  110 
 Threader module structures . 111 
-	ThreaderGetThreadInfo function  112 
-	ThreaderGetThreadData function  113 
-	ThreaderEnumThreadInfo function  114 
-	ThreaderPauseThread function  115 
-	ThreaderResumeThread function . 116 
-	ThreaderTerminateThread function . 117 
-	ThreaderPauseAllThreads function . 118 
-	ThreaderResumeAllThreads function . 119 
-	ThreaderPauseProcess function . 120 
-	ThreaderResumeProcess function  121 
-	ThreaderIsThreadStillRunning function  122 
-	ThreaderIsThreadActive function . 123 
-	ThreaderIsAnyThreadActive function . 124 
-	ThreaderIsExceptionInMainThread function  125 
-	ThreaderGetOpenHandleForThread function  126 
-	ThreaderSetCallBackForNextExitThreadEvent function . 127 
-	ThreaderCreateRemoteThreadEx function . 128 
-	ThreaderCreateRemoteThread function  129 
-	ThreaderInjectAndExecuteCodeEx function . 130 
-	ThreaderInjectAndExecuteCode function . 131 
-	ThreaderExecuteOnlyInjectedThreads function . 132 
-	ThreaderImportRunningThreadData function  133 
+	**ThreaderGetThreadInfo function  112 
+	**ThreaderGetThreadData function  113 
+	**ThreaderEnumThreadInfo function  114 
+	**ThreaderPauseThread function  115 
+	**ThreaderResumeThread function . 116 
+	**ThreaderTerminateThread function . 117 
+	**ThreaderPauseAllThreads function . 118 
+	**ThreaderResumeAllThreads function . 119 
+	**ThreaderPauseProcess function . 120 
+	**ThreaderResumeProcess function  121 
+	**ThreaderIsThreadStillRunning function  122 
+	**ThreaderIsThreadActive function . 123 
+	**ThreaderIsAnyThreadActive function . 124 
+	**ThreaderIsExceptionInMainThread function  125 
+	**ThreaderGetOpenHandleForThread function  126 
+	**ThreaderSetCallBackForNextExitThreadEvent function . 127 
+	**ThreaderCreateRemoteThreadEx function . 128 
+	**ThreaderCreateRemoteThread function  129 
+	**ThreaderInjectAndExecuteCodeEx function . 130 
+	**ThreaderInjectAndExecuteCode function . 131 
+	**ThreaderExecuteOnlyInjectedThreads function . 132 
+	**ThreaderImportRunningThreadData function  133 
 TLS module  134 
 	TLSBreakOnCallBack function . 135 
 	TLSBreakOnCallBackEx function 136 
@@ -132,11 +132,11 @@ TLS module  134
 Librarian module . 144 
 Librarian module constants  145 
 Librarian module structures 145 
-	LibrarianSetBreakPoint function . 146 
-	LibrarianRemoveBreakPoint function . 147 
-	LibrarianGetLibraryInfo function  148 
-	LibrarianGetLibraryInfoEx function . 149 
-	LibrarianEnumLibraryInfo function . 150 
+	*LibrarianSetBreakPoint function . 146 
+	*LibrarianRemoveBreakPoint function . 147 
+	*LibrarianGetLibraryInfo function  148 
+	*LibrarianGetLibraryInfoEx function . 149 
+	**LibrarianEnumLibraryInfo function . 150 
 Hooks module . 151 
 Hooks module constants. 152 
 Hooks module structures  152 
@@ -163,12 +163,12 @@ OEP Finder module . 172
 	FindOEPInit function . 173 
 	FindOEPGenerically function  174 
 Process module . 175 
-	GetActiveProcessId function . 176 
-	EnumProcessesWithLibrary function  177 
-	RemoteLoadLibrary function  178 
-	RemoteFreeLibrary function . 179 
-	RemoteExitProcess function . 180 
-	TranslateNativeName function . 181 
+	*GetActiveProcessId function . 176 
+	*EnumProcessesWithLibrary function  177 
+	*RemoteLoadLibrary function  178 
+	*RemoteFreeLibrary function . 179 
+	*RemoteExitProcess function . 180 
+	*TranslateNativeName function . 181 
 Dumper module  182 
 Dumper module constants . 183 
 Dumper module structures . 184 
@@ -180,7 +180,7 @@ Dumper module structures . 184
 	*DumpRegionsEx function  191 
 	*DumpModule function  192 
 	*DumpModuleEx function  193 
-	PastePEHeader function . 194 
+	*PastePEHeader function . 194 
 	ExtractSection function . 195 
 	ResortFileSections function  196 
 	FindOverlay function . 197 
@@ -228,16 +228,16 @@ Importer module structures . 224
 	ImporterGetAPIName function . 239 
 	ImporterGetAPINameEx function . 240 
 	ImporterGetAPIOrdinalNumber function . 241 
-	ImporterGetRemoteAPIAddress function . 242 
-	ImporterGetRemoteAPIAddressEx function . 243 
+	*ImporterGetRemoteAPIAddress function . 242 
+	*ImporterGetRemoteAPIAddressEx function . 243 
 	ImporterGetLocalAPIAddress function . 244 
-	ImporterGetDLLNameFromDebugee function . 245 
-	ImporterGetAPINameFromDebugee function  246 
-	ImporterGetAPIOrdinalNumberFromDebugee function  247 
+	*ImporterGetDLLNameFromDebugee function . 245 
+	*ImporterGetAPINameFromDebugee function  246 
+	*ImporterGetAPIOrdinalNumberFromDebugee function  247 
 	ImporterGetDLLIndexEx function . 248 
 	ImporterGetDLLIndex function . 249 
-	ImporterGetRemoteDLLBase function  250 
-	ImporterGetRemoteDLLBaseEx function  251 
+	*ImporterGetRemoteDLLBase function  250 
+	*ImporterGetRemoteDLLBaseEx function  251 
 	ImporterIsForwardedAPI function  252 
 	ImporterGetForwardedAPIName function . 253 
 	ImporterGetForwardedAPIOrdinalNumber function . 254 
@@ -299,7 +299,7 @@ Exporter module . 305
 	ExporterEstimatedSize function  312 
 	ExporterBuildExportTableEx function . 313 
 	ExporterBuildExportTable function. 314 
-	ExporterLoadExportTable function . 315 
+	*ExporterLoadExportTable function . 315 
 Resourcer module . 316 
 	ResourcerLoadFileForResourceUse function  317 
 	ResourcerFreeLoadedFile function . 318 

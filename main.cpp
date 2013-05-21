@@ -16,14 +16,15 @@ static const char* commands[]=
     "InitDebugger\1init\1initdbg", //8:init debugger arg1:exefile,[arg2:commandline]
 };
 
-void CharacterCount(const char* arg1)
+static void CharacterCount(const char* arg1)
 {
     printf("\"%s\"[%d]\n", arg1, strlen(arg1));
 }
 
-bool cbCommandLoop(const char* cmd)
+static bool cbMainCommandLoop(const char* cmd, COMMAND_LIST* cmd_list)
 {
-    switch(cmdnum(cmd, commands, sizeof(commands))+1)
+    //COMMAND_LIST cmd_list={sizeof(commands), commands};
+    switch(cmdnum(cmd, cmd_list))
     {
     case 7: //varlist
         cbInstrVarList(cmd);
@@ -43,7 +44,7 @@ bool cbCommandLoop(const char* cmd)
     case 2: //strlen
     {
         char arg1[deflen]="";
-        if(!getarg(cmd, arg1, 0, false))
+        if(!argget(cmd, arg1, 0, false))
             break;
         CharacterCount(arg1);
     }
@@ -60,7 +61,9 @@ bool cbCommandLoop(const char* cmd)
 
 int main()
 {
+    dbg("main");
     varinit();
-    commandloop(cbCommandLoop);
+    COMMAND_LIST cmd_list={sizeof(commands), commands};
+    cmdloop(cbMainCommandLoop, &cmd_list);
     return 0;
 }

@@ -9,7 +9,7 @@ static VAR* varfind(const char* name, VAR** link)
     if(!cur)
         return 0;
     VAR* prev=cur;
-    while(!scmp(cur->name, name))
+    while(!arraycontains(cur->name, name))
     {
         if(!cur->next)
             return 0;
@@ -24,10 +24,10 @@ static VAR* varfind(const char* name, VAR** link)
 void varinit()
 {
     dbg("varinit");
-    varnew("res", 0, VAR_SYSTEM);
+    varnew("$res\1$result", 0, VAR_SYSTEM);
 }
 
-VAR* getvarptr()
+VAR* vargetptr()
 {
     return vars;
 }
@@ -76,19 +76,19 @@ bool varget(const char* name, void* value, VAR_TYPE* type)
     return true;
 }
 
-bool varset(const char* name, void* value)
+bool varset(const char* name, void* value, bool setreadonly)
 {
     dbg("varset");
     VAR* found=varfind(name, 0);
     if(!found)
         return false;
-    if(found->type==VAR_READONLY)
+    if(!setreadonly and found->type==VAR_READONLY)
         return false;
     found->value=value;
     return true;
 }
 
-bool vardel(const char* name_)
+bool vardel(const char* name_, bool delsystem)
 {
     dbg("vardel");
     char* name=(char*)malloc(strlen(name_)+2);
@@ -105,7 +105,7 @@ bool vardel(const char* name_)
     if(!found)
         return false;
     VAR_TYPE type=found->type;
-    if(type!=VAR_USER)
+    if(!delsystem and type!=VAR_USER)
         return false;
     free(found->name);
     prev->next=found->next;
@@ -113,7 +113,7 @@ bool vardel(const char* name_)
     return true;
 }
 
-bool isregister(const char* string)
+static bool isregister(const char* string)
 {
     if(scmp(string, "eax"))
         return true;
@@ -228,7 +228,7 @@ bool isregister(const char* string)
     return false;
 }
 
-bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TYPE* var_type)
+bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TYPE* var_type, bool* isvar)
 {
     if(!*string)
     {
@@ -237,23 +237,31 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
         return true;
     }
     if(*string=='$') //variable
+    {
+        if(isvar)
+            *isvar=true;
         return varget(string, value, var_type);
+    }
     if(isregister(string)) //register
     {
         //TODO: getregister
         void** val=(void**)value;
-        *val=(void*)0xFFFFFFFF;
+        *val=(void*)0xFFFF;
         if(value_size)
             *value_size=sizeof(unsigned int);
+        if(isvar)
+            *isvar=true;
         return true;
     }
     if(*string=='!') //flag
     {
         //TODO: getflag
         void** val=(void**)value;
-        *val=(void*)0xFFFFFFFF;
+        *val=(void*)1;
         if(value_size)
             *value_size=0;
+        if(isvar)
+            *isvar=true;
         return true;
     }
     char* temp=(char*)malloc(strlen(string)+1);
@@ -268,8 +276,6 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
         if(!*temp)
             return false;
         sscanf(temp, "%u", (unsigned int*)value);
-        if(value_size)
-            *value_size=sizeof(unsigned int);
         return true;
     }
     //hexadecimal value

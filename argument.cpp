@@ -20,7 +20,7 @@ formatarg:
 11) restore double backslash
 12) combine formatted arguments and command
 */
-void formatarg(char* cmd)
+void argformat(char* cmd)
 {
     //puts("[DEBUG] formatarg");
     char command[deflen]="";
@@ -154,9 +154,9 @@ void formatarg(char* cmd)
 1) remove double backslash
 2) count unescaped commas
 */
-int getargcount(const char* cmd)
+int arggetcount(const char* cmd)
 {
-    //puts("[DEBUG] getargcount");
+    //puts("[DEBUG] arggetcount");
     int len=strlen(cmd);
     if(!len)
         return -1;
@@ -195,9 +195,9 @@ int getargcount(const char* cmd)
 4) restore double backslash
 5) handle escape characters
 */
-bool getarg(const char* cmd, char* arg, int arg_num, bool optional)
+bool argget(const char* cmd, char* arg, int arg_num, bool optional)
 {
-    int argcount=getargcount(cmd);
+    int argcount=arggetcount(cmd);
     if((arg_num+1)>argcount)
     {
         if(!optional)

@@ -9,26 +9,6 @@
 
 #pragma pack(push, 1)
 
-// Engine.Libs:
-/*#define TitanEngineLinkLibs
-#define TitanEngineSubFolderSDK  // Comment out this line to have SDK in default folder!
-
-#ifdef TitanEngineLinkLibs
-	#ifdef TitanEngineSubFolderSDK
-		#if defined(_WIN64)
-			#pragma comment(lib, "sdk\\TitanEngine_x64.lib")
-		#else
-			#pragma comment(lib, "sdk\\TitanEngine_x86.lib")
-		#endif
-	#else
-		#if defined(_WIN64)
-			#pragma comment(lib, "TitanEngine_x64.lib")
-		#else
-			#pragma comment(lib, "TitanEngine_x86.lib")
-		#endif
-	#endif
-#endif*/
-
 // Global.Constant.Structure.Declaration:
 // Engine.External:
 #define UE_ACCESS_READ 0

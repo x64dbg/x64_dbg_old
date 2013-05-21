@@ -4,8 +4,8 @@
 #include "_global.h"
 
 //functions
-bool getarg(const char* cmd, char* arg, int arg_num, bool optional);
-int getargcount(const char* cmd);
-void formatarg(char* cmd);
+bool argget(const char* cmd, char* arg, int arg_num, bool optional);
+int arggetcount(const char* cmd);
+void argformat(char* cmd);
 
 #endif

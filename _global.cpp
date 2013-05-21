@@ -1,5 +1,28 @@
 #include "_global.h"
 
+bool arraycontains(const char* cmd_list, const char* cmd)
+{
+    char temp[deflen]="";
+    strcpy(temp, cmd_list);
+    int len=strlen(cmd_list);
+    for(int i=0; i<len; i++)
+        if(temp[i]==1)
+            temp[i]=0;
+    if(!strcasecmp(temp, cmd))
+        return true;
+    for(int i=0; i<len; i++)
+    {
+        if(!temp[i])
+        {
+            i++;
+            if(!strcasecmp(temp+i, cmd))
+                return true;
+            i+=strlen(temp+i);
+        }
+    }
+    return false;
+}
+
 bool scmp(const char* a, const char* b)
 {
     dbg("scmp");
