@@ -14,6 +14,7 @@ struct COMMAND
 };
 
 //functions
+COMMAND* cmdinit();
 bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand);
 bool cmddel(COMMAND* command_list, const char* name);
 CBCOMMAND cmdget(COMMAND* command_list, const char* cmd);

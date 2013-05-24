@@ -27,10 +27,7 @@ static COMMAND* command_list=0;
 
 static void registercommands()
 {
-
-    command_list=(COMMAND*)malloc(sizeof(COMMAND));
-    memset(command_list, 0, sizeof(COMMAND));
-    COMMAND* cmd=command_list;
+    COMMAND* cmd=command_list=cmdinit();
     cmdnew(cmd, "exit\1x", cbExit); //quit debugger
     cmdnew(cmd, "strlen\1charcount\1ccount", cbStrLen); //get strlen, arg1:string
     cmdnew(cmd, "varnew\1var", cbInstrVar); //make a variable arg1:name,[arg2:value]

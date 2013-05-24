@@ -22,6 +22,14 @@ static COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
     return 0;
 }
 
+COMMAND* cmdinit()
+{
+    dbg("cmdinit");
+    COMMAND* cmd=(COMMAND*)malloc(sizeof(COMMAND));
+    memset(cmd, 0, sizeof(COMMAND));
+    return cmd;
+}
+
 bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand)
 {
     dbg("cmdnew");
