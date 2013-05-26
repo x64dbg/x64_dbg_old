@@ -29,6 +29,8 @@ void varinit()
     vars=(VAR*)malloc(sizeof(VAR));
     memset(vars, 0, sizeof(VAR));
     varnew("$res\1$result", 0, VAR_SYSTEM);
+    varnew("$hp\1$hProcess", 0, VAR_READONLY);
+    varnew("$pid", 0, VAR_READONLY);
 }
 
 VAR* vargetptr()
@@ -68,7 +70,7 @@ bool varnew(const char* name_, void* value, VAR_TYPE type)
     memset(var, 0, sizeof(VAR));
     var->name=name;
     var->type=type;
-    var->value=value;
+    var->value.value=value;
     if(!nonext)
     {
         VAR* cur=vars;
@@ -79,7 +81,7 @@ bool varnew(const char* name_, void* value, VAR_TYPE type)
     return true;
 }
 
-bool varget(const char* name, void* value, VAR_TYPE* type)
+bool varget(const char* name, void* value, int* size, VAR_TYPE* type)
 {
     dbg("varget");
     VAR* found=varfind(name, 0);
@@ -92,7 +94,7 @@ bool varget(const char* name, void* value, VAR_TYPE* type)
     if(type)
         *type=found->type;
     void** val=(void**)value;
-    *val=found->value;
+    *val=found->value.value;
     return true;
 }
 
@@ -104,7 +106,7 @@ bool varset(const char* name, void* value, bool setreadonly)
         return false;
     if(!setreadonly and found->type==VAR_READONLY)
         return false;
-    found->value=value;
+    found->value.value=value;
     return true;
 }
 
@@ -275,7 +277,7 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
     {
         if(isvar)
             *isvar=true;
-        return varget(string, value, var_type);
+        return varget(string, value, value_size, var_type);
     }
     if(isregister(string)) //register
     {

@@ -9,6 +9,7 @@ bool cbBadCmd(const char* cmd)
     bool isvar=false;
     if(getvaluefromstring(cmd, &value, &valsize, 0, &isvar)) //dump variable/value/register/etc
     {
+        printf("[DEBUG] valsize: %d\n", valsize);
         if(valsize)
             valsize*=2;
         else
@@ -123,7 +124,7 @@ bool cbInstrMov(const char* cmd)
         varnew(arg1, (void*)set_value, VAR_USER);
     }
     unsigned int value=0;
-    varget(arg1, &value, 0);
+    varget(arg1, &value, 0, 0);
     if(value>15)
         printf("%s=%X (%ud)\n", arg1, value, value);
     else
@@ -161,7 +162,7 @@ bool cbInstrVarList(const char* cmd)
             for(int i=0; i<len; i++)
                 if(name[i]==1)
                     name[i]='/';
-            value=(unsigned int)cur->value;
+            value=(unsigned int)cur->value.value;
             if(filter)
             {
                 if(cur->type==filter)

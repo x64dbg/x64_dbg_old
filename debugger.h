@@ -3,4 +3,7 @@
 
 #include "_global.h"
 
+//functions
+bool cbInitDebug(const char* cmd);
+
 #endif // _DEBUGGER_H

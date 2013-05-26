@@ -3,6 +3,7 @@
 #include "command.h"
 #include "variable.h"
 #include "instruction.h"
+#include "debugger.h"
 
 static bool cbStrLen(const char* cmd)
 {
@@ -35,7 +36,7 @@ static void registercommands()
     cmdnew(cmd, "mov\1set", cbInstrMov); //mov a variable, arg1:dest,arg2:src
     cmdnew(cmd, "cls", cbCls); //clear the screen
     cmdnew(cmd, "varlist", cbInstrVarList); //list variables[arg1:type filter]
-    //cmdnew(cmd, "InitDebugger\1init\1initdbg", 0); //init debugger arg1:exefile,[arg2:commandline]
+    cmdnew(cmd, "InitDebug\1init\1initdbg", cbInitDebug); //init debugger arg1:exefile,[arg2:commandline]
 }
 
 int main()
