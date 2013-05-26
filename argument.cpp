@@ -225,7 +225,7 @@ bool argget(const char* cmd, char* arg, int arg_num, bool optional)
             temp[i]=0;
     }
     for(int i=0; i<len; i++)
-        if(temp[i]=='\\' and temp[i+1]=='\\')
+        if(temp[i]==1 and temp[i+1]==1)
         {
             temp[i]='\\';
             temp[i+1]='\\';

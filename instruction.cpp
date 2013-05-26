@@ -9,7 +9,7 @@ bool cbBadCmd(const char* cmd)
     bool isvar=false;
     if(getvaluefromstring(cmd, &value, &valsize, 0, &isvar)) //dump variable/value/register/etc
     {
-        printf("[DEBUG] valsize: %d\n", valsize);
+        //printf("[DEBUG] valsize: %d\n", valsize);
         if(valsize)
             valsize*=2;
         else
