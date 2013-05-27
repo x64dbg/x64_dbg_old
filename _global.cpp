@@ -87,3 +87,15 @@ void formatdec(char* string)
     strcpy(string, new_string);
     free(new_string);
 }
+
+bool FileExists(const char* file)
+{
+    DWORD attrib=GetFileAttributes(file);
+    return (attrib != INVALID_FILE_ATTRIBUTES && !(attrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+bool DirExists(const char* dir)
+{
+    DWORD attrib=GetFileAttributes(dir);
+    return (attrib==FILE_ATTRIBUTE_DIRECTORY);
+}

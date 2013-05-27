@@ -24,15 +24,17 @@ enum WAIT_ID
 #define deflen 1024
 
 //functions
+void waitclear();
+void wait(WAIT_ID id);
+void lock(WAIT_ID id);
+void unlock(WAIT_ID id);
+
 bool arraycontains(const char* cmd_list, const char* cmd);
 bool scmp(const char* a, const char* b);
 void dbg(const char* a);
 void formathex(char* string);
 void formatdec(char* string);
-
-void waitclear();
-void wait(WAIT_ID id);
-void lock(WAIT_ID id);
-void unlock(WAIT_ID id);
+bool FileExists(const char* file);
+bool DirExists(const char* dir);
 
 #endif // _GLOBAL_H
