@@ -76,8 +76,6 @@ void consoleinsert(const char* text)
     consolesetlasty();
 }
 
-
-
 int consolegetlasty()
 {
     return lasty;

@@ -5,3 +5,7 @@ ODbgScript.chm
 ODbgScript.chw
 CppCheckResults.xml
 *.cscope_file_list
+.cccc/
+test.dll
+test.exe
+bin/TitanEngine.dll

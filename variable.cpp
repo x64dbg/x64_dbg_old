@@ -28,7 +28,9 @@ void varinit()
     dbg("varinit");
     vars=(VAR*)malloc(sizeof(VAR));
     memset(vars, 0, sizeof(VAR));
+    //General variables
     varnew("$res\1$result", 0, VAR_SYSTEM);
+    //InitDebug variables
     varnew("$hp\1$hProcess", 0, VAR_READONLY);
     varnew("$pid", 0, VAR_READONLY);
 }
