@@ -24,7 +24,8 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     if(!fdProcessInfo)
     {
         puts("error starting process (invalid pe?)!");
-        return true;
+        unlock(WAITID_SYSBREAK);
+        return 0;
     }
     varset("$hp", (void*)fdProcessInfo->hProcess, true);
     varset("$pid", (void*)fdProcessInfo->dwProcessId, true);
@@ -33,7 +34,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     DebugLoop();
     //message the user/do final stuff
     consoleinsert("debugging stopped!");
-    waitclear();
+    unlock(WAITID_SYSBREAK);
     return 0;
 }
 
@@ -71,9 +72,6 @@ bool cbInitDebug(const char* cmd)
     init->exe=arg1;
     init->commandline=commandline;
     init->currentfolder=currentfolder;
-
-    //printf("[DEBUG] InitDebug(\"%s\", \"%s\", \"%s\");\n", arg1, commandline, currentfolder);
-
 
     //initialize
     waitclear(); //clear waiting flags

@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fomit-frame-pointer" />
+					<Add option="-Os" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -24,6 +25,9 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add library="shlwapi" />
+		</Linker>
 		<Unit filename="TitanEngine.h" />
 		<Unit filename="_global.cpp" />
 		<Unit filename="_global.h" />
