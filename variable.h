@@ -2,7 +2,6 @@
 #define _VARIABLE_H
 
 #include "_global.h"
-#include "command.h"
 
 //TODO: VAR_VALUE struct usage
 

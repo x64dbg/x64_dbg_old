@@ -1,5 +1,6 @@
 #include "command.h"
 #include "argument.h"
+#include "console.h"
 
 static COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
 {
@@ -124,13 +125,18 @@ void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
     while(bLoop)
     {
         printf(">");
+        consolesetlasty();
         fgets(command, deflen, stdin);
         command[strlen(command)-1]=0;
-        argformat(command);
-        CBCOMMAND cbCommand=cmdget(command_list, command);
-        if(!cbCommand)
-            bLoop=cbUnknownCommand(command);
-        else
-            bLoop=cbCommand(command);
+        int len=strlen(command);
+        if(len)
+        {
+            argformat(command);
+            CBCOMMAND cbCommand=cmdget(command_list, command);
+            if(!cbCommand)
+                bLoop=cbUnknownCommand(command);
+            else
+                bLoop=cbCommand(command);
+        }
     }
 }

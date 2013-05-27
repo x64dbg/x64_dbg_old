@@ -31,6 +31,8 @@
 		<Unit filename="argument.h" />
 		<Unit filename="command.cpp" />
 		<Unit filename="command.h" />
+		<Unit filename="console.cpp" />
+		<Unit filename="console.h" />
 		<Unit filename="debugger.cpp" />
 		<Unit filename="debugger.h" />
 		<Unit filename="instruction.cpp" />

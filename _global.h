@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <windows.h>
 
 //defines
 #define deflen 1024

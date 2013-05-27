@@ -15,9 +15,10 @@ html,body {
 </head>
 
 <body>
-<P><STRONG>InitDebug,[initdbg,init]<BR></STRONG>Initializes 
-the debugger. This command will load the executable and break at the system 
-breakpoint or program entry point before giving back control to the 
+<P><STRONG>InitDebug,[initdbg,init]<BR></STRONG>Initializes the debugger. This command will load 
+the executable (do some basic checks),&nbsp;set breakpoints on TLS callbacks 
+   (if present), set a breakpoint at the process entry point&nbsp;and 
+break at the system breakpoint before giving back control to the 
 user.</P>
 <P><U>arguments</U><BR>&nbsp; arg1 : Path to the executable file to debug. If no 
 full path is given, the GetCurrentDirectory API will be called to retrieve a full path. 
@@ -32,9 +33,9 @@ full path is given, the GetCurrentDirectory API will be called to retrieve a ful
              
            
 </P>
-<P><U>result<BR></U>This command will give control back to the user, after 
-the initial breakpoint (or entry point breakpoint) is reached. It will set 
-<U>$pid</U> and&nbsp;<U>$hp/$hProcess</U>. 
+<P><U>result<BR></U>      This command will give 
+control back to the user, after the&nbsp;system breakpoint&nbsp;is reached. It will set 
+<U>$pid</U> and&nbsp;<U>$hp/$hProcess</U>variables. 
              
            
-</P></body></HTML>
+</P></head>
