@@ -1,10 +1,11 @@
 #include "instruction.h"
 #include "argument.h"
 #include "variable.h"
+#include "console.h"
 
 bool cbBadCmd(const char* cmd)
 {
-    unsigned int value=0;
+    uint value=0;
     int valsize=0;
     bool isvar=false;
     if(getvaluefromstring(cmd, &value, &valsize, 0, &isvar)) //dump variable/value/register/etc
@@ -70,7 +71,7 @@ bool cbInstrVar(const char* cmd)
     if(!argget(cmd, arg1, 0, false)) //var name
         return true;
     argget(cmd, arg2, 1, true); //var value (optional)
-    unsigned int value=0;
+    uint value=0;
     if(!getvaluefromstring(arg2, &value, 0, 0, 0))
     {
         printf("invalid value \"%s\"\n", arg2);
@@ -108,7 +109,7 @@ bool cbInstrMov(const char* cmd)
         return true;
     if(!argget(cmd, arg2, 1, false)) //src name
         return true;
-    unsigned int set_value=0;
+    uint set_value=0;
     if(!getvaluefromstring(arg2, &set_value, 0, 0, 0))
     {
         printf("invalid src \"%s\"\n", arg2);
@@ -123,7 +124,7 @@ bool cbInstrMov(const char* cmd)
         }
         varnew(arg1, (void*)set_value, VAR_USER);
     }
-    unsigned int value=0;
+    uint value=0;
     varget(arg1, &value, 0, 0);
     if(value>15)
         printf("%s=%X (%ud)\n", arg1, value, value);
@@ -147,10 +148,10 @@ bool cbInstrVarList(const char* cmd)
     VAR* cur=vargetptr();
     if(!cur)
     {
-        puts("no variables");
+        cputs("no variables");
         return true;
     }
-    unsigned int value=0;
+    uint value=0;
     bool bNext=true;
     while(bNext)
     {
@@ -162,7 +163,7 @@ bool cbInstrVarList(const char* cmd)
             for(int i=0; i<len; i++)
                 if(name[i]==1)
                     name[i]='/';
-            value=(unsigned int)cur->value.value;
+            value=(uint)cur->value.value;
             if(filter)
             {
                 if(cur->type==filter)

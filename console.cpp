@@ -89,3 +89,21 @@ int consolesetlasty()
     lasty=screeninfo.dwCursorPosition.Y;
     return lasty;
 }
+
+int cputs(const char* text)
+{
+    int ret=puts(text);
+    consolesetlasty();
+    return ret;
+}
+
+int cprintf(const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    char msg[deflen]="";
+    vsprintf(msg, format, args);
+    int ret=printf(msg);
+    consolesetlasty();
+    return ret;
+}

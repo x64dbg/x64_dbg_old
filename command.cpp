@@ -1,6 +1,7 @@
 #include "command.h"
 #include "argument.h"
 #include "console.h"
+#include "debugger.h"
 
 static COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
 {
@@ -31,7 +32,7 @@ COMMAND* cmdinit()
     return cmd;
 }
 
-bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand)
+bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool debugonly)
 {
     dbg("cmdnew");
     if(!command_list or !cbCommand or !name or !*name or cmdfind(command_list, name, 0))
@@ -49,6 +50,7 @@ bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand)
     cmd->name=(char*)malloc(strlen(name)+1);
     strcpy(cmd->name, name);
     cmd->cbCommand=cbCommand;
+    cmd->debugonly=debugonly;
     COMMAND* cur=command_list;
     if(!nonext)
     {
@@ -59,7 +61,7 @@ bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand)
     return true;
 }
 
-CBCOMMAND cmdget(COMMAND* command_list, const char* cmd)
+COMMAND* cmdget(COMMAND* command_list, const char* cmd)
 {
     dbg("cmdget");
     char new_cmd[deflen]="";
@@ -72,10 +74,10 @@ CBCOMMAND cmdget(COMMAND* command_list, const char* cmd)
     COMMAND* found=cmdfind(command_list, new_cmd, 0);
     if(!found)
         return 0;
-    return found->cbCommand;
+    return found;
 }
 
-CBCOMMAND cmdset(COMMAND* command_list, const char* name, CBCOMMAND cbCommand)
+CBCOMMAND cmdset(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool debugonly)
 {
     dbg("cmdset");
     if(!cbCommand)
@@ -85,6 +87,7 @@ CBCOMMAND cmdset(COMMAND* command_list, const char* name, CBCOMMAND cbCommand)
         return 0;
     CBCOMMAND old=found->cbCommand;
     found->cbCommand=cbCommand;
+    found->debugonly=debugonly;
     return old;
 }
 
@@ -132,11 +135,17 @@ void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
         if(len)
         {
             argformat(command);
-            CBCOMMAND cbCommand=cmdget(command_list, command);
-            if(!cbCommand)
-                bLoop=cbUnknownCommand(command);
+            COMMAND* cmd=cmdget(command_list, command);
+            CBCOMMAND cbCommand=cmd->cbCommand;
+            if(cmd->debugonly and !IsFileBeingDebugged())
+                cputs("this command is debug-only");
             else
-                bLoop=cbCommand(command);
+            {
+                if(!cbCommand)
+                    bLoop=cbUnknownCommand(command);
+                else
+                    bLoop=cbCommand(command);
+            }
         }
     }
 }

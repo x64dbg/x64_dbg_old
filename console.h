@@ -7,5 +7,7 @@
 void consoleinsert(const char* text);
 int consolegetlasty();
 int consolesetlasty();
+int cputs(const char* text);
+int cprintf(const char* format, ...);
 
 #endif // _CONSOLE_H

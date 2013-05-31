@@ -14,6 +14,7 @@
 				<Compiler>
 					<Add option="-fomit-frame-pointer" />
 					<Add option="-Os" />
+					<Add option="-Wno-format" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -33,6 +34,8 @@
 		<Unit filename="_global.h" />
 		<Unit filename="argument.cpp" />
 		<Unit filename="argument.h" />
+		<Unit filename="breakpoint.cpp" />
+		<Unit filename="breakpoint.h" />
 		<Unit filename="command.cpp" />
 		<Unit filename="command.h" />
 		<Unit filename="console.cpp" />
@@ -42,6 +45,8 @@
 		<Unit filename="instruction.cpp" />
 		<Unit filename="instruction.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="threading.cpp" />
+		<Unit filename="threading.h" />
 		<Unit filename="variable.cpp" />
 		<Unit filename="variable.h" />
 		<Extensions>
@@ -49,6 +54,15 @@
 			<envvars />
 			<debugger />
 			<lib_finder disable_auto="1" />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

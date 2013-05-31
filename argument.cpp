@@ -2,29 +2,34 @@
 
 /*
 formatarg:
-01) get command (first space) and lowercase
-02) get arguments
-03) remove double quotes (from arguments)
-04) temp. remove double backslash
-05) remove prepended/appended non-escaped commas and spaces (from arguments)
+01) remove prepended spaces
+02) get command (first space) and lowercase
+03) get arguments
+04) remove double quotes (from arguments)
+05) temp. remove double backslash
+06) remove prepended/appended non-escaped commas and spaces (from arguments)
     a) prepended
     b) appended
-06) get quote count, ignore escaped (from arguments)
-07) process quotes (from arguments):
+07) get quote count, ignore escaped (from arguments)
+08) process quotes (from arguments):
     a) zero quotes
     b) restore double backslash
     c) escape commas and spaces
-08) temp. remove double backslash
-09) remove unescaped double commas (from arguments)
-10) remove unescaped spaces (from arguments)
-11) restore double backslash
-12) combine formatted arguments and command
+09) temp. remove double backslash
+10) remove unescaped double commas (from arguments)
+11) remove unescaped spaces (from arguments)
+12) restore double backslash
+13) combine formatted arguments and command
 */
 void argformat(char* cmd)
 {
-    //puts("[DEBUG] formatarg");
-    char command[deflen]="";
+    //cputs("[DEBUG] formatarg");
+    char command_[deflen]="";
+    char* command=command_;
     strcpy(command, cmd);
+    while(*command==' ')
+        command++;
+    //printf("[DEBUG] 1:command: \"%s\"[%d]\n", command, strlen(command));
     int len=strlen(command);
     int start=0;
     for(int i=0; i<len; i++)
@@ -156,7 +161,7 @@ void argformat(char* cmd)
 */
 int arggetcount(const char* cmd)
 {
-    //puts("[DEBUG] arggetcount");
+    //cputs("[DEBUG] arggetcount");
     int len=strlen(cmd);
     if(!len)
         return -1;

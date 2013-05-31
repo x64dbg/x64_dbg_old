@@ -12,23 +12,13 @@
 #include <conio.h>
 #include <windows.h>
 #include <shlwapi.h>
-
-//enums
-enum WAIT_ID
-{
-    WAITID_SYSBREAK=0,
-    WAITID_RUN=1
-};
+#include <stdarg.h>
 
 //defines
 #define deflen 1024
+#define uint unsigned long long
 
 //functions
-void waitclear();
-void wait(WAIT_ID id);
-void lock(WAIT_ID id);
-void unlock(WAIT_ID id);
-
 bool arraycontains(const char* cmd_list, const char* cmd);
 bool scmp(const char* a, const char* b);
 void dbg(const char* a);

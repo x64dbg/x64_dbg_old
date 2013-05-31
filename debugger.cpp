@@ -2,15 +2,19 @@
 #include "argument.h"
 #include "variable.h"
 #include "console.h"
+#include "threading.h"
 
 static PROCESS_INFORMATION* fdProcessInfo;
+static char szFileName[deflen]="";
 
 static void cbSystemBreakpoint(void* ExceptionData)
 {
     //handle stuff (TLS, main entry, etc)
-    puts("system breakpoint reached!");
+    cputs("system breakpoint reached!");
     //unlock
     unlock(WAITID_SYSBREAK);
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
 }
 
 static DWORD WINAPI threadDebugLoop(void* lpParameter)
@@ -23,10 +27,11 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
         fdProcessInfo=(PROCESS_INFORMATION*)InitDebug(init->exe, init->commandline, init->currentfolder);
     if(!fdProcessInfo)
     {
-        puts("error starting process (invalid pe?)!");
+        cputs("error starting process (invalid pe?)!");
         unlock(WAITID_SYSBREAK);
         return 0;
     }
+    strcpy(szFileName, init->exe);
     varset("$hp", (void*)fdProcessInfo->hProcess, true);
     varset("$pid", (void*)fdProcessInfo->dwProcessId, true);
     SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbSystemBreakpoint);
@@ -34,16 +39,18 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     DebugLoop();
     //message the user/do final stuff
     consoleinsert("debugging stopped!");
-    unlock(WAITID_SYSBREAK);
+    varset("$hp", (void*)0, true);
+    varset("$pid", (void*)0, true);
+    waitclear();
     return 0;
 }
 
-bool cbInitDebug(const char* cmd)
+bool cbDebugInit(const char* cmd)
 {
     dbg("cbInitDebug");
     if(IsFileBeingDebugged())
     {
-        puts("already debugging!");
+        cputs("already debugging!");
         return true;
     }
 
@@ -52,7 +59,7 @@ bool cbInitDebug(const char* cmd)
         return true;
     if(!FileExists(arg1))
     {
-        puts("file does not exsist!");
+        cputs("file does not exsist!");
         return true;
     }
 
@@ -78,9 +85,38 @@ bool cbInitDebug(const char* cmd)
     lock(WAITID_SYSBREAK);
     if(!CreateThread(0, 0, threadDebugLoop, init, 0, 0))
     {
-        puts("failed creating debug thread!");
+        cputs("failed creating debug thread!");
         return true;
     }
     wait(WAITID_SYSBREAK);
+    return true;
+}
+
+bool cbDebugRun(const char* cmd)
+{
+    if(!waitislocked(WAITID_RUN))
+    {
+        cputs("program is already running");
+        return true;
+    }
+    unlock(WAITID_RUN);
+    return true;
+}
+
+void cbEntryBreakpoint()
+{
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}
+
+bool cbDebugEpBreak(const char* cmd)
+{
+    dbg("cbDebugEpBreak");
+    uint imagebase=GetDebuggedFileBaseAddress();
+    uint ep=GetPE32Data(szFileName, 0, UE_OEP);
+    if(!SetBPX(imagebase+ep, UE_BREAKPOINT, (void*)cbEntryBreakpoint))
+        cputs("failed to set breakpoint!");
+    else
+        cputs("breakpoint set!");
     return true;
 }

@@ -287,7 +287,7 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
         void** val=(void**)value;
         *val=(void*)0xFFFF;
         if(value_size)
-            *value_size=sizeof(unsigned int);
+            *value_size=sizeof(uint);
         if(isvar)
             *isvar=true;
         return true;
@@ -314,7 +314,7 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
                 return false;
         if(!*temp)
             return false;
-        sscanf(temp, "%u", (unsigned int*)value);
+        sscanf(temp, "%u", (uint*)value);
         free(temp);
         return true;
     }
@@ -327,9 +327,9 @@ bool getvaluefromstring(const char* string, void* value, int* value_size, VAR_TY
             return false;
     if(!*temp)
         return false;
-    sscanf(temp, "%x", (unsigned int*)value);
+    sscanf(temp, "%x", (uint*)value);
     if(value_size)
-        *value_size=sizeof(unsigned int);
+        *value_size=sizeof(uint);
     free(temp);
     return true;
 }

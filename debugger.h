@@ -13,6 +13,8 @@ struct INIT_STRUCT
 };
 
 //functions
-bool cbInitDebug(const char* cmd);
+bool cbDebugInit(const char* cmd);
+bool cbDebugRun(const char* cmd);
+bool cbDebugEpBreak(const char* cmd);
 
 #endif // _DEBUGGER_H
