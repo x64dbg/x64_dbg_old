@@ -114,19 +114,8 @@ bool cbDebugRun(const char* cmd)
     return true;
 }
 
-bool cbDebugEpBreak(const char* cmd)
+bool cbDebugSetBPX(const char* cmd)
 {
-    dbg("cbDebugEpBreak");
-
-    uint imagebase;
-    if(bFileIsDll)
-        imagebase=GetDebuggedDLLBaseAddress();
-    else
-        imagebase=GetDebuggedFileBaseAddress();
-    uint ep=GetPE32Data(szFileName, 0, UE_OEP);
-    if(!SetBPX(imagebase+ep, UE_SINGLESHOOT, (void*)cbEntryBreakpoint))
-        cputs("failed to set breakpoint!");
-    else
-        cputs("breakpoint set!");
+    dbg("cbDebugSetBPX");
     return true;
 }

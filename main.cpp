@@ -38,7 +38,7 @@ static void registercommands()
     cmdnew(cmd, "varlist", cbInstrVarList, false); //list variables[arg1:type filter]
     cmdnew(cmd, "InitDebug\1init\1initdbg", cbDebugInit, false); //init debugger arg1:exefile,[arg2:commandline]
     cmdnew(cmd, "run\1r\1go\1g", cbDebugRun, true); //unlock WAITID_RUN
-    cmdnew(cmd, "epbreak", cbDebugEpBreak, true); //test command
+    cmdnew(cmd, "SetBPX\1bp\1bpx", cbDebugSetBPX, true); //breakpoint
 }
 
 int main()
