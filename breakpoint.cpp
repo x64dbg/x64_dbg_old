@@ -47,7 +47,7 @@ bool bpnew(BREAKPOINT* breakpoint_list, const char* name, void* addr, BP_TYPE ty
         strcpy(bp->name, name);
     }
     bp->addr=addr;
-
+    bp->type=type;
     BREAKPOINT* cur=breakpoint_list;
     if(!nonext)
     {
