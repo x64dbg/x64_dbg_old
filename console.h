@@ -4,7 +4,7 @@
 #include "_global.h"
 
 //functions
-void consoleinsert(const char* text);
+void cinsert(const char* text);
 int consolegetlasty();
 int consolesetlasty();
 int cputs(const char* text);

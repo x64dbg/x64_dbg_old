@@ -30,6 +30,10 @@ void varinit()
     memset(vars, 0, sizeof(VAR));
     //General variables
     varnew("$res\1$result", 0, VAR_SYSTEM);
+    varnew("$res1\1$result1", 0, VAR_SYSTEM);
+    varnew("$res2\1$result2", 0, VAR_SYSTEM);
+    varnew("$res3\1$result3", 0, VAR_SYSTEM);
+    varnew("$res4\1$result4", 0, VAR_SYSTEM);
     //InitDebug variables
     varnew("$hp\1$hProcess", 0, VAR_READONLY);
     varnew("$pid", 0, VAR_READONLY);

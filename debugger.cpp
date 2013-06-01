@@ -6,6 +6,15 @@
 
 static PROCESS_INFORMATION* fdProcessInfo;
 static char szFileName[deflen]="";
+bool bFileIsDll;
+
+static void cbEntryBreakpoint()
+{
+    cinsert("entry point reached!");
+    //lock
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}
 
 static void cbSystemBreakpoint(void* ExceptionData)
 {
@@ -13,6 +22,7 @@ static void cbSystemBreakpoint(void* ExceptionData)
     cputs("system breakpoint reached!");
     //unlock
     unlock(WAITID_SYSBREAK);
+    //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
 }
@@ -21,10 +31,11 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
 {
     //initialize
     INIT_STRUCT* init=(INIT_STRUCT*)lpParameter;
-    if(IsFileDLL(init->exe, 0))
-        fdProcessInfo=(PROCESS_INFORMATION*)InitDLLDebug(init->exe, false, init->commandline, init->currentfolder, 0);
+    bFileIsDll=IsFileDLL(init->exe, 0);
+    if(bFileIsDll)
+        fdProcessInfo=(PROCESS_INFORMATION*)InitDLLDebug(init->exe, false, init->commandline, init->currentfolder, (void*)cbEntryBreakpoint);
     else
-        fdProcessInfo=(PROCESS_INFORMATION*)InitDebug(init->exe, init->commandline, init->currentfolder);
+        fdProcessInfo=(PROCESS_INFORMATION*)InitDebugEx(init->exe, init->commandline, init->currentfolder, (void*)cbEntryBreakpoint);
     if(!fdProcessInfo)
     {
         cputs("error starting process (invalid pe?)!");
@@ -38,7 +49,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
     //message the user/do final stuff
-    consoleinsert("debugging stopped!");
+    cinsert("debugging stopped!");
     varset("$hp", (void*)0, true);
     varset("$pid", (void*)0, true);
     waitclear();
@@ -103,18 +114,17 @@ bool cbDebugRun(const char* cmd)
     return true;
 }
 
-void cbEntryBreakpoint()
-{
-    lock(WAITID_RUN);
-    wait(WAITID_RUN);
-}
-
 bool cbDebugEpBreak(const char* cmd)
 {
     dbg("cbDebugEpBreak");
-    uint imagebase=GetDebuggedFileBaseAddress();
+
+    uint imagebase;
+    if(bFileIsDll)
+        imagebase=GetDebuggedDLLBaseAddress();
+    else
+        imagebase=GetDebuggedFileBaseAddress();
     uint ep=GetPE32Data(szFileName, 0, UE_OEP);
-    if(!SetBPX(imagebase+ep, UE_BREAKPOINT, (void*)cbEntryBreakpoint))
+    if(!SetBPX(imagebase+ep, UE_SINGLESHOOT, (void*)cbEntryBreakpoint))
         cputs("failed to set breakpoint!");
     else
         cputs("breakpoint set!");

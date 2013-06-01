@@ -23,7 +23,7 @@ static void move_rect(int x, int y, int new_x, int new_y, int width, int height)
     delete [] buffer;
 }
 
-void consoleinsert(const char* text)
+void cinsert(const char* text)
 {
     //get height (in lines) of the text
     char text_[deflen]="";
