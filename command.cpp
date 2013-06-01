@@ -136,15 +136,20 @@ void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
         {
             argformat(command);
             COMMAND* cmd=cmdget(command_list, command);
-            CBCOMMAND cbCommand=cmd->cbCommand;
-            if(cmd->debugonly and !IsFileBeingDebugged())
-                cputs("this command is debug-only");
+            if(!cmd)
+                bLoop=cbUnknownCommand(command);
             else
             {
-                if(!cbCommand)
-                    bLoop=cbUnknownCommand(command);
+                CBCOMMAND cbCommand=cmd->cbCommand;
+                if(cmd->debugonly and !IsFileBeingDebugged())
+                    cputs("this command is debug-only");
                 else
-                    bLoop=cbCommand(command);
+                {
+                    if(!cbCommand)
+                        bLoop=cbUnknownCommand(command);
+                    else
+                        bLoop=cbCommand(command);
+                }
             }
         }
     }
