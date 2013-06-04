@@ -1,4 +1,5 @@
 #include "argument.h"
+#include "console.h"
 
 /*
 formatarg:
@@ -206,7 +207,7 @@ bool argget(const char* cmd, char* arg, int arg_num, bool optional)
     if((arg_num+1)>argcount)
     {
         if(!optional)
-            printf("missing argument nr %d\n", arg_num+1);
+            cprintf("missing argument nr %d\n", arg_num+1);
         return false;
     }
     int len=strlen(cmd);

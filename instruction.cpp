@@ -2,13 +2,14 @@
 #include "argument.h"
 #include "variable.h"
 #include "console.h"
+#include "value.h"
 
 bool cbBadCmd(const char* cmd)
 {
     uint value=0;
     int valsize=0;
     bool isvar=false;
-    if(getvaluefromstring(cmd, &value, &valsize, 0, &isvar)) //dump variable/value/register/etc
+    if(valfromstring(cmd, &value, &valsize, &isvar)) //dump variable/value/register/etc
     {
         //printf("[DEBUG] valsize: %d\n", valsize);
         if(valsize)
@@ -72,7 +73,7 @@ bool cbInstrVar(const char* cmd)
         return true;
     argget(cmd, arg2, 1, true); //var value (optional)
     uint value=0;
-    if(!getvaluefromstring(arg2, &value, 0, 0, 0))
+    if(!valfromstring(arg2, &value, 0, 0))
     {
         printf("invalid value \"%s\"\n", arg2);
         return true;
@@ -110,7 +111,7 @@ bool cbInstrMov(const char* cmd)
     if(!argget(cmd, arg2, 1, false)) //src name
         return true;
     uint set_value=0;
-    if(!getvaluefromstring(arg2, &set_value, 0, 0, 0))
+    if(!valfromstring(arg2, &set_value, 0, 0))
     {
         printf("invalid src \"%s\"\n", arg2);
         return true;

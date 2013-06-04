@@ -482,10 +482,9 @@ typedef struct
     DWORD OriginalCOMTableSize;
 } FILE_FIX_INFO, *PFILE_FIX_INFO;
 
-#if !defined (_WIN64)
 #ifdef __cplusplus
-extern "C" {
-#endif /*__cplusplus*/
+extern "C"
+{
 #endif
 
 // Global.Function.Declaration:
@@ -915,10 +914,8 @@ __declspec(dllexport) bool __stdcall ExtensionManagerUnloadAllPlugins();
 __declspec(dllexport) bool __stdcall ExtensionManagerUnloadPlugin(char* szPluginName);
 __declspec(dllexport) void* __stdcall ExtensionManagerGetPluginInfo(char* szPluginName);
 
-#if !defined (_WIN64)
 #ifdef __cplusplus
 }
-#endif /*__cplusplus*/
 #endif
 
 #pragma pack(pop)

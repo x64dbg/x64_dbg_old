@@ -44,7 +44,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     }
     strcpy(szFileName, init->exe);
     varset("$hp", (void*)fdProcessInfo->hProcess, true);
-    varset("$pid", (void*)fdProcessInfo->dwProcessId, true);
+    varset("$pid", (void*)(uint)fdProcessInfo->dwProcessId, true);
     SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbSystemBreakpoint);
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
@@ -114,8 +114,15 @@ bool cbDebugRun(const char* cmd)
     return true;
 }
 
-bool cbDebugSetBPX(const char* cmd)
+bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 {
     dbg("cbDebugSetBPX");
+    char argaddr[deflen]="";
+    if(!argget(cmd, argaddr, 0, false))
+        return true;
+    char argname[deflen]="";
+    argget(cmd, argname, 1, true);
+    char argtype[deflen]="";
+    argget(cmd, argtype, 2, true);
     return true;
 }

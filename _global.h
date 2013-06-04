@@ -16,7 +16,12 @@
 
 //defines
 #define deflen 1024
+
+#ifdef _WIN64
 #define uint unsigned long long
+#else
+#define uint unsigned long
+#endif // _WIN64
 
 //functions
 bool arraycontains(const char* cmd_list, const char* cmd);
