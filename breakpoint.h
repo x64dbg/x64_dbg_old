@@ -17,16 +17,16 @@ enum BP_TYPE
 struct BREAKPOINT
 {
     char* name;
-    void* addr;
+    uint addr;
     BP_TYPE type;
     BREAKPOINT* next;
 };
 
 //functions
 BREAKPOINT* bpinit();
-BREAKPOINT* bpfind(BREAKPOINT* breakpoint_list, const char* name, void* addr, BREAKPOINT** link);
-bool bpnew(BREAKPOINT* breakpoint_list, const char* name, void* addr);
-bool bpsetname(BREAKPOINT* breakpoint_list, void* addr, const char* name);
-bool bpdel(BREAKPOINT* breakpoint_list, const char* name, void* addr);
+BREAKPOINT* bpfind(BREAKPOINT* breakpoint_list, const char* name, uint addr, BREAKPOINT** link);
+bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr);
+bool bpsetname(BREAKPOINT* breakpoint_list, uint addr, const char* name);
+bool bpdel(BREAKPOINT* breakpoint_list, const char* name, uint addr);
 
 #endif // _BREAKPOINT_H

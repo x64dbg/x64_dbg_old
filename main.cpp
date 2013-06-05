@@ -43,7 +43,7 @@ static void registercommands()
 
 int main()
 {
-    dbg("main");
+    //dbg("main");
     varinit();
     registercommands();
     cmdloop(command_list, cbBadCmd);

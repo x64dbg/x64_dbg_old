@@ -19,6 +19,7 @@ static void cbEntryBreakpoint()
 static void cbSystemBreakpoint(void* ExceptionData)
 {
     //handle stuff (TLS, main entry, etc)
+    SetCustomHandler(UE_CH_CREATEPROCESS, 0);
     cputs("system breakpoint reached!");
     //unlock
     unlock(WAITID_SYSBREAK);
@@ -43,22 +44,22 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
         return 0;
     }
     strcpy(szFileName, init->exe);
-    varset("$hp", (void*)fdProcessInfo->hProcess, true);
-    varset("$pid", (void*)(uint)fdProcessInfo->dwProcessId, true);
+    varset("$hp", (uint)fdProcessInfo->hProcess, true);
+    varset("$pid", fdProcessInfo->dwProcessId, true);
     SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbSystemBreakpoint);
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
     //message the user/do final stuff
     cinsert("debugging stopped!");
-    varset("$hp", (void*)0, true);
-    varset("$pid", (void*)0, true);
+    varset("$hp", 0, true);
+    varset("$pid", 0, true);
     waitclear();
     return 0;
 }
 
 bool cbDebugInit(const char* cmd)
 {
-    dbg("cbInitDebug");
+    //dbg("cbInitDebug");
     if(IsFileBeingDebugged())
     {
         cputs("already debugging!");
@@ -116,7 +117,7 @@ bool cbDebugRun(const char* cmd)
 
 bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 {
-    dbg("cbDebugSetBPX");
+    //dbg("cbDebugSetBPX");
     char argaddr[deflen]="";
     if(!argget(cmd, argaddr, 0, false))
         return true;

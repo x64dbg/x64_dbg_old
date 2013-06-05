@@ -116,12 +116,13 @@ static bool isregister(const char* string)
     return false;
 }
 
-bool valfromstring(const char* string, void* value, int* value_size, bool* isvar)
+bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar)
 {
+    if(!value)
+        return false;
     if(!*string)
     {
-        void** val=(void**)value;
-        *val=0;
+        *value=0;
         return true;
     }
     if(*string=='$') //variable
@@ -133,8 +134,7 @@ bool valfromstring(const char* string, void* value, int* value_size, bool* isvar
     if(isregister(string)) //register
     {
         //TODO: getregister
-        void** val=(void**)value;
-        *val=(void*)0xFFFF;
+        *value=0xFFFF;
         if(value_size)
             *value_size=sizeof(uint);
         if(isvar)
@@ -144,41 +144,36 @@ bool valfromstring(const char* string, void* value, int* value_size, bool* isvar
     if(*string=='!') //flag
     {
         //TODO: getflag
-        void** val=(void**)value;
-        *val=(void*)1;
+        *value=1;
         if(value_size)
             *value_size=0;
         if(isvar)
             *isvar=true;
         return true;
     }
-    char* temp=(char*)malloc(strlen(string)+1);
-    strcpy(temp, string);
     if(*string=='.') //decimal value
     {
-        temp++;
-        int len=strlen(temp);
-        for(int i=0; i<len; i++)
-            if(!isdigit(temp[i]))
-                return false;
-        if(!*temp)
+        int len=strlen(string+1);
+        if(!string[1])
             return false;
-        sscanf(temp, "%u", (uint*)value);
-        free(temp);
+        for(int i=0; i<len; i++)
+            if(!isdigit(string[i+1]))
+                return false;
+        sscanf(string+1, "%u", value);
         return true;
     }
     //hexadecimal value
+    int inc=0;
     if(*string=='x')
-        temp++;
-    int len=strlen(temp);
-    for(int i=0; i<len; i++)
-        if(!isxdigit(temp[i]))
-            return false;
-    if(!*temp)
+        inc=1;
+    int len=strlen(string+inc);
+    if(!string[inc])
         return false;
-    sscanf(temp, "%x", (uint*)value);
+    for(int i=0; i<len; i++)
+        if(!isxdigit(string[i+inc]))
+            return false;
+    sscanf(string+inc, "%x", value);
     if(value_size)
         *value_size=sizeof(uint);
-    free(temp);
     return true;
 }

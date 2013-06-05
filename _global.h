@@ -20,8 +20,10 @@
 #define deflen 1024
 
 #ifdef _WIN64 //defined by default
+#define fext "ll"
 #define uint unsigned long long
 #else
+#define fext ""
 #define uint unsigned long
 #endif // _WIN64
 

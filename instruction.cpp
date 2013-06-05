@@ -78,7 +78,7 @@ bool cbInstrVar(const char* cmd)
         printf("invalid value \"%s\"\n", arg2);
         return true;
     }
-    if(!varnew(arg1, (void*)value, VAR_USER))
+    if(!varnew(arg1, value, VAR_USER))
         printf("error creating variable \"%s\"\n", arg1);
     else
     {
@@ -116,14 +116,14 @@ bool cbInstrMov(const char* cmd)
         printf("invalid src \"%s\"\n", arg2);
         return true;
     }
-    if(!varset(arg1, (void*)set_value, false))
+    if(!varset(arg1, set_value, false))
     {
         if(*arg1!='$')
         {
             printf("invalid dest \"%s\"\n", arg1);
             return true;
         }
-        varnew(arg1, (void*)set_value, VAR_USER);
+        varnew(arg1, set_value, VAR_USER);
     }
     uint value=0;
     varget(arg1, &value, 0, 0);
@@ -136,7 +136,7 @@ bool cbInstrMov(const char* cmd)
 
 bool cbInstrVarList(const char* cmd)
 {
-    dbg("varlist");
+    //dbg("varlist");
     char arg1[deflen]="";
     argget(cmd, arg1, 0, true);
     int filter=0;
