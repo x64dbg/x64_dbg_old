@@ -33,12 +33,6 @@ bool scmp(const char* a, const char* b)
     return true;
 }
 
-void dbg(const char* a)
-{
-    char b[256]="";
-    strcpy(b,a);
-}
-
 void formathex(char* string)
 {
     int len=strlen(string);

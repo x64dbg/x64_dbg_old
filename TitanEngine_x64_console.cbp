@@ -19,6 +19,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add library=".\TitanEngine_x86.a" />
+					<Add library=".\libdbg_x32.a" />
 				</Linker>
 			</Target>
 			<Target title="x64">
@@ -29,11 +30,12 @@
 				<Compiler>
 					<Add option="-fomit-frame-pointer" />
 					<Add option="-Os" />
-					<Add option="-Wno-format" />
+					<Add option="-Wno-format -Wno-narrowing" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add library=".\TitanEngine_x64.a" />
+					<Add library=".\libdbg_x64.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -55,6 +57,7 @@
 		<Unit filename="command.h" />
 		<Unit filename="console.cpp" />
 		<Unit filename="console.h" />
+		<Unit filename="dbg.h" />
 		<Unit filename="debugger.cpp" />
 		<Unit filename="debugger.h" />
 		<Unit filename="instruction.cpp" />

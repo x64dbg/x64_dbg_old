@@ -14,10 +14,12 @@
 #include <shlwapi.h>
 #include <stdarg.h>
 
+#include "dbg.h"
+
 //defines
 #define deflen 1024
 
-#ifdef _WIN64
+#ifdef _WIN64 //defined by default
 #define uint unsigned long long
 #else
 #define uint unsigned long
@@ -26,7 +28,6 @@
 //functions
 bool arraycontains(const char* cmd_list, const char* cmd);
 bool scmp(const char* a, const char* b);
-void dbg(const char* a);
 void formathex(char* string);
 void formatdec(char* string);
 bool FileExists(const char* file);

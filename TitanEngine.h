@@ -677,7 +677,7 @@ __declspec(dllexport) void* __stdcall GetDebugData();
 __declspec(dllexport) void* __stdcall GetTerminationData();
 __declspec(dllexport) long __stdcall GetExitCode();
 __declspec(dllexport) long long __stdcall GetDebuggedDLLBaseAddress();
-__declspec(dllexport) long long __stdcall GetDebuggedFileBaseAddress();
+__declspec(dllexport) unsigned long long __stdcall GetDebuggedFileBaseAddress();
 __declspec(dllexport) bool __stdcall GetRemoteString(HANDLE hProcess, LPVOID StringAddress, LPVOID StringStorage, int MaximumStringSize);
 __declspec(dllexport) long long __stdcall GetFunctionParameter(HANDLE hProcess, DWORD FunctionType, DWORD ParameterNumber, DWORD ParameterType);
 __declspec(dllexport) long long __stdcall GetJumpDestinationEx(HANDLE hProcess, ULONG_PTR InstructionAddress, bool JustJumps);
