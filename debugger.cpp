@@ -3,10 +3,32 @@
 #include "variable.h"
 #include "console.h"
 #include "threading.h"
+#include "value.h"
+#include "breakpoint.h"
 
 static PROCESS_INFORMATION* fdProcessInfo;
 static char szFileName[deflen]="";
 bool bFileIsDll;
+BREAKPOINT* bplist;
+
+static void cbUserBreakpoint()
+{
+    BREAKPOINT* cur=bpfind(bplist, 0, GetContextData(UE_CIP), 0);
+    if(!cur)
+        cinsert("breakpoint reached not in list!");
+    else
+    {
+        char log[deflen]="";
+        if(cur->name)
+            sprintf(log, "breakpoint \"%s\" at "fhex"!", cur->name, cur->addr);
+        else
+            sprintf(log, "breakpoint at "fhex"!", cur->addr);
+        cinsert(log);
+    }
+    //lock
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}
 
 static void cbEntryBreakpoint()
 {
@@ -46,6 +68,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     strcpy(szFileName, init->exe);
     varset("$hp", (uint)fdProcessInfo->hProcess, true);
     varset("$pid", fdProcessInfo->dwProcessId, true);
+    bplist=bpinit();
     SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbSystemBreakpoint);
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
@@ -118,7 +141,7 @@ bool cbDebugRun(const char* cmd)
 
 bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 {
-    //dbg("cbDebugSetBPX");
+    dbg("cbDebugSetBPX");
     char argaddr[deflen]="";
     if(!argget(cmd, argaddr, 0, false))
         return true;
@@ -126,5 +149,37 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
     argget(cmd, argname, 1, true);
     char argtype[deflen]="";
     argget(cmd, argtype, 2, true);
+    _strlwr(argtype);
+    uint addr=0;
+    if(!valfromstring(argaddr, &addr, 0, 0))
+    {
+        cprintf("invalid addr: \"%s\"\n", argaddr);
+        return true;
+    }
+    uint type=0;
+    BP_TYPE list_type;
+    if(strstr(argtype, "ss"))
+    {
+        type|=UE_SINGLESHOOT;
+        list_type=BPSINGLESHOOT;
+    }
+    else
+    {
+        type|=UE_BREAKPOINT;
+        list_type=BPNORMAL;
+    }
+    if(strstr(argtype, "long"))
+        type|=UE_BREAKPOINT_LONG_INT3;
+    else if(strstr(argtype, "ud2"))
+        type|=UE_BREAKPOINT_TYPE_UD2;
+    else
+        type|=UE_BREAKPOINT_TYPE_INT3;
+    if(IsBPXEnabled(addr) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
+    {
+        cprintf("error setting breakpoint at "fhex"!\n", addr);
+        return true;
+    }
+    bpnew(bplist, argname, addr, list_type);
+    cprintf("breakpoint at "fhex" set!\n", addr);
     return true;
 }

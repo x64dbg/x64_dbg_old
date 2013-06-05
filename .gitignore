@@ -9,3 +9,4 @@ CppCheckResults.xml
 test.dll
 test.exe
 bin/TitanEngine.dll
+bin/x64_dbg.chm
