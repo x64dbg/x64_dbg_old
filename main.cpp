@@ -47,5 +47,6 @@ int main()
     varinit();
     registercommands();
     cmdloop(command_list, cbBadCmd);
+    DeleteFileA("DLLLoader.exe");
     return 0;
 }

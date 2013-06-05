@@ -227,6 +227,11 @@
 #define UE_R15 34
 #define UE_CIP 35
 #define UE_CSP 36
+#ifdef _WIN64
+#define UE_CFLAGS UE_RFLAGS
+#else
+#define UE_CFLAGS UE_EFLAGS
+#endif
 #define UE_SEG_GS 37
 #define UE_SEG_FS 38
 #define UE_SEG_ES 39

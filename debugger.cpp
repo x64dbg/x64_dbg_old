@@ -49,6 +49,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbSystemBreakpoint);
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
+    DeleteFileA("DLLLoader.exe");
     //message the user/do final stuff
     cinsert("debugging stopped!");
     varset("$hp", 0, true);
