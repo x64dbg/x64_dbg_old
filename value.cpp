@@ -159,7 +159,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         for(int i=0; i<len; i++)
             if(!isdigit(string[i+1]))
                 return false;
-        sscanf(string+1, "%u", value);
+        sscanf(string+1, "%"fext"u", value);
         return true;
     }
     //hexadecimal value
@@ -172,7 +172,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
     for(int i=0; i<len; i++)
         if(!isxdigit(string[i+inc]))
             return false;
-    sscanf(string+inc, "%x", value);
+    sscanf(string+inc, "%"fext"x", value);
     if(value_size)
         *value_size=sizeof(uint);
     return true;

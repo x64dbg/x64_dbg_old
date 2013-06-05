@@ -21,12 +21,12 @@ bool cbBadCmd(const char* cmd)
         {
             if(value>15)
             {
-                sprintf(format_str, "%%s=%%.%dX (%%ud)\n", valsize);
+                sprintf(format_str, "%%s=%%.%d"fext"X (%%"fext"ud)\n", valsize);
                 printf(format_str, cmd, value, value);
             }
             else
             {
-                sprintf(format_str, "%%s=%%.%dX\n", valsize);
+                sprintf(format_str, "%%s=%%.%d"fext"X\n", valsize);
                 printf(format_str, cmd, value);
             }
         }
@@ -34,12 +34,12 @@ bool cbBadCmd(const char* cmd)
         {
             if(value>15)
             {
-                sprintf(format_str, "%%.%dX (%%ud)\n", valsize);
+                sprintf(format_str, "%%.%d"fext"X (%%"fext"ud)\n", valsize);
                 printf(format_str, value, value);
             }
             else
             {
-                sprintf(format_str, "%%.%dX\n", valsize);
+                sprintf(format_str, "%%.%d"fext"X\n", valsize);
                 printf(format_str, value);
             }
         }
@@ -83,9 +83,9 @@ bool cbInstrVar(const char* cmd)
     else
     {
         if(value>15)
-            printf("%s=%X (%ud)\n", arg1, value, value);
+            printf("%s=%"fext"X (%"fext"ud)\n", arg1, value, value);
         else
-            printf("%s=%X\n", arg1, value);
+            printf("%s=%"fext"X\n", arg1, value);
     }
     return true;
 }
@@ -128,9 +128,9 @@ bool cbInstrMov(const char* cmd)
     uint value=0;
     varget(arg1, &value, 0, 0);
     if(value>15)
-        printf("%s=%X (%ud)\n", arg1, value, value);
+        printf("%s=%"fext"X (%"fext"ud)\n", arg1, value, value);
     else
-        printf("%s=%X\n", arg1, value);
+        printf("%s=%"fext"X\n", arg1, value);
     return true;
 }
 
@@ -170,17 +170,17 @@ bool cbInstrVarList(const char* cmd)
                 if(cur->type==filter)
                 {
                     if(value>15)
-                        printf("%s=%X (%ud)\n", name, value, value);
+                        printf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
                     else
-                        printf("%s=%X\n", name, value);
+                        printf("%s=%"fext"X\n", name, value);
                 }
             }
             else
             {
                 if(value>15)
-                    printf("%s=%X (%ud)\n", name, value, value);
+                    printf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
                 else
-                    printf("%s=%X\n", name, value);
+                    printf("%s=%"fext"X\n", name, value);
             }
         }
         cur=cur->next;
