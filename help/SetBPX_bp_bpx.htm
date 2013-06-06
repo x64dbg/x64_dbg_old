@@ -16,4 +16,17 @@ html,body {
 
 <body>
 <P><STRONG>SetBPX[,bp,bpx]</STRONG><BR>Sets an INT3 (SHORT/LONG)&nbsp;or UD2 breakpoint 
-and optionally assigns a name to it.</P></body>
+and optionally assigns a name to it.</P>
+<P><U>arguments<BR></U>&nbsp; arg1: Address to put a breakpoint on. This can be an API name&nbsp;[not      
+      implemented].</P>
+<P>      
+      [arg2]: Name of the breakpoint, use quotation marks to 
+include      
+      spaces.</P>
+<P>      
+      [arg3]: Breakpoint type. Can be one of the following 
+options in random order: "ss" (single shot breakpoint), "long" (CD03) and "ud2" 
+(0F0B). You can combine the "ss" option with either "long" or      
+      "ud2".</P>
+<P><U>result<BR></U>      
+ This command sets no result variables.</P></head>

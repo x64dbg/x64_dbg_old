@@ -174,7 +174,7 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
         type|=UE_BREAKPOINT_TYPE_UD2;
     else
         type|=UE_BREAKPOINT_TYPE_INT3;
-    if(IsBPXEnabled(addr) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
+    if(bpfind(bplist, 0, addr, 0) or IsBPXEnabled(addr) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
     {
         cprintf("error setting breakpoint at "fhex"!\n", addr);
         return true;
