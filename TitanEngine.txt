@@ -41,7 +41,7 @@ Debugger module constants . 21
 	SetNextDbgContinueStatus function  48 
 	*StopDebug function  49 
 	*ForceClose function  50 
-	SetBPXOptions function  51 
+	*SetBPXOptions function  51 
 	*SetBPX function . 52 
 	*SetBPXEx function . 53 
 	*EnableBPX function . 55 

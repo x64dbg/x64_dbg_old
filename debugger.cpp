@@ -139,6 +139,38 @@ bool cbDebugRun(const char* cmd)
     return true;
 }
 
+bool cbDebugSetBPXOptions(const char* cmd)
+{
+    char argtype[deflen]="";
+    uint type=0;
+    if(!argget(cmd, argtype, 0, false))
+        return true;
+    const char* a=0;
+    if(strstr(argtype, "long"))
+    {
+        a="TYPE_LONG_INT3";
+        type=UE_BREAKPOINT_TYPE_LONG_INT3;
+    }
+    else if(strstr(argtype, "ud2"))
+    {
+        a="TYPE_UD2";
+        type=UE_BREAKPOINT_TYPE_UD2;
+    }
+    else if(strstr(argtype, "short"))
+    {
+        a="TYPE_INT3";
+        type=UE_BREAKPOINT_TYPE_INT3;
+    }
+    else
+    {
+        cputs("invalid type specified!");
+        return true;
+    }
+    SetBPXOptions(type);
+    cprintf("default breakpoint type set to: %s\n", a);
+    return true;
+}
+
 bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 {
     dbg("cbDebugSetBPX");
@@ -169,10 +201,10 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
         list_type=BPNORMAL;
     }
     if(strstr(argtype, "long"))
-        type|=UE_BREAKPOINT_LONG_INT3;
+        type|=UE_BREAKPOINT_TYPE_LONG_INT3;
     else if(strstr(argtype, "ud2"))
         type|=UE_BREAKPOINT_TYPE_UD2;
-    else
+    else if(strstr(argtype, "short"))
         type|=UE_BREAKPOINT_TYPE_INT3;
     if(bpfind(bplist, 0, addr, 0) or IsBPXEnabled(addr) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
     {
