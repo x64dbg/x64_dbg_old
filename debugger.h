@@ -19,6 +19,7 @@ bool cbDebugSetBPXOptions(const char* cmd);
 bool cbDebugSetBPX(const char* cmd);
 bool cbDebugEnableBPX(const char* cmd);
 bool cbDebugDisableBPX(const char* cmd);
+bool cbDebugToggleBPX(const char* cmd);
 bool cbDebugDeleteBPX(const char* cmd);
 bool cbDebugBplist(const char* cmd);
 

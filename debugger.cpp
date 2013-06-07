@@ -173,7 +173,7 @@ bool cbDebugSetBPXOptions(const char* cmd)
 
 bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 {
-    dbg("cbDebugSetBPX");
+    //dbg("cbDebugSetBPX");
     char argaddr[deflen]="";
     if(!argget(cmd, argaddr, 0, false))
         return true;
@@ -275,6 +275,44 @@ bool cbDebugDisableBPX(const char* cmd)
     }
     if(!DisableBPX(bp->addr))
         cprintf("failed to disable: \"%s\"\n", arg1);
+    return true;
+}
+
+bool cbDebugToggleBPX(const char* cmd)
+{
+    char arg1[deflen]="";
+    if(!argget(cmd, arg1, 0, false))
+        return true;
+    BREAKPOINT* bp=bpfind(bplist, arg1, 0, 0);
+    if(!bp)
+    {
+        uint addr=0;
+        if(!valfromstring(arg1, &addr, 0, 0))
+        {
+            cprintf("invalid addr: \"%s\"\n", arg1);
+            return true;
+        }
+        bp=bpfind(bplist, 0, addr, 0);
+        if(!bp)
+        {
+            cprintf("no such breakpoint: \"%s\"\n", arg1);
+            return true;
+        }
+    }
+    bool disable=IsBPXEnabled(bp->addr);
+    if(disable)
+    {
+        if(!DisableBPX(bp->addr))
+            cprintf("failed to disable: \"%s\"\n", arg1);
+        cputs("breakpoint disabled!");
+    }
+    else
+    {
+        if(!EnableBPX(bp->addr))
+            cprintf("failed to enable: \"%s\"\n", arg1);
+        cputs("breakpoint enabled!");
+    }
+    varset("$res", (uint)disable, false);
     return true;
 }
 

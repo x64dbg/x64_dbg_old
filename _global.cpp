@@ -2,7 +2,7 @@
 
 bool arraycontains(const char* cmd_list, const char* cmd)
 {
-    dbg("arraycontains");
+    //dbg("arraycontains");
     if(!cmd_list or !cmd)
         return false;
     char temp[deflen]="";

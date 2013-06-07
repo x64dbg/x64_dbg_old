@@ -457,7 +457,7 @@ static uint getregister(int* size, const char* string)
 
 bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar)
 {
-    dbg("valfromstring");
+    //dbg("valfromstring");
     if(!value)
         return false;
     if(!*string)
