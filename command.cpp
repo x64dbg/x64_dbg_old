@@ -5,7 +5,7 @@
 
 static COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
 {
-    //dbg("cmdfind");
+    dbg("cmdfind");
     COMMAND* cur=command_list;
     if(!cur->name)
         return 0;

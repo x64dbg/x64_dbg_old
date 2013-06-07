@@ -39,11 +39,23 @@ static void registercommands()
     cmdnew(cmd, "InitDebug\1init\1initdbg", cbDebugInit, false); //init debugger arg1:exefile,[arg2:commandline]
     cmdnew(cmd, "run\1go\1r\1g", cbDebugRun, true); //unlock WAITID_RUN
     cmdnew(cmd, "SetBPX\1bp\1bpx", cbDebugSetBPX, true); //breakpoint
+    cmdnew(cmd, "EnableBPX\1bpe\1be", cbDebugEnableBPX, true); //breakpoint enable
+    cmdnew(cmd, "DisableBPX\1bpd\1bd", cbDebugDisableBPX, true); //breakpoint disable
+    cmdnew(cmd, "DeleteBPX\1bpc\1bc", cbDebugDeleteBPX, true); //breakpoint delete
+    cmdnew(cmd, "bplist", cbDebugBplist, true); //breakpoint list
 }
 
 int main()
 {
     //dbg("main");
+    char dir[deflen]="";
+    GetModuleFileNameA(GetModuleHandleA(0), dir, deflen);
+    int len=strlen(dir);
+    while(dir[len]!='\\')
+        len--;
+    dir[len]=0;
+    SetCurrentDirectoryA(dir);
+
     varinit();
     registercommands();
     cmdloop(command_list, cbBadCmd);

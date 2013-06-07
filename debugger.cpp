@@ -183,3 +183,127 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
     cprintf("breakpoint at "fhex" set!\n", addr);
     return true;
 }
+
+bool cbDebugEnableBPX(const char* cmd)
+{
+    char arg1[deflen]="";
+    if(!argget(cmd, arg1, 0, false))
+        return true;
+    BREAKPOINT* bp=bpfind(bplist, arg1, 0, 0);
+    if(!bp)
+    {
+        uint addr=0;
+        if(!valfromstring(arg1, &addr, 0, 0))
+        {
+            cprintf("invalid addr: \"%s\"\n", arg1);
+            return true;
+        }
+        bp=bpfind(bplist, 0, addr, 0);
+        if(!bp)
+        {
+            cprintf("no such breakpoint: \"%s\"\n", arg1);
+            return true;
+        }
+    }
+    if(IsBPXEnabled(bp->addr))
+    {
+        cputs("breakpoint already enabled!");
+        return true;
+    }
+    if(!EnableBPX(bp->addr))
+        cprintf("failed to enable: \"%s\"\n", arg1);
+    return true;
+}
+
+bool cbDebugDisableBPX(const char* cmd)
+{
+    char arg1[deflen]="";
+    if(!argget(cmd, arg1, 0, false))
+        return true;
+    BREAKPOINT* bp=bpfind(bplist, arg1, 0, 0);
+    if(!bp)
+    {
+        uint addr=0;
+        if(!valfromstring(arg1, &addr, 0, 0))
+        {
+            cprintf("invalid addr: \"%s\"\n", arg1);
+            return true;
+        }
+        bp=bpfind(bplist, 0, addr, 0);
+        if(!bp)
+        {
+            cprintf("no such breakpoint: \"%s\"\n", arg1);
+            return true;
+        }
+    }
+    if(!IsBPXEnabled(bp->addr))
+    {
+        cputs("breakpoint already disabled!");
+        return true;
+    }
+    if(!DisableBPX(bp->addr))
+        cprintf("failed to disable: \"%s\"\n", arg1);
+    return true;
+}
+
+bool cbDebugDeleteBPX(const char* cmd)
+{
+    char arg1[deflen]="";
+    if(!argget(cmd, arg1, 0, false))
+        return true;
+    BREAKPOINT* bp=bpfind(bplist, arg1, 0, 0);
+    if(!bp)
+    {
+        uint addr=0;
+        if(!valfromstring(arg1, &addr, 0, 0))
+        {
+            cprintf("invalid addr: \"%s\"\n", arg1);
+            return true;
+        }
+        bp=bpfind(bplist, 0, addr, 0);
+        if(!bp)
+        {
+            cprintf("no such breakpoint: \"%s\"\n", arg1);
+            return true;
+        }
+    }
+    if(!DeleteBPX(bp->addr))
+    {
+        cprintf("delete breakpoint failed: "fhex"\n", bp->addr);
+        return true;
+    }
+    bpdel(bplist, 0, bp->addr);
+    return true;
+}
+
+bool cbDebugBplist(const char* cmd)
+{
+    BREAKPOINT* cur=bplist;
+    if(!cur or !cur->addr)
+    {
+        cputs("no breakpoints!");
+        return true;
+    }
+    bool bNext=true;
+    while(bNext)
+    {
+        const char* type=0;
+        if(cur->type==BPNORMAL)
+            type="BP";
+        if(cur->type==BPSINGLESHOOT)
+            type="SS";
+        if(cur->type==BPHARDWARE)
+            type="HW";
+        if(cur->type==BPMEMORY)
+            type="GP";
+        bool enabled=IsBPXEnabled(cur->addr);
+        if(cur->name)
+            cprintf("%d:%s:"fhex":\"%s\"\n", enabled, type, cur->addr, cur->name);
+        else
+            cprintf("%d:%s:"fhex"\n", enabled, type, cur->addr);
+        cur=cur->next;
+        if(!cur)
+            bNext=false;
+    }
+    return true;
+}

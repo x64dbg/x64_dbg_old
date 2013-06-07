@@ -147,7 +147,7 @@ bool cbInstrVarList(const char* cmd)
     else if(!strcasecmp(arg1, "SYSTEM"))
         filter=VAR_SYSTEM;
     VAR* cur=vargetptr();
-    if(!cur)
+    if(!cur or !cur->name)
     {
         cputs("no variables");
         return true;
@@ -156,32 +156,29 @@ bool cbInstrVarList(const char* cmd)
     bool bNext=true;
     while(bNext)
     {
-        if(cur->name)
+        char name[deflen]="";
+        strcpy(name, cur->name);
+        int len=strlen(name);
+        for(int i=0; i<len; i++)
+            if(name[i]==1)
+                name[i]='/';
+        value=(uint)cur->value.value;
+        if(filter)
         {
-            char name[deflen]="";
-            strcpy(name, cur->name);
-            int len=strlen(name);
-            for(int i=0; i<len; i++)
-                if(name[i]==1)
-                    name[i]='/';
-            value=(uint)cur->value.value;
-            if(filter)
-            {
-                if(cur->type==filter)
-                {
-                    if(value>15)
-                        printf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
-                    else
-                        printf("%s=%"fext"X\n", name, value);
-                }
-            }
-            else
+            if(cur->type==filter)
             {
                 if(value>15)
                     printf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
                 else
                     printf("%s=%"fext"X\n", name, value);
             }
+        }
+        else
+        {
+            if(value>15)
+                printf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
+            else
+                printf("%s=%"fext"X\n", name, value);
         }
         cur=cur->next;
         if(!cur)

@@ -2,6 +2,7 @@
 
 bool arraycontains(const char* cmd_list, const char* cmd)
 {
+    dbg("arraycontains");
     if(!cmd_list or !cmd)
         return false;
     char temp[deflen]="";
@@ -12,14 +13,13 @@ bool arraycontains(const char* cmd_list, const char* cmd)
             temp[i]=0;
     if(!strcasecmp(temp, cmd))
         return true;
-    for(int i=0; i<len; i++)
+    for(int i=strlen(temp); i<len; i++)
     {
         if(!temp[i])
         {
-            i++;
-            if(!strcasecmp(temp+i, cmd))
+            if(!strcasecmp(temp+i+1, cmd))
                 return true;
-            i+=strlen(temp+i);
+            i+=strlen(temp+i+1);
         }
     }
     return false;

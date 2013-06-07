@@ -16,5 +16,9 @@ struct INIT_STRUCT
 bool cbDebugInit(const char* cmd);
 bool cbDebugRun(const char* cmd);
 bool cbDebugSetBPX(const char* cmd);
+bool cbDebugEnableBPX(const char* cmd);
+bool cbDebugDisableBPX(const char* cmd);
+bool cbDebugDeleteBPX(const char* cmd);
+bool cbDebugBplist(const char* cmd);
 
 #endif // _DEBUGGER_H
