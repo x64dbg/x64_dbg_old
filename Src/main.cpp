@@ -4,6 +4,9 @@
 #include "CPUWidget.h"
 #include "ColumnWidget.h"
 #include "CustomTableView.h"
+#include "DisassemblyView.h"
+#include "MapViewOfMem.h"
+#include "QBeaEngine.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,13 +20,22 @@ int main(int argc, char *argv[])
     //CPUWidget cpuWin;
     //cpuWin.show();
 
+    /*
     ColumnWidget cw(5);
     cw.show();
 
     QWidget w;
     CustomTableView cust(&w);
     w.show();
+    */
 
+    QBeaEngine disasm;
+
+
+    MapViewOfMem mem(0, 100000);
+    DisassemblyView dis(mem,0);
+    dis.resize(QSize(600,600));
+    dis.show();
 
 /*
     QWidget fenetre;

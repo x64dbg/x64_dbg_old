@@ -3,3 +3,4 @@
 CustomTreeWidget::CustomTreeWidget(QTreeWidget *parent) :QTreeWidget(parent)
 {
 }
+
