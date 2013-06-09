@@ -5,6 +5,7 @@
 #include <QtGui>
 #include <qdebug.h>
 #include "MapViewOfMem.h"
+#include "QBeaEngine.h"
 
 
 
@@ -41,7 +42,20 @@ public:
 
     explicit DisassemblyView(MapViewOfMem memory, QWidget *parent = 0);
 
-    //
+    // Instructions Management
+    int getPreviousInstructionRVA(int address, int count);
+    int getNextInstructionRVA(int address, int count);
+    QString getStringToPrint(int topTableAddress, int rowIndex, int colIndex);
+
+    // Selection Management
+    bool isSelected(ulong rva, ulong count);
+    void addToSelection(ulong rva, ulong count);
+    void setSingleSelection(ulong rva, ulong count);
+
+    // ScrollBar Management
+    void updateVertScrollbarRange();
+
+    // Coordinate analysis
     int getRowIndexFromY(int y);
     int getColumnIndexFromX(int x);
     int getColumnPosition(int index);
@@ -62,10 +76,14 @@ public:
     void addColumn();
     int columnWidth(int index);
     void setColumnWidth(int index, int width);
+
 signals:
     
 public slots:
-    void vertSliderMoved(int value);
+    // ScrollBar Management
+    void vertSliderActionSlot(int action);
+
+    // Selection Management
     void multiSelTimerSlot();
 
 private:
@@ -85,9 +103,11 @@ private:
 
 
 
-    int mTopTableAddress;
+    int mTopTableRVA;   // RVA of the first displayed instruction
 
     QTimer* mMultiSelTimer;
+
+    QBeaEngine mDisasm;
 };
 
 #endif // DISASSEMBLYVIEW_H

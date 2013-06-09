@@ -6,6 +6,26 @@ MapViewOfMem::MapViewOfMem()
 
 }
 
+MapViewOfMem::MapViewOfMem(QString file)
+{
+    qDebug() << "MapViewOfMem() Load data from file.";
+
+    QFile wFile(file);
+
+    if(wFile.open(QIODevice::ReadOnly) == false)
+         qDebug() << "File has not been opened.";
+
+    mData = wFile.readAll();
+    qDebug() << "Size: " << mData.size();
+
+    if(mData.size() == 0)
+    {
+        qDebug() << "No Data";
+    }
+
+    mSize = mData.size();
+}
+
 
 MapViewOfMem::MapViewOfMem(unsigned long long startAddress , unsigned long long size)
 {
@@ -29,3 +49,7 @@ unsigned long long MapViewOfMem::size()
     return mSize;
 }
 
+unsigned char* MapViewOfMem::data()
+{
+    return (unsigned char*)(mData.data());
+}

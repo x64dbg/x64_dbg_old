@@ -29,10 +29,10 @@ int main(int argc, char *argv[])
     w.show();
     */
 
-    QBeaEngine disasm;
+    //QBeaEngine disasm;
 
 
-    MapViewOfMem mem(0, 100000);
+    MapViewOfMem mem("AsmCode.bin");
     DisassemblyView dis(mem,0);
     dis.resize(QSize(600,600));
     dis.show();
