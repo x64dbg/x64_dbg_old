@@ -1,5 +1,14 @@
 #include "DisassemblyView.h"
 
+/* TODO
+ *
+ * Change the selection system (When the user select a byte in an instruction, the instruction need to be hilighted)
+ *
+ *
+ */
+
+
+
 DisassemblyView::DisassemblyView(MapViewOfMem memory, QWidget *parent) : QAbstractScrollArea(parent)
 {
     setFont(QFont("Monospace", 8));
@@ -164,7 +173,7 @@ void DisassemblyView::mouseMoveEvent(QMouseEvent* event)
 
                 int wRowIndex = getRowIndexFromY(event->y());
 
-                addToSelection(mTopTableRVA, wRowIndex);
+                expandSelectionUpTo(mTopTableRVA, wRowIndex);
 
                 viewport()->repaint();
             }
@@ -238,8 +247,100 @@ void DisassemblyView::wheelEvent(QWheelEvent* event)
 {
     qDebug() << "wheelEvent";
 
-    QAbstractScrollArea::wheelEvent(event);
+    //QAbstractScrollArea::wheelEvent(event);
+
+    ulong rva = verticalScrollBar()->value();
+
+    if(event->delta() > 0)
+    {
+        rva = getPreviousInstructionRVA(rva, 3);
+    }
+    else
+    {
+        rva = getNextInstructionRVA(rva, 3);
+    }
+
+    verticalScrollBar()->setValue(rva);
+    verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
 }
+
+
+void DisassemblyView::keyPressEvent(QKeyEvent* event)
+{
+    int key = event->key();
+    ulong rva = getFirstSelected();
+    ulong newRVA;
+    int viewableRowsCount = this->viewport()->height() / rowHeight(); // Rounded down
+    ulong lastInstrRVA = getNextInstructionRVA(mTopTableRVA, viewableRowsCount - 1);
+
+    if(key == Qt::Key_Up)
+    {
+        newRVA = getPreviousInstructionRVA(rva, 1);
+        setSingleSelection(newRVA, 0);
+
+        if(rva <= mTopTableRVA)
+        {
+            verticalScrollBar()->setValue(newRVA);
+            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
+        }
+        else if(rva > lastInstrRVA)
+        {
+
+            newRVA = getPreviousInstructionRVA(newRVA, viewableRowsCount - 1);
+
+            verticalScrollBar()->setValue(newRVA);
+            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
+        }
+    }
+    else if(key == Qt::Key_Down)
+    {
+        newRVA = getNextInstructionRVA(rva, 1);
+        setSingleSelection(newRVA, 0);
+
+        if(rva < mTopTableRVA)
+        {
+            verticalScrollBar()->setValue(newRVA);
+            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
+        }
+        else if(rva >= lastInstrRVA)
+        {
+            newRVA = getPreviousInstructionRVA(newRVA, viewableRowsCount - 1);
+
+            verticalScrollBar()->setValue(newRVA);
+            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
+        }
+    }
+
+    viewport()->repaint();
+}
+
+
+void DisassemblyView::contextMenuEvent(QContextMenuEvent* event)
+{
+    QPoint globalPos = event->globalPos();
+
+    QMenu myMenu;
+    myMenu.addAction("Menu Item 1");
+    myMenu.addAction("Menu Item 2");
+    myMenu.addAction("Menu Item 3");
+
+    QAction* selectedItem = myMenu.exec(globalPos);
+    if (selectedItem)
+    {
+        // something was chosen, do stuff
+    }
+    else
+    {
+        // nothing was chosen
+    }
+}
+
+
+
+
+
+
+
 
 
 int DisassemblyView::getRowIndexFromY(int y)
@@ -319,7 +420,7 @@ void DisassemblyView::multiSelTimerSlot()
                 wNewScrollBarValue = getNextInstructionRVA(wScrollBarValue, qAbs(wY));
             }
 
-            addToSelection(wNewScrollBarValue, wRowIndex);
+            expandSelectionUpTo(wNewScrollBarValue, wRowIndex);
 
 
             verticalScrollBar()->setValue(wNewScrollBarValue);
@@ -351,14 +452,15 @@ bool DisassemblyView::isSelected(ulong rva, ulong count)
 
 
 /**
- * @brief       Add the instruction located count instructions after the address rva to the selection.
+ * @brief       Expand the selection up to the instruction located count instructions after the address rva. @n
+ *              If the instruction pointed by the parameters is already selected, the selction will be reduce up to this instruction.
  *
  * @param[in]   rva     Address an instruction
- * @param[in]   count   Number of instructions
+ * @param[in]   count   Offset (In number of instructions)
  *
  * @return      Nothing.
  */
-void DisassemblyView::addToSelection(ulong rva, ulong count)
+void DisassemblyView::expandSelectionUpTo(ulong rva, ulong count)
 {
     int wRVA = getNextInstructionRVA(rva, count);
 
@@ -390,6 +492,16 @@ void DisassemblyView::setSingleSelection(ulong rva, ulong count)
     mSelectedRowsData.firstSelectedIndex = wRVA;
     mSelectedRowsData.fromIndex = wRVA;
     mSelectedRowsData.toIndex = wRVA;
+}
+
+/**
+ * @brief       Return the rva of the selected instruction. In case of multi-selection, the first selected instruction.
+ *
+ * @return      Return the rva of the selected instruction.
+ */
+int DisassemblyView::getFirstSelected()
+{
+    return mSelectedRowsData.firstSelectedIndex;
 }
 
 
@@ -430,7 +542,8 @@ QString DisassemblyView::getStringToPrint(int topTableAddress, int rowIndex, int
         }
         case 1:
         {
-            string = "Dump";
+            for(int i = 0; i < instruction.dump.size(); i++)
+                string += QString::number((unsigned char)(instruction.dump.at(i)), 16).toUpper();;
             break;
         }
         case 2:
@@ -495,15 +608,11 @@ void DisassemblyView::vertSliderActionSlot(int action)
             break;
 
         case QAbstractSlider::SliderToMinimum:
-            {
-                qDebug() << "SliderToMinimum";
-            }
-            break;
         case QAbstractSlider::SliderToMaximum:
         case QAbstractSlider::SliderMove:
             {
                 qDebug() << "SliderMove";
-
+                /*
                 int delta = verticalScrollBar()->sliderPosition() - mTopTableRVA;
 
                 if(qAbs(delta) < 10)
@@ -530,8 +639,16 @@ void DisassemblyView::vertSliderActionSlot(int action)
                 }
                 else
                 {
-                    mTopTableRVA = verticalScrollBar()->value();
+                    mTopTableRVA = verticalScrollBar()->sliderPosition();
                 }
+                */
+
+                int rva = verticalScrollBar()->sliderPosition();
+
+                rva = getPreviousInstructionRVA(rva, 1);
+                rva = getNextInstructionRVA(rva, 1);
+
+                mTopTableRVA = rva;
             }
             break;
         case QAbstractSlider::SliderNoAction:

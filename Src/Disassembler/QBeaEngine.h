@@ -11,6 +11,7 @@
 typedef struct _Instruction_t
 {
     QString instStr;
+    QByteArray dump;
     ulong rva;
     int lentgh;
 } Instruction_t;

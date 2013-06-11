@@ -215,10 +215,12 @@ Instruction_t QBeaEngine::DisassembleAt(char* data, ulong base, ulong size, ulon
     mDisasmStruct.SecurityBlock = 0;
 
     wInst.instStr = QString(mDisasmStruct.CompleteInstr);
+    wInst.dump = QByteArray((char*)mDisasmStruct.EIP, len);
     wInst.rva = wInstRVA;
     wInst.lentgh = len;
 
     return wInst;
 }
+
 
 

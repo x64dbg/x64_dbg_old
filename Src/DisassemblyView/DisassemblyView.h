@@ -49,8 +49,9 @@ public:
 
     // Selection Management
     bool isSelected(ulong rva, ulong count);
-    void addToSelection(ulong rva, ulong count);
+    void expandSelectionUpTo(ulong rva, ulong count);
     void setSingleSelection(ulong rva, ulong count);
+    int getFirstSelected();
 
     // ScrollBar Management
     void updateVertScrollbarRange();
@@ -66,6 +67,9 @@ public:
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
     void wheelEvent(QWheelEvent* event);
+    void keyPressEvent(QKeyEvent* event);
+    void contextMenuEvent(QContextMenuEvent* event);
+
 
     // Getters and Setters
     int rowHeight();
