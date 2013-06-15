@@ -4,6 +4,16 @@
 #include <QtGui>
 #include <QDebug>
 
+
+typedef struct _Selection_t
+{
+    int firstSelectedIndex;
+    int fromIndex;
+    int toIndex;
+} Selection_t;
+
+
+
 class MapViewOfMem
 {
 
@@ -16,12 +26,20 @@ class MapViewOfMem
         unsigned long long size();
         unsigned char *data();
 
+        Selection_t getSelection();
+        void setSelection(Selection_t sel);
+
+        ulong getBase();
+
     private:
+        ulong mBase;
         unsigned long mStartAddress;
         unsigned long mEndAddress;
         unsigned long mSize;
 
         QByteArray mData;
+
+        Selection_t mSelectedData;
 };
 
 #endif // MAPVIEWOFMEM_H

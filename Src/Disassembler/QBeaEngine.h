@@ -14,6 +14,7 @@ typedef struct _Instruction_t
     QByteArray dump;
     ulong rva;
     int lentgh;
+    DISASM disasm;
 } Instruction_t;
 
 

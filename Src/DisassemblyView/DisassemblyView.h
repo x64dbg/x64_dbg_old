@@ -7,24 +7,24 @@
 #include "MapViewOfMem.h"
 #include "QBeaEngine.h"
 
+typedef struct _HeaderButton_t
+{
+    bool isClickable;
+    int height;
+    QPushButton* button;
+} HeaderButton_t;
 
 
 typedef struct _ColumnItem_t
 {
     int width;
+    HeaderButton_t header;
 } ColumnItem_t;
 
 typedef struct _RowItem_t
 {
     bool isSelected;
 } RowItem_t;
-
-typedef struct _SelectedRows_t
-{
-    int firstSelectedIndex;
-    int fromIndex;
-    int toIndex;
-} SelectedRows_t;
 
 typedef struct _ColumnResizingData_t
 {
@@ -34,24 +34,31 @@ typedef struct _ColumnResizingData_t
 } ColumnResizingData_t;
 
 
+
 class DisassemblyView : public QAbstractScrollArea
 {
     Q_OBJECT
 public:
     enum GuiState_t {NoState, ResizeColumnState, MultiRowsSelectionState};
+    enum GraphicDump_t {GD_Nothing, GD_FootToTop, GD_FootToBottom, GD_HeadFromTop, GD_HeadFromBottom, GD_Vert}; // GD_FootToTop = '- , GD_FootToBottom = ,- , GD_HeadFromTop = '-> , GD_HeadFromBottom = ,-> , GD_Vert = |
 
     explicit DisassemblyView(MapViewOfMem memory, QWidget *parent = 0);
+
+    QString getStringToPrint(int topTableAddress, int rowIndex, int colIndex);
+    void paintGraphicDump(QPainter *painter, int x, int y, int topTableRVA, int rowIndex);
 
     // Instructions Management
     int getPreviousInstructionRVA(int address, int count);
     int getNextInstructionRVA(int address, int count);
-    QString getStringToPrint(int topTableAddress, int rowIndex, int colIndex);
+    Instruction_t DisassembleAt(ulong rva);
+    Instruction_t DisassembleAt(ulong rva, ulong count);
 
     // Selection Management
     bool isSelected(ulong rva, ulong count);
     void expandSelectionUpTo(ulong rva, ulong count);
     void setSingleSelection(ulong rva, ulong count);
-    int getFirstSelected();
+    int getInitialSelected();
+    int getSelectionHead();
 
     // ScrollBar Management
     void updateVertScrollbarRange();
@@ -80,6 +87,7 @@ public:
     void addColumn();
     int columnWidth(int index);
     void setColumnWidth(int index, int width);
+    int headerOffset();
 
 signals:
     
@@ -99,12 +107,9 @@ private:
     QList<ColumnItem_t> mColumnItemList;
     QList<RowItem_t> mRowItemList;
 
-    SelectedRows_t mSelectedRowsData;
-
     GuiState_t mGuiState;
 
     ColumnResizingData_t mColResizeData;
-
 
 
     int mTopTableRVA;   // RVA of the first displayed instruction
@@ -112,6 +117,10 @@ private:
     QTimer* mMultiSelTimer;
 
     QBeaEngine mDisasm;
+
+    bool isHeaderVisible;
+
+
 };
 
 #endif // DISASSEMBLYVIEW_H

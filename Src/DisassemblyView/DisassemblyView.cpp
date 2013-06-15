@@ -2,7 +2,6 @@
 
 /* TODO
  *
- * Change the selection system (When the user select a byte in an instruction, the instruction need to be hilighted)
  *
  *
  */
@@ -11,26 +10,33 @@
 
 DisassemblyView::DisassemblyView(MapViewOfMem memory, QWidget *parent) : QAbstractScrollArea(parent)
 {
-    setFont(QFont("Monospace", 8));
+    setFont(QFont("Monospace", 9));
     setMouseTracking(true);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-    setRowHeight(14);
+    int wRowsHeight = QFontMetrics(this->font()).height();
+    wRowsHeight = (wRowsHeight * 105) / 100;
+    wRowsHeight = (wRowsHeight % 2) == 0 ? wRowsHeight : wRowsHeight + 1;
+
+    setRowHeight(wRowsHeight);
     setRowCount(10);
+
+    isHeaderVisible = true;
 
     addColumn();
     addColumn();
     addColumn();
     addColumn();
     addColumn();
+
+
+
 
     mGuiState = DisassemblyView::NoState;
 
     mColResizeData.splitHandle = false;
 
 
-    mSelectedRowsData.fromIndex = -1;
-    mSelectedRowsData.toIndex = -1;
 
     mMemoryView = memory;
 
@@ -60,6 +66,42 @@ void DisassemblyView::paintEvent(QPaintEvent* event)
 
     // Paint background
     painter.fillRect(painter.viewport(), QBrush(QColor(255, 251, 240)));
+/*
+    QTextDocument doc;
+    doc.setDocumentMargin(0);
+    doc.setUndoRedoEnabled(false);
+    doc.setTextWidth(this->width());
+    doc.setHtml("<span style=\" font-family:'Monospace'; font-size:9pt;\">CALL <FONT style=\"BACKGROUND-COLOR: yellow\">next </FONT></span>");
+    painter.save();
+    painter.translate(0,0);
+    doc.drawContents(&painter, QRectF(QRect(0,0,50,40)));
+    painter.restore();
+*/
+
+
+    // Draw header
+    if(isHeaderVisible == true)
+    {
+        for(int i = 0; i < columnCount(); i++)
+        {
+            if(i < (columnCount() - 1)) // For all columns except the last one
+            {
+                mColumnItemList.at(i).header.button->resize(columnWidth(i), mColumnItemList.at(i).header.button->height());
+                mColumnItemList.at(i).header.button->move(x + 1, y);
+                x += columnWidth(i);
+            }
+            else
+            {
+                mColumnItemList.at(i).header.button->resize(painter.viewport().width() - x, mColumnItemList.at(i).header.button->height());
+                mColumnItemList.at(i).header.button->move(x + 1, y);
+                x += columnWidth(i);
+            }
+        }
+
+        x = 0;
+        y = headerOffset();
+    }
+
 
     // Iterate over all columns and cells
     for(int i = 0; i < columnCount(); i++)
@@ -72,8 +114,19 @@ void DisassemblyView::paintEvent(QPaintEvent* event)
                 if(isSelected(mTopTableRVA, j) == true)
                     painter.fillRect(QRect(x, y, columnWidth(i), rowHeight()), QBrush(QColor(192,192,192)));
 
-                //  Draw cell content
-                painter.drawText(QRect(x + 4, y, columnWidth(i) - 4, rowHeight()), 0, getStringToPrint(mTopTableRVA, j, i));
+
+                if(i == 1)
+                {
+                    paintGraphicDump(&painter, x + 5, y, mTopTableRVA, j);
+
+                    //  Draw cell content
+                    painter.drawText(QRect(x + 15, y, columnWidth(i) - 15, rowHeight()), 0, getStringToPrint(mTopTableRVA, j, i));
+                }
+                else
+                {
+                    //  Draw cell content
+                    painter.drawText(QRect(x + 4, y, columnWidth(i) - 4, rowHeight()), 0, getStringToPrint(mTopTableRVA, j, i));
+                }
 
                 // Draw cell right border
                 painter.save() ;
@@ -90,14 +143,14 @@ void DisassemblyView::paintEvent(QPaintEvent* event)
                 if(isSelected(mTopTableRVA, j) == true)
                     painter.fillRect(QRect(x, y, painter.viewport().width() - x, rowHeight()), QBrush(QColor(192,192,192)));
 
-                // Draw cell right border
+                //  Draw cell content
                 painter.drawText(QRect(x + 4, y, painter.viewport().width() - x - 4, rowHeight()), 0, getStringToPrint(mTopTableRVA, j, i));
 
                 // Update y for the next iteration
                 y += rowHeight();
             }
         }
-        y = 0;
+        y = headerOffset();
         x += columnWidth(i);
     }
 }
@@ -161,7 +214,6 @@ void DisassemblyView::mouseMoveEvent(QMouseEvent* event)
             this->viewport()->repaint();
 
             mColResizeData.lastPosX = event->x();
-
             break;
         }
         case DisassemblyView::MultiRowsSelectionState:
@@ -268,7 +320,7 @@ void DisassemblyView::wheelEvent(QWheelEvent* event)
 void DisassemblyView::keyPressEvent(QKeyEvent* event)
 {
     int key = event->key();
-    ulong rva = getFirstSelected();
+    ulong rva = getInitialSelected();
     ulong newRVA;
     int viewableRowsCount = this->viewport()->height() / rowHeight(); // Rounded down
     ulong lastInstrRVA = getNextInstructionRVA(mTopTableRVA, viewableRowsCount - 1);
@@ -442,9 +494,12 @@ void DisassemblyView::multiSelTimerSlot()
  */
 bool DisassemblyView::isSelected(ulong rva, ulong count)
 {
+    Selection_t selection = mMemoryView.getSelection();
     int wRVA = getNextInstructionRVA(rva, count);
+    ulong startRVA = wRVA;
+    ulong stopRVA = wRVA + DisassembleAt(wRVA).lentgh - 1;
 
-    if((wRVA >= mSelectedRowsData.fromIndex) && (wRVA <= mSelectedRowsData.toIndex))
+    if(((startRVA >= selection.fromIndex) && (startRVA <= selection.toIndex)) || ((stopRVA >= selection.fromIndex) && (stopRVA <= selection.toIndex)))
         return true;
     else
         return false;
@@ -462,18 +517,21 @@ bool DisassemblyView::isSelected(ulong rva, ulong count)
  */
 void DisassemblyView::expandSelectionUpTo(ulong rva, ulong count)
 {
+    Selection_t selection = mMemoryView.getSelection();
     int wRVA = getNextInstructionRVA(rva, count);
+    Instruction_t instruction = DisassembleAt(wRVA);
 
-    if(wRVA < mSelectedRowsData.firstSelectedIndex)
+    if(wRVA < selection.firstSelectedIndex)
     {
-        mSelectedRowsData.fromIndex = wRVA;
-        mSelectedRowsData.toIndex = mSelectedRowsData.firstSelectedIndex;
+        selection.fromIndex = wRVA;
+        selection.toIndex = selection.firstSelectedIndex;
     }
-    else if(wRVA > mSelectedRowsData.firstSelectedIndex)
+    else if(wRVA > selection.firstSelectedIndex)
     {
-        mSelectedRowsData.fromIndex = mSelectedRowsData.firstSelectedIndex;
-        mSelectedRowsData.toIndex = wRVA;
+        selection.fromIndex = selection.firstSelectedIndex;
+        selection.toIndex = wRVA + instruction.lentgh - 1;
     }
+    mMemoryView.setSelection(selection);
 }
 
 
@@ -487,21 +545,36 @@ void DisassemblyView::expandSelectionUpTo(ulong rva, ulong count)
  */
 void DisassemblyView::setSingleSelection(ulong rva, ulong count)
 {
+    Selection_t selection = mMemoryView.getSelection();
     ulong wRVA = getNextInstructionRVA(rva, count);
+    Instruction_t instruction = DisassembleAt(wRVA);
 
-    mSelectedRowsData.firstSelectedIndex = wRVA;
-    mSelectedRowsData.fromIndex = wRVA;
-    mSelectedRowsData.toIndex = wRVA;
+    selection.firstSelectedIndex = wRVA;
+    selection.fromIndex = wRVA;
+    selection.toIndex = wRVA + instruction.lentgh - 1;
+
+    mMemoryView.setSelection(selection);
 }
 
 /**
- * @brief       Return the rva of the selected instruction. In case of multi-selection, the first selected instruction.
+ * @brief       Return the rva of the selected instruction. In case of multi-selection, the initial instructions is returned (Instruction that was pressed).
  *
  * @return      Return the rva of the selected instruction.
  */
-int DisassemblyView::getFirstSelected()
+int DisassemblyView::getInitialSelected()
 {
-    return mSelectedRowsData.firstSelectedIndex;
+    return mMemoryView.getSelection().firstSelectedIndex;
+}
+
+
+/**
+ * @brief       Return the rva of the selection head.
+ *
+ * @return      Return the rva of the selection head.
+ */
+int DisassemblyView::getSelectionHead()
+{
+    return mMemoryView.getSelection().fromIndex;
 }
 
 
@@ -524,38 +597,170 @@ int DisassemblyView::getNextInstructionRVA(int address, int count)
     //return address + count;
 }
 
-QString DisassemblyView::getStringToPrint(int topTableAddress, int rowIndex, int colIndex)
+Instruction_t DisassemblyView::DisassembleAt(ulong rva)
 {
     char* data = (char*)mMemoryView.data();
-    ulong base = 0;
+    ulong base = mMemoryView.getBase();
     ulong size = mMemoryView.size();
+    ulong ip = base + rva;
+
+    return mDisasm.DisassembleAt(data, base, size, ip);
+}
+
+Instruction_t DisassemblyView::DisassembleAt(ulong rva, ulong count)
+{
+    rva = getNextInstructionRVA(rva, count);
+
+    char* data = (char*)mMemoryView.data();
+    ulong base = mMemoryView.getBase();
+    ulong size = mMemoryView.size();
+    ulong ip = base + rva;
+
+    return mDisasm.DisassembleAt(data, base, size, ip);
+}
+
+
+QString DisassemblyView::getStringToPrint(int topTableAddress, int rowIndex, int colIndex)
+{
     ulong ip = getNextInstructionRVA(topTableAddress, rowIndex);
-    Instruction_t instruction = mDisasm.DisassembleAt(data, base, size, ip);
     QString string = "";
 
-    switch(colIndex)
+    if(ip < mMemoryView.size())
     {
-        case 0:
+        Instruction_t instruction = DisassembleAt(ip);
+
+        switch(colIndex)
         {
-            string = QString("%1").arg(instruction.rva, 8, 16, QChar('0')).toUpper();
-            break;
+            case 0:
+            {
+                ulong addr = (ulong)instruction.rva + (ulong)mMemoryView.getBase();
+                string = QString("%1").arg(addr, 8, 16, QChar('0')).toUpper();
+                break;
+            }
+            case 1:
+            {
+                for(int i = 0; i < instruction.dump.size(); i++)
+                    string += QString("%1").arg((unsigned char)(instruction.dump.at(i)), 2, 16, QChar('0')).toUpper();
+                break;
+            }
+            case 2:
+            {
+                string = instruction.instStr.toUpper();
+                break;
+            }
+            case 3:
+            {
+                break;
+            }
+            default:
+                break;
         }
-        case 1:
-        {
-            for(int i = 0; i < instruction.dump.size(); i++)
-                string += QString::number((unsigned char)(instruction.dump.at(i)), 16).toUpper();;
-            break;
-        }
-        case 2:
-        {
-            string = instruction.instStr.toUpper();
-            break;
-        }
-        default:
-            break;
     }
 
     return string;
+}
+
+
+void DisassemblyView::paintGraphicDump(QPainter* painter, int x, int y, int topTableRVA, int rowIndex)
+{
+    ulong selHeadRVA = getSelectionHead();
+    ulong rva = getNextInstructionRVA(topTableRVA, rowIndex);
+    Instruction_t instruction = DisassembleAt(selHeadRVA);
+    Int32 branchType = instruction.disasm.Instruction.BranchType;
+    GraphicDump_t wPict = GD_Nothing;
+
+    if(     branchType == (Int32)JO      ||
+            branchType == (Int32)JC      ||
+            branchType == (Int32)JE      ||
+            branchType == (Int32)JA      ||
+            branchType == (Int32)JS      ||
+            branchType == (Int32)JP      ||
+            branchType == (Int32)JL      ||
+            branchType == (Int32)JG      ||
+            branchType == (Int32)JB      ||
+            branchType == (Int32)JECXZ   ||
+            branchType == (Int32)JmpType ||
+            branchType == (Int32)RetType ||
+            branchType == (Int32)JNO     ||
+            branchType == (Int32)JNC     ||
+            branchType == (Int32)JNE     ||
+            branchType == (Int32)JNA     ||
+            branchType == (Int32)JNS     ||
+            branchType == (Int32)JNP     ||
+            branchType == (Int32)JNL     ||
+            branchType == (Int32)JNG     ||
+            branchType == (Int32)JNB)
+    {
+        ulong destRVA = (ulong)instruction.disasm.Instruction.AddrValue;
+
+        if(destRVA > (ulong)mMemoryView.getBase())
+        {
+            destRVA -= (ulong)mMemoryView.getBase();
+
+            if(destRVA < selHeadRVA)
+            {
+                if(rva == destRVA)
+                    wPict = GD_HeadFromBottom;
+                else if(rva > destRVA && rva < selHeadRVA)
+                    wPict = GD_Vert;
+                else if(rva == selHeadRVA)
+                    wPict = GD_FootToTop;
+            }
+            else if(destRVA > selHeadRVA)
+            {
+                if(rva == selHeadRVA)
+                    wPict = GD_FootToBottom;
+                else if(rva > selHeadRVA && rva < destRVA)
+                    wPict = GD_Vert;
+                else if(rva == destRVA)
+                    wPict = GD_HeadFromTop;
+            }
+        }
+    }
+
+    painter->save() ;
+    painter->setPen(QColor(0, 0, 0));
+
+    if(wPict == GD_Vert)
+    {
+        painter->drawLine(x, y, x, y + rowHeight());
+    }
+    else if(wPict == GD_FootToBottom)
+    {
+        painter->drawLine(x, y + rowHeight() / 2, x + 5, y + rowHeight() / 2);
+        painter->drawLine(x, y + rowHeight() / 2, x, y + rowHeight());
+    }
+    if(wPict == GD_FootToTop)
+    {
+        painter->drawLine(x, y + rowHeight() / 2, x + 5, y + rowHeight() / 2);
+        painter->drawLine(x, y, x, y + rowHeight() / 2);
+    }
+    else if(wPict == GD_HeadFromBottom)
+    {
+        QPoint wPoints[] = {
+             QPoint(x + 3, y + rowHeight() / 2 - 2),
+             QPoint(x + 5, y + rowHeight() / 2),
+             QPoint(x + 3, y + rowHeight() / 2 + 2),
+         };
+
+        painter->drawLine(x, y + rowHeight() / 2, x + 5, y + rowHeight() / 2);
+        painter->drawLine(x, y + rowHeight() / 2, x, y + rowHeight());
+        painter->drawPolyline(wPoints, 3);
+    }
+    if(wPict == GD_HeadFromTop)
+    {
+        QPoint wPoints[] = {
+             QPoint(x + 3, y + rowHeight() / 2 - 2),
+             QPoint(x + 5, y + rowHeight() / 2),
+             QPoint(x + 3, y + rowHeight() / 2 + 2),
+         };
+
+        painter->drawLine(x, y + rowHeight() / 2, x + 5, y + rowHeight() / 2);
+        painter->drawLine(x, y, x, y + rowHeight() / 2);
+        painter->drawPolyline(wPoints, 3);
+    }
+
+    painter->restore();
 }
 
 /************************************************************************************
@@ -612,41 +817,14 @@ void DisassemblyView::vertSliderActionSlot(int action)
         case QAbstractSlider::SliderMove:
             {
                 qDebug() << "SliderMove";
-                /*
-                int delta = verticalScrollBar()->sliderPosition() - mTopTableRVA;
-
-                if(qAbs(delta) < 10)
-                {
-                    qDebug() << "SliderMove 1";
-                    if(delta < 0)
-                    {
-                        qDebug() << "SliderMove 2";
-                        int address = verticalScrollBar()->value();
-                        address = getPreviousInstructionRVA(address, qAbs(delta));
-                        verticalScrollBar()->setSliderPosition(address);
-                        mTopTableRVA = address;
-                    }
-                    else if(delta > 0)
-                    {
-                        qDebug() << "SliderMove 3";
-                        int address = verticalScrollBar()->value();
-                        address = getNextInstructionRVA(address, qAbs(delta));
-                        qDebug() << "address retruned " << address;
-                        verticalScrollBar()->setValue(address);
-                        mTopTableRVA = address;
-                    }
-                    qDebug() << "SliderMove 4";
-                }
-                else
-                {
-                    mTopTableRVA = verticalScrollBar()->sliderPosition();
-                }
-                */
 
                 int rva = verticalScrollBar()->sliderPosition();
 
-                rva = getPreviousInstructionRVA(rva, 1);
-                rva = getNextInstructionRVA(rva, 1);
+                if((rva != 0) && (rva != (mMemoryView.size()-1)))
+                {
+                    rva = getPreviousInstructionRVA(rva, 1);
+                    rva = getNextInstructionRVA(rva, 1);
+                }
 
                 mTopTableRVA = rva;
             }
@@ -701,7 +879,12 @@ void DisassemblyView::addColumn()
 {
     ColumnItem_t wNewItem;
 
-    wNewItem.width = 50;
+    wNewItem.width = 100;
+    wNewItem.header.height = 20;
+    wNewItem.header.button = new QPushButton("text", this);
+    wNewItem.header.button->setStyleSheet(" QPushButton {\n     background-color: rgb(192, 192, 192);\n     border-style: outset;\n     border-width: 2px;\n     border-color: rgb(128, 128, 128);\n }\n QPushButton:pressed {\n     background-color: rgb(192, 192, 192);\n     border-style: inset;\n }");
+    wNewItem.header.button->resize(wNewItem.width - 1, wNewItem.header.height);
+    wNewItem.header.isClickable = false;
 
     mColumnItemList.append(wNewItem);
 }
@@ -726,4 +909,10 @@ int DisassemblyView::columnWidth(int index)
 void DisassemblyView::setColumnWidth(int index, int width)
 {
     mColumnItemList[index].width = width;
+}
+
+
+int DisassemblyView::headerOffset()
+{
+    return mColumnItemList.at(0).header.height;
 }

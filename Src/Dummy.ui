@@ -291,8 +291,8 @@ background-color: rgb(255, 52, 157);</string>
   <widget class="QColumnView" name="columnView_2">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>120</y>
+     <x>50</x>
+     <y>420</y>
      <width>256</width>
      <height>192</height>
     </rect>
@@ -342,6 +342,44 @@ background-color: rgb(255, 52, 157);</string>
      <string>Nouvelle colonne</string>
     </property>
    </column>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>20</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Monospace'; font-size:9pt;&quot;&gt;CALL &lt;/span&gt;&lt;span style=&quot; font-family:'Monospace'; font-size:9pt; background-color:#ffff00;&quot;&gt;toto&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="evilButton">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>160</y>
+     <width>186</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"> QPushButton {
+     background-color: rgb(192, 192, 192);
+     border-style: outset;
+     border-width: 2px;
+     border-color: rgb(128, 128, 128);
+ }
+ QPushButton:pressed {
+     background-color: rgb(192, 192, 192);
+     border-style: inset;
+ }</string>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
   </widget>
  </widget>
  <resources/>

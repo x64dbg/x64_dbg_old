@@ -3,11 +3,16 @@
 
 MapViewOfMem::MapViewOfMem()
 {
-
+    mSelectedData.fromIndex = -1;
+    mSelectedData.toIndex = -1;
 }
 
 MapViewOfMem::MapViewOfMem(QString file)
 {
+
+    mSelectedData.fromIndex = -1;
+    mSelectedData.toIndex = -1;
+
     qDebug() << "MapViewOfMem() Load data from file.";
 
     QFile wFile(file);
@@ -24,6 +29,7 @@ MapViewOfMem::MapViewOfMem(QString file)
     }
 
     mSize = mData.size();
+    mBase = 0x00401000;
 }
 
 
@@ -52,4 +58,20 @@ unsigned long long MapViewOfMem::size()
 unsigned char* MapViewOfMem::data()
 {
     return (unsigned char*)(mData.data());
+}
+
+
+Selection_t MapViewOfMem::getSelection()
+{
+    return mSelectedData;
+}
+
+void MapViewOfMem::setSelection(Selection_t sel)
+{
+    mSelectedData = sel;
+}
+
+ulong MapViewOfMem::getBase()
+{
+    return mBase;
 }
