@@ -21,7 +21,8 @@ DisassemblyView::DisassemblyView(MapViewOfMem memory, QWidget *parent) : QAbstra
     setRowHeight(wRowsHeight);
     setRowCount(10);
 
-    isHeaderVisible = true;
+
+    mHeader.height = 20;
 
     addColumn();
     addColumn();
@@ -29,14 +30,14 @@ DisassemblyView::DisassemblyView(MapViewOfMem memory, QWidget *parent) : QAbstra
     addColumn();
     addColumn();
 
-
+    setHeaderVisible(true);
 
 
     mGuiState = DisassemblyView::NoState;
 
     mColResizeData.splitHandle = false;
 
-
+    button.setStyleSheet(" QPushButton {\n     background-color: rgb(192, 192, 192);\n     border-style: outset;\n     border-width: 2px;\n     border-color: rgb(128, 128, 128);\n }\n QPushButton:pressed {\n     background-color: rgb(192, 192, 192);\n     border-style: inset;\n }");
 
     mMemoryView = memory;
 
@@ -60,12 +61,13 @@ void DisassemblyView::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this->viewport());
 
-    int viewableRowsCount = this->viewport()->height() / rowHeight() + 1;
+    int viewableRowsCount = this->trueHeight() / rowHeight() + 1;
     int x = 0;
     int y = 0;
 
     // Paint background
     painter.fillRect(painter.viewport(), QBrush(QColor(255, 251, 240)));
+    //painter.fillRect(painter.viewport(), QBrush(QColor(192, 192, 192)));
 /*
     QTextDocument doc;
     doc.setDocumentMargin(0);
@@ -80,28 +82,38 @@ void DisassemblyView::paintEvent(QPaintEvent* event)
 
 
     // Draw header
-    if(isHeaderVisible == true)
+    if(mHeader.isHeaderVisible == true)
     {
         for(int i = 0; i < columnCount(); i++)
         {
             if(i < (columnCount() - 1)) // For all columns except the last one
             {
-                mColumnItemList.at(i).header.button->resize(columnWidth(i), mColumnItemList.at(i).header.button->height());
-                mColumnItemList.at(i).header.button->move(x + 1, y);
+                QStyleOptionButton opt;
+                if((mColumnItemList.at(i).header.isPressed == true) && (mColumnItemList[mPressedHeaderCol].header.isMouseOver == true))
+                    opt.state = QStyle::State_Sunken;
+                else
+                    opt.state = QStyle::State_Enabled;
+                opt.rect = QRect(x, y, columnWidth(i), mHeader.height);
+                button.style()->drawControl(QStyle::CE_PushButton, &opt, &painter,&button);
+
                 x += columnWidth(i);
             }
             else
             {
-                mColumnItemList.at(i).header.button->resize(painter.viewport().width() - x, mColumnItemList.at(i).header.button->height());
-                mColumnItemList.at(i).header.button->move(x + 1, y);
+                QStyleOptionButton opt;
+                if(mColumnItemList.at(i).header.isPressed == false)
+                    opt.state = QStyle::State_Enabled;
+                else
+                    opt.state = QStyle::State_Sunken;
+                opt.rect = QRect(x, y, painter.viewport().width() - x, mHeader.height);
+                button.style()->drawControl(QStyle::CE_PushButton, &opt, &painter,&button);
+
                 x += columnWidth(i);
             }
         }
-
         x = 0;
         y = headerOffset();
     }
-
 
     // Iterate over all columns and cells
     for(int i = 0; i < columnCount(); i++)
@@ -208,28 +220,48 @@ void DisassemblyView::mouseMoveEvent(QMouseEvent* event)
             qDebug() << "State = ResizeColumnState";
 
             int delta = event->x() - mColResizeData.lastPosX;
+
             int wNewSize = ((columnWidth(mColResizeData.index) + delta) >= 20) ? (columnWidth(mColResizeData.index) + delta) : (20);
 
             setColumnWidth(mColResizeData.index, wNewSize);
-            this->viewport()->repaint();
 
             mColResizeData.lastPosX = event->x();
+
+            this->viewport()->repaint();
+
             break;
         }
         case DisassemblyView::MultiRowsSelectionState:
         {
             qDebug() << "State = MultiRowsSelectionState";
 
-            if((event->y() >= 0) || (event->y() <= this->height()))
+            if((transY(event->y()) >= 0) || (transY(event->y()) <= this->trueHeight()))
             {
 
-                int wRowIndex = getRowIndexFromY(event->y());
+                int wRowIndex = getRowIndexFromY(transY(event->y()));
 
                 expandSelectionUpTo(mTopTableRVA, wRowIndex);
 
-                viewport()->repaint();
+                this->viewport()->repaint();
             }
             break;
+        }
+        case DisassemblyView::HeaderButtonPressed:
+        {
+            qDebug() << "State = HeaderButtonPressed";
+
+            int wColIndex = getColumnIndexFromX(event->x());
+
+            if((wColIndex == mPressedHeaderCol) && (event->y() <= mHeader.height) && (event->y() >= 0))
+            {
+                mColumnItemList[mPressedHeaderCol].header.isMouseOver = true;
+            }
+            else
+            {
+                mColumnItemList[mPressedHeaderCol].header.isMouseOver = false;
+            }
+
+            this->viewport()->repaint();
         }
         default:
             break;
@@ -241,6 +273,7 @@ void DisassemblyView::mousePressEvent(QMouseEvent* event)
 {
     if(((event->buttons() & Qt::LeftButton) != 0) && ((event->buttons() & Qt::RightButton) == 0))
     {
+
         if(mColResizeData.splitHandle == true)
         {
             int wColIndex = getColumnIndexFromX(event->x());
@@ -259,9 +292,24 @@ void DisassemblyView::mousePressEvent(QMouseEvent* event)
 
             mColResizeData.lastPosX = event->x();
         }
+        else if((mHeader.isHeaderVisible == true) && (event->y() <= mHeader.height) && (event->y() >= 0))
+        {
+            int wColIndex = getColumnIndexFromX(event->x());
+
+            qDebug() << "Button " << wColIndex << "has been pressed.";
+
+            mColumnItemList[wColIndex].header.isPressed = true;
+            mColumnItemList[wColIndex].header.isMouseOver = true;
+
+            mPressedHeaderCol = wColIndex;
+
+            mGuiState = DisassemblyView::HeaderButtonPressed;
+
+            this->viewport()->repaint();
+        }
         else
         {
-            int wRowIndex = getRowIndexFromY(event->y());
+            int wRowIndex = getRowIndexFromY(transY(event->y()));
 
             setSingleSelection(mTopTableRVA, wRowIndex);
 
@@ -287,10 +335,27 @@ void DisassemblyView::mouseReleaseEvent(QMouseEvent* event)
         {
             mGuiState = DisassemblyView::NoState;
         }
+        else if(mGuiState == DisassemblyView::HeaderButtonPressed)
+        {
+            if(mColumnItemList[mPressedHeaderCol].header.isMouseOver == true)
+            {
+                //TODO: send event
+                qDebug() << "Button " << mPressedHeaderCol << "has been released.";
+            }
+            mGuiState = DisassemblyView::NoState;
+        }
         else
         {
             QWidget::mouseReleaseEvent(event);
         }
+
+
+        for(int i = 0; i < columnCount(); i++)
+        {
+            mColumnItemList[i].header.isPressed = false;
+        }
+
+        this->viewport()->repaint();
     }
 }
 
@@ -322,7 +387,7 @@ void DisassemblyView::keyPressEvent(QKeyEvent* event)
     int key = event->key();
     ulong rva = getInitialSelected();
     ulong newRVA;
-    int viewableRowsCount = this->viewport()->height() / rowHeight(); // Rounded down
+    int viewableRowsCount = trueHeight() / rowHeight(); // Rounded down
     ulong lastInstrRVA = getNextInstructionRVA(mTopTableRVA, viewableRowsCount - 1);
 
     if(key == Qt::Key_Up)
@@ -392,9 +457,6 @@ void DisassemblyView::contextMenuEvent(QContextMenuEvent* event)
 
 
 
-
-
-
 int DisassemblyView::getRowIndexFromY(int y)
 {
     return (y / rowHeight());
@@ -418,7 +480,7 @@ int DisassemblyView::getColumnIndexFromX(int x)
             index++;
         }
     }
-    return -1;
+    return columnCount() - 1;
 }
 
 int DisassemblyView::getColumnPosition(int index)
@@ -449,16 +511,16 @@ void DisassemblyView::multiSelTimerSlot()
 
     if(mGuiState == DisassemblyView::MultiRowsSelectionState)
     {
-        int wY = this->mapFromGlobal(QCursor::pos()).y();
+        int wY = transY(this->mapFromGlobal(QCursor::pos()).y());
 
-        if((wY < 0) || (wY > this->height()))
+        if((wY < 0) || (wY > this->trueHeight()))
         {
             int wScrollBarValue = verticalScrollBar()->value();
             int wNewScrollBarValue;
-            int viewableRowsCount = this->height() / rowHeight() + 1;
+            int viewableRowsCount = this->trueHeight() / rowHeight() + 1;
             int wRowIndex;
 
-            wY = (wY < 0) ? wY : (wY - this->height());
+            wY = (wY < 0) ? wY : (wY - this->trueHeight());
 
             if(wY < 0)
             {
@@ -843,7 +905,7 @@ void DisassemblyView::vertSliderActionSlot(int action)
 void DisassemblyView::updateVertScrollbarRange()
 {
     int wMemSize = mMemoryView.size();
-    int wViewableRowsCount = this->viewport()->height() / rowHeight();  // Round down
+    int wViewableRowsCount = this->trueHeight() / rowHeight();  // Round down
     int wScrollMax = (wMemSize > wViewableRowsCount) ? wMemSize - 1 : 0;
 
     verticalScrollBar()->setRange(0, wScrollMax);
@@ -880,11 +942,8 @@ void DisassemblyView::addColumn()
     ColumnItem_t wNewItem;
 
     wNewItem.width = 100;
-    wNewItem.header.height = 20;
-    wNewItem.header.button = new QPushButton("text", this);
-    wNewItem.header.button->setStyleSheet(" QPushButton {\n     background-color: rgb(192, 192, 192);\n     border-style: outset;\n     border-width: 2px;\n     border-color: rgb(128, 128, 128);\n }\n QPushButton:pressed {\n     background-color: rgb(192, 192, 192);\n     border-style: inset;\n }");
-    wNewItem.header.button->resize(wNewItem.width - 1, wNewItem.header.height);
     wNewItem.header.isClickable = false;
+    wNewItem.header.isPressed = false;
 
     mColumnItemList.append(wNewItem);
 }
@@ -914,5 +973,23 @@ void DisassemblyView::setColumnWidth(int index, int width)
 
 int DisassemblyView::headerOffset()
 {
-    return mColumnItemList.at(0).header.height;
+    if(mHeader.isHeaderVisible == true)
+        return mHeader.height;
+    else
+        return 0;
+}
+
+int DisassemblyView::transY(int y)
+{
+    return y - headerOffset();
+}
+
+int DisassemblyView::trueHeight()
+{
+    return this->height() - headerOffset();
+}
+
+void DisassemblyView::setHeaderVisible(bool visible)
+{
+   mHeader.isHeaderVisible = visible;
 }

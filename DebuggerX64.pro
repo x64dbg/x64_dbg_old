@@ -12,7 +12,6 @@ TARGET = DebuggerX64
 TEMPLATE = app
 
 
-
 SOURCES += \
     Src/Gui/MainWindow.cpp \
     Src/main.cpp \

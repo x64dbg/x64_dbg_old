@@ -13,34 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>129</y>
-     <width>160</width>
-     <height>50</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-   </layout>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>60</y>
-     <width>46</width>
-     <height>13</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
-   </property>
-  </widget>
   <widget class="QTableWidget" name="tableWidget">
    <property name="geometry">
     <rect>
@@ -154,42 +126,6 @@
     </property>
    </item>
   </widget>
-  <widget class="QTreeWidget" name="treeWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>190</y>
-     <width>256</width>
-     <height>192</height>
-    </rect>
-   </property>
-   <attribute name="headerHighlightSections">
-    <bool>false</bool>
-   </attribute>
-   <attribute name="headerStretchLastSection">
-    <bool>false</bool>
-   </attribute>
-   <column>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </column>
-   <item>
-    <property name="text">
-     <string>Nouvel élément</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Nouvel élément</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Nouvel élément</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QTableWidget" name="tableWidget_2">
    <property name="geometry">
     <rect>
@@ -250,44 +186,6 @@
     </property>
    </column>
   </widget>
-  <widget class="QSplitter" name="splitter">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>30</y>
-     <width>281</width>
-     <height>121</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="styleSheet">
-     <string notr="true">color: rgb(219, 38, 255);
-border-color: rgb(255, 96, 253);
-background-color: rgb(255, 52, 157);</string>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-    <property name="autoDefault">
-     <bool>false</bool>
-    </property>
-    <property name="default">
-     <bool>false</bool>
-    </property>
-    <property name="flat">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
-   <widget class="QListWidget" name="listWidget"/>
-  </widget>
   <widget class="QColumnView" name="columnView_2">
    <property name="geometry">
     <rect>
@@ -297,51 +195,6 @@ background-color: rgb(255, 52, 157);</string>
      <height>192</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QTableWidget" name="tableWidget_3">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>200</y>
-     <width>256</width>
-     <height>192</height>
-    </rect>
-   </property>
-   <row>
-    <property name="text">
-     <string>Nouvelle ligne</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Nouvelle ligne</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Nouvelle ligne</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Nouvelle ligne</string>
-    </property>
-   </row>
-   <row>
-    <property name="text">
-     <string>Nouvelle ligne</string>
-    </property>
-   </row>
-   <column>
-    <property name="text">
-     <string>Nouvelle colonne</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Nouvelle colonne</string>
-    </property>
-   </column>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
@@ -359,8 +212,8 @@ background-color: rgb(255, 52, 157);</string>
   <widget class="QPushButton" name="evilButton">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>160</y>
+     <x>340</x>
+     <y>280</y>
      <width>186</width>
      <height>91</height>
     </rect>
@@ -376,6 +229,82 @@ background-color: rgb(255, 52, 157);</string>
      background-color: rgb(192, 192, 192);
      border-style: inset;
  }</string>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>100</y>
+     <width>601</width>
+     <height>80</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,10,10,10">
+    <item>
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="minimumSize">
+       <size>
+        <width>50</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>50</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPushButton" name="pushButton_5">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>230</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"> QPushButton {
+     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 #515151, stop: 0.5 #404040,
+                                       stop: 0.6 #333333, stop:1 #555555);
+     color: white;
+     padding-left: 4px;
+     border: 1px solid #6c6c6c;
+ }
+</string>
    </property>
    <property name="text">
     <string>PushButton</string>

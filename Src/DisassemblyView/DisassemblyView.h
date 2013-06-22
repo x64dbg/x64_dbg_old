@@ -10,10 +10,15 @@
 typedef struct _HeaderButton_t
 {
     bool isClickable;
-    int height;
-    QPushButton* button;
+    bool isPressed;
+    bool isMouseOver;
 } HeaderButton_t;
 
+typedef struct _Header_t
+{
+    bool isHeaderVisible;
+    int height;
+} Header_t;
 
 typedef struct _ColumnItem_t
 {
@@ -38,8 +43,11 @@ typedef struct _ColumnResizingData_t
 class DisassemblyView : public QAbstractScrollArea
 {
     Q_OBJECT
+
+
+
 public:
-    enum GuiState_t {NoState, ResizeColumnState, MultiRowsSelectionState};
+    enum GuiState_t {NoState, ResizeColumnState, MultiRowsSelectionState, HeaderButtonPressed};
     enum GraphicDump_t {GD_Nothing, GD_FootToTop, GD_FootToBottom, GD_HeadFromTop, GD_HeadFromBottom, GD_Vert}; // GD_FootToTop = '- , GD_FootToBottom = ,- , GD_HeadFromTop = '-> , GD_HeadFromBottom = ,-> , GD_Vert = |
 
     explicit DisassemblyView(MapViewOfMem memory, QWidget *parent = 0);
@@ -78,6 +86,7 @@ public:
     void contextMenuEvent(QContextMenuEvent* event);
 
 
+
     // Getters and Setters
     int rowHeight();
     void setRowHeight(int heigth);
@@ -88,6 +97,17 @@ public:
     int columnWidth(int index);
     void setColumnWidth(int index, int width);
     int headerOffset();
+    int transY(int y);
+    int trueHeight();
+    void setHeaderVisible(bool visible);
+
+/*
+    QScopedPointer<QPushButton> button;
+
+    DisassemblyView() : button(new QPushButton) {
+        button->setStyleSheet("background-color: red");
+    }
+*/
 
 signals:
     
@@ -118,9 +138,11 @@ private:
 
     QBeaEngine mDisasm;
 
-    bool isHeaderVisible;
+    Header_t mHeader;
 
+    int mPressedHeaderCol;
 
+    QPushButton button;
 };
 
 #endif // DISASSEMBLYVIEW_H
