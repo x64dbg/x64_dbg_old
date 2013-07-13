@@ -1,7 +1,7 @@
 #include "QBeaEngine.h"
 
 
-QBeaEngine::QBeaEngine(QWidget *parent) : QWidget(parent)
+QBeaEngine::QBeaEngine()
 {
     /*
     QFile file("AsmCode.bin");
@@ -188,6 +188,7 @@ ulong QBeaEngine::DisassembleNext(char* data, ulong base, ulong size, ulong ip, 
     for(i = 0; i < n && size > 0; i++)
     {
         mDisasmStruct.EIP = (UIntPtr)pdata;
+        mDisasmStruct.SecurityBlock = (UIntPtr)size;
         len = Disasm(&mDisasmStruct);
         cmdsize = (len < 1) ? 1 : len ;
 
@@ -207,7 +208,7 @@ Instruction_t QBeaEngine::DisassembleAt(char* data, ulong base, ulong size, ulon
 
     mDisasmStruct.EIP = (UIntPtr)((long)data + (long)wInstRVA);
     mDisasmStruct.VirtualAddr = ip;
-    mDisasmStruct.SecurityBlock = (UIntPtr)((long)data + (long)size - 1 - (long)mDisasmStruct.EIP);
+    mDisasmStruct.SecurityBlock = (UIntPtr)(size - wInstRVA);
 
     len = Disasm(&mDisasmStruct);
     len = (len < 1) ? 1 : len ;

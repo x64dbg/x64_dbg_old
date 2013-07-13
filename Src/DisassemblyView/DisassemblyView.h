@@ -129,6 +129,7 @@ private:
 
     GuiState_t mGuiState;
 
+
     ColumnResizingData_t mColResizeData;
 
 

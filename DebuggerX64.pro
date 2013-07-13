@@ -23,7 +23,11 @@ SOURCES += \
     Src/DisassemblyView/DisassemblyView.cpp \
     Src/Memory/MapViewOfMem.cpp \
     Src/Memory/test.cpp \
-    Src/Disassembler/QBeaEngine.cpp
+    Src/Disassembler/QBeaEngine.cpp \
+    Src/DisassemblyView/AbstractTableView.cpp \
+    Src/DisassemblyView/Disassembly.cpp \
+    Src/DisassemblyView/StdTable.cpp \
+    Src/DisassemblyView/HexDump.cpp
 
 HEADERS  += \
     Src/Gui/MainWindow.h \
@@ -35,7 +39,12 @@ HEADERS  += \
     Src/DisassemblyView/DisassemblyView.h \
     Src/Memory/MapViewOfMem.h \
     Src/Memory/test.h \
-    Src/Disassembler/QBeaEngine.h
+    Src/Disassembler/QBeaEngine.h \
+    Src/DisassemblyView/AbstractTableView.h \
+    Src/DisassemblyView/Disassembly.h \
+    Src/Global/NewTypes.h \
+    Src/DisassemblyView/StdTable.h \
+    Src/DisassemblyView/HexDump.h
 
 INCLUDEPATH += \
     Src/Gui \

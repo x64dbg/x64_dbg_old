@@ -189,7 +189,7 @@ void DisassemblyView::mouseMoveEvent(QMouseEvent* event)
                 else
                     hasCursor = false;
 
-                if(((wColIndex != 0) && (event->x() >= wStartPos) && (event->x() <= (wStartPos + 2))) || ((wColIndex != (columnCount() - 1)) && (event->x() <= wEndPos) && (event->x() >= (wEndPos - 2))))
+                if(((wColIndex != 0) && (event->x() >= wStartPos) && (event->x() <= (wStartPos + 5))) || ((wColIndex != (columnCount() - 1)) && (event->x() <= wEndPos) && (event->x() >= (wEndPos - 5))))
                 {
                     handle = true;
                 }

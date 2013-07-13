@@ -19,11 +19,11 @@ typedef struct _Instruction_t
 
 
 
-class QBeaEngine : public QWidget
+class QBeaEngine
 {
-    Q_OBJECT
+
 public:
-    explicit QBeaEngine(QWidget *parent = 0);
+    explicit QBeaEngine();
 
     ulong DisassembleBack(char *data, ulong base, ulong size, ulong ip, int n);
     ulong DisassembleNext(char* data, ulong base, ulong size, ulong ip, int n);
