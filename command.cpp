@@ -2,10 +2,10 @@
 #include "argument.h"
 #include "console.h"
 #include "debugger.h"
+#include "math.h"
 
 static COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
 {
-    //dbg("cmdfind");
     COMMAND* cur=command_list;
     if(!cur->name)
         return 0;
@@ -137,7 +137,10 @@ void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
             argformat(command);
             COMMAND* cmd=cmdget(command_list, command);
             if(!cmd)
+            {
+                mathformat(command);
                 bLoop=cbUnknownCommand(command);
+            }
             else
             {
                 CBCOMMAND cbCommand=cmd->cbCommand;
@@ -146,7 +149,10 @@ void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
                 else
                 {
                     if(!cbCommand)
+                    {
+                        mathformat(command);
                         bLoop=cbUnknownCommand(command);
+                    }
                     else
                         bLoop=cbCommand(command);
                 }

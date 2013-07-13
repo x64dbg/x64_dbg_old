@@ -2,6 +2,19 @@
 #include "variable.h"
 #include "debugger.h"
 #include "console.h"
+#include "math.h"
+
+static bool dosignedcalc=false;
+
+bool valuesignedcalc()
+{
+    return dosignedcalc;
+}
+
+void valuesetsignedcalc(bool a)
+{
+    dosignedcalc=a;
+}
 
 bool isflag(const char* string)
 {
@@ -454,10 +467,8 @@ static uint getregister(int* size, const char* string)
     return 0;
 }
 
-
 bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar)
 {
-    //dbg("valfromstring");
     if(!value)
         return false;
     if(!*string)
@@ -465,6 +476,24 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         *value=0;
         return true;
     }
+    if(mathcontains(string)) //handle math
+    {
+        int len=strlen(string);
+        char* string_=(char*)malloc(len+1);
+        strcpy(string_, string);
+        int add=0;
+        while(mathisoperator(string_[add])>2)
+            add++;
+        if(!mathhandlebrackets(string_+add, 0))
+        {
+            free(string_);
+            return false;
+        }
+        bool ret=mathfromstring(string_+add, value);
+        free(string_);
+        return ret;
+    }
+
     if(*string=='$') //variable
     {
         if(isvar)
