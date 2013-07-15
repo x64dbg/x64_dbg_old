@@ -59,6 +59,7 @@ static HWND GetConsoleHwnd(void)
     Sleep(40);
     hwndFound=FindWindow(NULL, pszNewWindowTitle);
     SetConsoleTitle(pszOldWindowTitle);
+    Sleep(100);
     return hwndFound;
 }
 
