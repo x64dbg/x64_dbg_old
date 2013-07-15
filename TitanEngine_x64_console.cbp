@@ -19,6 +19,7 @@
 					<Add option="-s" />
 					<Add library=".\TitanEngine_x86.a" />
 					<Add library=".\libdbg_x32.a" />
+					<Add library=".\disasm\libdisasm_x32.a" />
 				</Linker>
 			</Target>
 			<Target title="x64">
@@ -34,6 +35,7 @@
 					<Add option="-s" />
 					<Add library=".\TitanEngine_x64.a" />
 					<Add library=".\libdbg_x64.a" />
+					<Add library=".\disasm\libdisasm_x64.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -58,6 +60,9 @@
 		<Unit filename="dbg.h" />
 		<Unit filename="debugger.cpp" />
 		<Unit filename="debugger.h" />
+		<Unit filename="disasm/disasm.h">
+			<Option target="x32" />
+		</Unit>
 		<Unit filename="instruction.cpp" />
 		<Unit filename="instruction.h" />
 		<Unit filename="main.cpp" />

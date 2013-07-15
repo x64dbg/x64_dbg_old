@@ -5,11 +5,34 @@
 #include "threading.h"
 #include "value.h"
 #include "breakpoint.h"
+#include "disasm\disasm.h"
 
 static PROCESS_INFORMATION* fdProcessInfo;
 static char szFileName[deflen]="";
 bool bFileIsDll;
 BREAKPOINT* bplist;
+
+DISASM_INIT dinit;
+
+static void doDisasm(uint addr)
+{
+    MEMORY_BASIC_INFORMATION mbi= {0};
+    VirtualQueryEx(fdProcessInfo->hProcess, (void*)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+    uint base=(uint)mbi.BaseAddress;
+    uint start=addr-16*16;
+    if(start<base)
+        start=base;
+    uint end=addr+16*16;
+    if(end>(uint)(mbi.BaseAddress)+mbi.RegionSize)
+        end=(uint)(mbi.BaseAddress)+mbi.RegionSize;
+    char* mem=(char*)malloc(34*16);
+    memset(mem, 0, 34*16);
+    ReadProcessMemory(fdProcessInfo->hProcess, (void*)start, mem, 34*16, 0);
+    memset(&dinit, 0, sizeof(DISASM_INIT));
+    DisasmInit(&dinit);
+    DisasmDo(mem, start, 0, 34*16, addr-start);
+    free(mem);
+}
 
 static void cbUserBreakpoint()
 {
@@ -24,6 +47,9 @@ static void cbUserBreakpoint()
         else
             sprintf(log, "breakpoint at "fhex"!", cur->addr);
         cinsert(log);
+        if(cur->type==BPSINGLESHOOT)
+            bpdel(bplist, 0, cur->addr);
+        doDisasm(GetContextData(UE_CIP));
     }
     //lock
     lock(WAITID_RUN);
@@ -33,6 +59,7 @@ static void cbUserBreakpoint()
 static void cbEntryBreakpoint()
 {
     cinsert("entry point reached!");
+    doDisasm(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -43,6 +70,7 @@ static void cbSystemBreakpoint(void* ExceptionData)
     //handle stuff (TLS, main entry, etc)
     SetCustomHandler(UE_CH_CREATEPROCESS, 0);
     cputs("system breakpoint reached!");
+    doDisasm(GetContextData(UE_CIP));
     //unlock
     unlock(WAITID_SYSBREAK);
     //lock

@@ -47,8 +47,24 @@ static void registercommands()
     cmdnew(cmd, "bplist", cbDebugBplist, true); //breakpoint list
 }
 
+static HWND GetConsoleHwnd(void)
+{
+#define MY_BUFSIZE 1024 // Buffer size for console window titles.
+    HWND hwndFound;         // This is what is returned to the caller.
+    char pszNewWindowTitle[MY_BUFSIZE]; // Contains fabricated
+    char pszOldWindowTitle[MY_BUFSIZE]; // Contains original
+    GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);
+    wsprintf(pszNewWindowTitle,"%d/%d", GetTickCount(), GetCurrentProcessId());
+    SetConsoleTitle(pszNewWindowTitle);
+    Sleep(40);
+    hwndFound=FindWindow(NULL, pszNewWindowTitle);
+    SetConsoleTitle(pszOldWindowTitle);
+    return hwndFound;
+}
+
 int main()
 {
+    SetForegroundWindow(GetConsoleHwnd());
     //dbg("main");
     char dir[deflen]="";
     GetModuleFileNameA(GetModuleHandleA(0), dir, deflen);
