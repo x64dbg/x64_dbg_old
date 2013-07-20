@@ -109,6 +109,22 @@ bool isregister(const char* string)
         return true;
     if(scmp(string, "dl"))
         return true;
+    if(scmp(string, "sih"))
+        return true;
+    if(scmp(string, "sil"))
+        return true;
+    if(scmp(string, "dih"))
+        return true;
+    if(scmp(string, "dil"))
+        return true;
+    if(scmp(string, "bph"))
+        return true;
+    if(scmp(string, "bpl"))
+        return true;
+    if(scmp(string, "sph"))
+        return true;
+    if(scmp(string, "spl"))
+        return true;
 
     if(scmp(string, "dr0"))
         return true;
@@ -167,6 +183,54 @@ bool isregister(const char* string)
     if(scmp(string, "r14"))
         return true;
     if(scmp(string, "r15"))
+        return true;
+    if(scmp(string, "r8d"))
+        return true;
+    if(scmp(string, "r9d"))
+        return true;
+    if(scmp(string, "r10d"))
+        return true;
+    if(scmp(string, "r11d"))
+        return true;
+    if(scmp(string, "r12d"))
+        return true;
+    if(scmp(string, "r13d"))
+        return true;
+    if(scmp(string, "r14d"))
+        return true;
+    if(scmp(string, "r15d"))
+        return true;
+    if(scmp(string, "r8w"))
+        return true;
+    if(scmp(string, "r9w"))
+        return true;
+    if(scmp(string, "r10w"))
+        return true;
+    if(scmp(string, "r11w"))
+        return true;
+    if(scmp(string, "r12w"))
+        return true;
+    if(scmp(string, "r13w"))
+        return true;
+    if(scmp(string, "r14w"))
+        return true;
+    if(scmp(string, "r15w"))
+        return true;
+    if(scmp(string, "r8b"))
+        return true;
+    if(scmp(string, "r9b"))
+        return true;
+    if(scmp(string, "r10b"))
+        return true;
+    if(scmp(string, "r11b"))
+        return true;
+    if(scmp(string, "r12b"))
+        return true;
+    if(scmp(string, "r13b"))
+        return true;
+    if(scmp(string, "r14b"))
+        return true;
+    if(scmp(string, "r15b"))
         return true;
     return false;
 }
@@ -341,6 +405,46 @@ static uint getregister(int* size, const char* string)
         uint val=GetContextData(UE_EDX);
         return val&0xFF;
     }
+    if(scmp(string, "sih"))
+    {
+        uint val=GetContextData(UE_ESI);
+        return (val>>8)&0xFF;
+    }
+    if(scmp(string, "sil"))
+    {
+        uint val=GetContextData(UE_ESI);
+        return val&0xFF;
+    }
+    if(scmp(string, "dih"))
+    {
+        uint val=GetContextData(UE_EDI);
+        return (val>>8)&0xFF;
+    }
+    if(scmp(string, "dil"))
+    {
+        uint val=GetContextData(UE_EDI);
+        return val&0xFF;
+    }
+    if(scmp(string, "bph"))
+    {
+        uint val=GetContextData(UE_EBP);
+        return (val>>8)&0xFF;
+    }
+    if(scmp(string, "bpl"))
+    {
+        uint val=GetContextData(UE_EBP);
+        return val&0xFF;
+    }
+    if(scmp(string, "sph"))
+    {
+        uint val=GetContextData(UE_ESP);
+        return (val>>8)&0xFF;
+    }
+    if(scmp(string, "spl"))
+    {
+        uint val=GetContextData(UE_ESP);
+        return val&0xFF;
+    }
 
     if(size)
         *size=sizeof(uint);
@@ -462,6 +566,112 @@ static uint getregister(int* size, const char* string)
     {
         return GetContextData(UE_R15);
     }
+
+    if(size)
+        *size=4;
+    if(scmp(string, "r8d"))
+    {
+        return GetContextData(UE_R8)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r9d"))
+    {
+        return GetContextData(UE_R9)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r10d"))
+    {
+        return GetContextData(UE_R10)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r11d"))
+    {
+        return GetContextData(UE_R11)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r12d"))
+    {
+        return GetContextData(UE_R12)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r13d"))
+    {
+        return GetContextData(UE_R13)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r14d"))
+    {
+        return GetContextData(UE_R14)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r15d"))
+    {
+        return GetContextData(UE_R15)&0xFFFFFFFF;
+    }
+
+    if(size)
+        *size=2;
+    if(scmp(string, "r8w"))
+    {
+        return GetContextData(UE_R8)&0xFFFF;
+    }
+    if(scmp(string, "r9w"))
+    {
+        return GetContextData(UE_R9)&0xFFFF;
+    }
+    if(scmp(string, "r10w"))
+    {
+        return GetContextData(UE_R10)&0xFFFF;
+    }
+    if(scmp(string, "r11w"))
+    {
+        return GetContextData(UE_R11)&0xFFFF;
+    }
+    if(scmp(string, "r12w"))
+    {
+        return GetContextData(UE_R12)&0xFFFF;
+    }
+    if(scmp(string, "r13w"))
+    {
+        return GetContextData(UE_R13)&0xFFFF;
+    }
+    if(scmp(string, "r14w"))
+    {
+        return GetContextData(UE_R14)&0xFFFF;
+    }
+    if(scmp(string, "r15w"))
+    {
+        return GetContextData(UE_R15)&0xFFFF;
+    }
+
+    if(size)
+        *size=1;
+    if(scmp(string, "r8b"))
+    {
+        return GetContextData(UE_R8)&0xFF;
+    }
+    if(scmp(string, "r9b"))
+    {
+        return GetContextData(UE_R9)&0xFF;
+    }
+    if(scmp(string, "r10b"))
+    {
+        return GetContextData(UE_R10)&0xFF;
+    }
+    if(scmp(string, "r11b"))
+    {
+        return GetContextData(UE_R11)&0xFF;
+    }
+    if(scmp(string, "r12b"))
+    {
+        return GetContextData(UE_R12)&0xFF;
+    }
+    if(scmp(string, "r13b"))
+    {
+        return GetContextData(UE_R13)&0xFF;
+    }
+    if(scmp(string, "r14b"))
+    {
+        return GetContextData(UE_R14)&0xFF;
+    }
+    if(scmp(string, "r15b"))
+    {
+        return GetContextData(UE_R15)&0xFF;
+    }
+
     if(size)
         *size=0;
     return 0;
@@ -469,6 +679,7 @@ static uint getregister(int* size, const char* string)
 
 bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar)
 {
+    dbg("valfromstring");
     if(!value)
         return false;
     if(!*string)
@@ -479,12 +690,12 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
     if(mathcontains(string)) //handle math
     {
         int len=strlen(string);
-        char* string_=(char*)malloc(len+1);
+        char* string_=(char*)malloc(len+256);
         strcpy(string_, string);
         int add=0;
         while(mathisoperator(string_[add])>2)
             add++;
-        if(!mathhandlebrackets(string_+add, 0))
+        if(!mathhandlebrackets(string_+add))
         {
             free(string_);
             return false;

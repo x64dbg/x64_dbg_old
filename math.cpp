@@ -1,6 +1,21 @@
 #include "math.h"
 #include "value.h"
 
+struct BRACKET_PAIR
+{
+    int openpos;
+    int closepos;
+    int layer;
+    int isset; //0=free, 1=open, 2=close
+};
+
+struct EXPRESSION
+{
+    BRACKET_PAIR* pairs;
+    int total_pairs;
+    char* expression;
+};
+
 /*
 operator precedence
 1 ( )
@@ -182,48 +197,143 @@ bool mathdosignedoperation(char op, sint left, sint right, sint* result)
     return false;
 }
 
-bool mathhandlebrackets(char* string, const char* base)
+static void fillpair(EXPRESSION* expstruct, int pos, int layer)
 {
-    dbg("brackets");
-    int len=strlen(string);
-    char* a=string;
-    char* end=a+len;
-    while(*a and *a!='(')
-        a++;
-    if(a!=end)
-        if(!mathhandlebrackets(a+1, string))
-            return false;
-    if(base and string!=base) //don't do the base calculations
+    for(int i=0; i<expstruct->total_pairs; i++)
     {
-        len=strlen(string);
-
-        int i;
-        for(i=0; i<len; i++)
-            if(string[i]==')')
-            {
-                string[i]=0;
-                i++;
-                break;
-            }
-        i--;
-        uint value=0;
-        if(!mathfromstring(string, &value))
-            return false;
-        char* bak=0;
-        int len2=strlen(string+i+1);
-        bool has_bak=false;
-        if(len2)
+        if(!expstruct->pairs[i].isset)
         {
-            has_bak=true;
-            bak=(char*)malloc(len2+1);
-            strcpy(bak, string+i+1);
+            expstruct->pairs[i].layer=layer;
+            expstruct->pairs[i].openpos=pos;
+            expstruct->pairs[i].isset=1;
+            break;
         }
-        int len3=sprintf(string-1, "%x"fext, value);
-        if(has_bak)
-            strcpy(string-1+len3, bak);
-        if(bak)
-            free(bak);
+        else if(expstruct->pairs[i].layer==layer and expstruct->pairs[i].isset==1)
+        {
+            expstruct->pairs[i].closepos=pos;
+            expstruct->pairs[i].isset=2;
+            break;
+        }
     }
+}
+
+
+static int matchpairs(EXPRESSION* expstruct, char* expression, int endlayer)
+{
+    int layer=endlayer;
+    int len=strlen(expression);
+    for(int i=0; i<len; i++)
+    {
+        if(expression[i]=='(')
+        {
+            layer++;
+            int pos=expression+i-expstruct->expression;
+            fillpair(expstruct, pos, layer);
+            i+=matchpairs(expstruct, expression+i+1, layer);
+        }
+        else if(expression[i]==')')
+        {
+            if(layer==endlayer)
+            {
+                int pos=expression+i-expstruct->expression;
+                fillpair(expstruct, pos, layer);
+                return i;
+            }
+            layer--;
+        }
+
+    }
+    return 0;
+}
+
+static int expressionformat(char* exp)
+{
+    int len=strlen(exp);
+    int open=0;
+    int close=0;
+    for(int i=0; i<len; i++)
+    {
+        if(exp[i]=='(')
+            open++;
+        else if(exp[i]==')')
+            close++;
+    }
+    if(close>open)
+        return -1;
+    int add=open-close;
+    if(add)
+    {
+        memset(exp+len, ')', add);
+        exp[len+add]=0;
+    }
+    return open;
+}
+
+static void adjustpairs(EXPRESSION* exps, int cur_open, int cur_close, int cur_len, int new_len)
+{
+    for(int i=0; i<exps->total_pairs; i++)
+    {
+        if(exps->pairs[i].openpos>cur_open)
+            exps->pairs[i].openpos+=new_len-cur_len;
+        if(exps->pairs[i].closepos>cur_close)
+            exps->pairs[i].closepos+=new_len-cur_len;
+    }
+}
+
+static bool printlayer(char* exp, EXPRESSION* exps, int layer)
+{
+    for(int i=0; i<exps->total_pairs; i++)
+    {
+        if(exps->pairs[i].layer==layer)
+        {
+            char temp[256]="";
+            char backup[256]="";
+
+            int open=exps->pairs[i].openpos;
+            int close=exps->pairs[i].closepos;
+            int len=close-open;
+            strncpy(temp, exp+open+1, len-1);
+
+            strcpy(backup, exp+open+len+1);
+
+            uint value;
+            if(!mathfromstring(temp, &value))
+                return false;
+
+            adjustpairs(exps, open, close, len+1, sprintf(exp+open, "%X", value));
+
+            if(*backup)
+                strcat(exp, backup);
+
+        }
+    }
+    return true;
+}
+
+bool mathhandlebrackets(char* expression)
+{
+    EXPRESSION expstruct;
+    expstruct.expression=expression;
+    int total_pairs=expressionformat(expression);
+    if(total_pairs==-1)
+        return false;
+    else if(!total_pairs)
+        return true;
+    expstruct.total_pairs=total_pairs;
+
+    expstruct.pairs=(BRACKET_PAIR*)malloc(expstruct.total_pairs*sizeof(BRACKET_PAIR));
+    memset(expstruct.pairs, 0, expstruct.total_pairs*sizeof(BRACKET_PAIR));
+    matchpairs(&expstruct, expression, 0);
+    int deepest=0;
+    for(int i=0; i<expstruct.total_pairs; i++)
+        if(expstruct.pairs[i].layer>deepest)
+            deepest=expstruct.pairs[i].layer;
+
+    for(int i=deepest; i>0; i--)
+        if(!printlayer(expression, &expstruct, i))
+            return false;
+
+    free(expstruct.pairs);
     return true;
 }
 

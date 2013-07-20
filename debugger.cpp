@@ -5,6 +5,7 @@
 #include "threading.h"
 #include "value.h"
 #include "breakpoint.h"
+#include "instruction.h"
 #include "disasm\disasm.h"
 
 static PROCESS_INFORMATION* fdProcessInfo;
@@ -203,6 +204,9 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 {
     //dbg("cbDebugSetBPX");
     char argaddr[deflen]="";
+    if(!argget(cmd, argaddr, 0, true))
+        if(!strncasecmp(cmd, "bp", 2))
+            return cbBadCmd(cmd);
     if(!argget(cmd, argaddr, 0, false))
         return true;
     char argname[deflen]="";
