@@ -136,7 +136,6 @@ bool cbInstrMov(const char* cmd)
 
 bool cbInstrVarList(const char* cmd)
 {
-    //dbg("varlist");
     char arg1[deflen]="";
     argget(cmd, arg1, 0, true);
     int filter=0;

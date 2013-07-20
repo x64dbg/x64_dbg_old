@@ -4,6 +4,7 @@
 #include "variable.h"
 #include "instruction.h"
 #include "debugger.h"
+#include "data.h"
 
 static bool cbStrLen(const char* cmd)
 {
@@ -66,7 +67,6 @@ static HWND GetConsoleHwnd(void)
 int main()
 {
     SetForegroundWindow(GetConsoleHwnd());
-    //dbg("main");
     char dir[deflen]="";
     GetModuleFileNameA(GetModuleHandleA(0), dir, deflen);
     int len=strlen(dir);

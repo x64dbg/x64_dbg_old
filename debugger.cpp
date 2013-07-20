@@ -112,7 +112,6 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
 
 bool cbDebugInit(const char* cmd)
 {
-    //dbg("cbInitDebug");
     if(IsFileBeingDebugged())
     {
         cputs("already debugging!");
@@ -202,7 +201,6 @@ bool cbDebugSetBPXOptions(const char* cmd)
 
 bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 {
-    //dbg("cbDebugSetBPX");
     char argaddr[deflen]="";
     if(!argget(cmd, argaddr, 0, true))
         if(!strncasecmp(cmd, "bp", 2))
@@ -212,7 +210,13 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
     char argname[deflen]="";
     argget(cmd, argname, 1, true);
     char argtype[deflen]="";
-    argget(cmd, argtype, 2, true);
+    bool has_arg2=argget(cmd, argtype, 2, true);
+    if(!has_arg2 and scmp(argname, "ss"))
+    {
+        strcpy(argtype, "ss");
+        *argname=0;
+    }
+
     _strlwr(argtype);
     uint addr=0;
     if(!valfromstring(argaddr, &addr, 0, 0))

@@ -2,7 +2,6 @@
 
 bool arraycontains(const char* cmd_list, const char* cmd)
 {
-    //dbg("arraycontains");
     if(!cmd_list or !cmd)
         return false;
     char temp[deflen]="";
@@ -27,7 +26,6 @@ bool arraycontains(const char* cmd_list, const char* cmd)
 
 bool scmp(const char* a, const char* b)
 {
-    //dbg("scmp");
     if(strcmp(a, b))
         return false;
     return true;

@@ -24,13 +24,11 @@ formatarg:
 */
 void argformat(char* cmd)
 {
-    //cputs("[DEBUG] formatarg");
     char command_[deflen]="";
     char* command=command_;
     strcpy(command, cmd);
     while(*command==' ')
         command++;
-    //printf("[DEBUG] 1:command: \"%s\"[%d]\n", command, strlen(command));
     int len=strlen(command);
     int start=0;
     for(int i=0; i<len; i++)
@@ -43,11 +41,9 @@ void argformat(char* cmd)
     if(!start)
         start=len;
     _strlwr(command);
-    //printf("[DEBUG] 1:command: \"%s\"[%d]\n", command, strlen(command));
     char arguments_[deflen]="";
     char* arguments=arguments_;
     strcpy(arguments, command+start);
-    //printf("[DEBUG] 2:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     char temp[deflen]="";
     len=strlen(arguments);
     for(int i=0,j=0; i<len; i++)
@@ -57,7 +53,6 @@ void argformat(char* cmd)
         j+=sprintf(temp+j, "%c", arguments[i]);
     }
     strcpy(arguments, temp);
-    //printf("[DEBUG] 3:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     len=strlen(arguments);
     for(int i=0; i<len; i++)
         if(arguments[i]=='\\' and arguments[i+1]=='\\')
@@ -65,34 +60,30 @@ void argformat(char* cmd)
             arguments[i]=1;
             arguments[i+1]=1;
         }
-    //printf("[DEBUG] 4:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     while((*arguments==',' or *arguments==' ') and *(arguments-1)!='\\')
         arguments++;
-    //printf("[DEBUG] 5a:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     len=strlen(arguments);
     while((arguments[len-1]==' ' or arguments[len-1]==',') and arguments[len-2]!='\\')
         len--;
     arguments[len]=0;
-    //printf("[DEBUG] 5b:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     len=strlen(arguments);
     int quote_count=0;
     for(int i=0; i<len; i++)
         if(arguments[i]=='"')
             quote_count++;
-    //printf("[DEBUG] 6:quote_count: %d\n", quote_count);
     if(!(quote_count%2))
     {
         for(int i=0; i<len; i++)
             if(arguments[i]=='"')
                 arguments[i]=0;
-        //dbg("[DEBUG] 7a:arguments");
+
         for(int i=0; i<len; i++)
             if(arguments[i]==1 and arguments[i+1]==1)
             {
                 arguments[i]='\\';
                 arguments[i+1]='\\';
             }
-        //dbg("[DEBUG] 7b:arguments");
+
         for(int i=0,j=0; i<len; i++)
         {
             if(!arguments[i])
@@ -114,7 +105,6 @@ void argformat(char* cmd)
         arguments=arguments_;
         strcpy(arguments, temp);
     }
-    //printf("[DEBUG] 7c:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     len=strlen(arguments);
     for(int i=0; i<len; i++)
         if(arguments[i]=='\\' and arguments[i+1]=='\\')
@@ -122,7 +112,6 @@ void argformat(char* cmd)
             arguments[i]=1;
             arguments[i+1]=1;
         }
-    //printf("[DEBUG] 8:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     len=strlen(arguments);
     for(int i=0,j=0; i<len; i++)
     {
@@ -131,7 +120,6 @@ void argformat(char* cmd)
         j+=sprintf(temp+j, "%c", arguments[i]);
     }
     strcpy(arguments, temp);
-    //printf("[DEBUG] 9:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     len=strlen(arguments);
     for(int i=0,j=0; i<len; i++)
     {
@@ -140,7 +128,6 @@ void argformat(char* cmd)
         j+=sprintf(temp+j, "%c", arguments[i]);
     }
     strcpy(arguments, temp);
-    //printf("[DEBUG] 10:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     len=strlen(arguments);
     for(int i=0; i<len; i++)
         if(arguments[i]==1 and arguments[i+1]==1)
@@ -148,12 +135,10 @@ void argformat(char* cmd)
             arguments[i]='\\';
             arguments[i+1]='\\';
         }
-    //printf("[DEBUG] 11:arguments: \"%s\"[%d]\n", arguments, strlen(arguments));
     if(strlen(arguments))
         sprintf(cmd, "%s %s", command, arguments);
     else
         strcpy(cmd, command);
-    //printf("[DEBUG] cmd: \"%s\"[%d]\n", cmd, strlen(cmd));
 }
 
 /*
@@ -162,7 +147,6 @@ void argformat(char* cmd)
 */
 int arggetcount(const char* cmd)
 {
-    //cputs("[DEBUG] arggetcount");
     int len=strlen(cmd);
     if(!len)
         return -1;
@@ -173,10 +157,7 @@ int arggetcount(const char* cmd)
     while(cmd[start]!=' ' and start<len)
         start++;
     if(start==len)
-    {
-        //printf("[DEBUG] arg_count: %d\n", arg_count);
         return arg_count;
-    }
     arg_count=1;
     char temp[deflen]="";
     strcpy(temp, cmd);
@@ -191,7 +172,6 @@ int arggetcount(const char* cmd)
         if(temp[i]==',' and temp[i-1]!='\\')
             arg_count++;
     }
-    //printf("[DEBUG] arg_count: %d\n", arg_count);
     return arg_count;
 }
 /*

@@ -25,7 +25,6 @@ static VAR* varfind(const char* name, VAR** link)
 
 void varinit()
 {
-    //dbg("varinit");
     vars=(VAR*)malloc(sizeof(VAR));
     memset(vars, 0, sizeof(VAR));
     //General variables
@@ -46,7 +45,6 @@ VAR* vargetptr()
 
 bool varnew(const char* name_, uint value, VAR_TYPE type)
 {
-    //dbg("varnew");
     if(!name_)
         return false;
     char* name=(char*)malloc(strlen(name_)+2);
@@ -89,7 +87,6 @@ bool varnew(const char* name_, uint value, VAR_TYPE type)
 
 bool varget(const char* name, uint* value, int* size, VAR_TYPE* type)
 {
-    //dbg("varget");
     VAR* found=varfind(name, 0);
     if(!found)
         return false;
@@ -105,7 +102,6 @@ bool varget(const char* name, uint* value, int* size, VAR_TYPE* type)
 
 bool varset(const char* name, uint value, bool setreadonly)
 {
-    //dbg("varset");
     VAR* found=varfind(name, 0);
     if(!found)
         return false;
@@ -117,7 +113,6 @@ bool varset(const char* name, uint value, bool setreadonly)
 
 bool vardel(const char* name_, bool delsystem)
 {
-    //dbg("vardel");
     char* name=(char*)malloc(strlen(name_)+2);
     if(*name_!='$')
     {

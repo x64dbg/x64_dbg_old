@@ -26,7 +26,6 @@ static COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
 
 COMMAND* cmdinit()
 {
-    //dbg("cmdinit");
     COMMAND* cmd=(COMMAND*)malloc(sizeof(COMMAND));
     memset(cmd, 0, sizeof(COMMAND));
     return cmd;
@@ -34,7 +33,6 @@ COMMAND* cmdinit()
 
 bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool debugonly)
 {
-    //dbg("cmdnew");
     if(!command_list or !cbCommand or !name or !*name or cmdfind(command_list, name, 0))
         return false;
     COMMAND* cmd;
@@ -63,7 +61,6 @@ bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool d
 
 COMMAND* cmdget(COMMAND* command_list, const char* cmd)
 {
-    //dbg("cmdget");
     char new_cmd[deflen]="";
     strcpy(new_cmd, cmd);
     int len=strlen(new_cmd);
@@ -79,7 +76,6 @@ COMMAND* cmdget(COMMAND* command_list, const char* cmd)
 
 CBCOMMAND cmdset(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool debugonly)
 {
-    //dbg("cmdset");
     if(!cbCommand)
         return 0;
     COMMAND* found=cmdfind(command_list, name, 0);
@@ -93,7 +89,6 @@ CBCOMMAND cmdset(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, b
 
 bool cmddel(COMMAND* command_list, const char* name)
 {
-    //dbg("cmddel");
     COMMAND* prev=0;
     COMMAND* found=cmdfind(command_list, name, &prev);
     if(!found)
@@ -121,7 +116,6 @@ bool cmddel(COMMAND* command_list, const char* name)
 
 void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
 {
-    //dbg("cmdloop");
     char command_[deflen]="";
     char* command=command_;
     bool bLoop=true;
