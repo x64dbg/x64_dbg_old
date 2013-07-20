@@ -57,6 +57,7 @@
 		<Unit filename="command.h" />
 		<Unit filename="console.cpp" />
 		<Unit filename="console.h" />
+		<Unit filename="data.h" />
 		<Unit filename="dbg.h" />
 		<Unit filename="debugger.cpp" />
 		<Unit filename="debugger.h" />
