@@ -687,6 +687,23 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         *value=0;
         return true;
     }
+    if(mathcontains(string)) //handle math
+    {
+        int len=strlen(string);
+        char* string_=(char*)malloc(len+256);
+        strcpy(string_, string);
+        int add=0;
+        while(mathisoperator(string_[add])>2)
+            add++;
+        if(!mathhandlebrackets(string_+add))
+        {
+            free(string_);
+            return false;
+        }
+        bool ret=mathfromstring(string_+add, value);
+        free(string_);
+        return ret;
+    }
     if(*string=='@')
     {
         if(!IsFileBeingDebugged())
@@ -720,23 +737,6 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         if(value_size)
             *value_size=read_size;
         return true;
-    }
-    if(mathcontains(string)) //handle math
-    {
-        int len=strlen(string);
-        char* string_=(char*)malloc(len+256);
-        strcpy(string_, string);
-        int add=0;
-        while(mathisoperator(string_[add])>2)
-            add++;
-        if(!mathhandlebrackets(string_+add))
-        {
-            free(string_);
-            return false;
-        }
-        bool ret=mathfromstring(string_+add, value);
-        free(string_);
-        return ret;
     }
     if(*string=='$') //variable
     {

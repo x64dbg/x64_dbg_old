@@ -30,13 +30,19 @@ class=rvts9>: All debug registers (all sizes) can be used as
 variables.</SPAN><SPAN class=rvts9><BR></SPAN></P>
 <P class=rvps3><SPAN class=rvts11><U>memory locations</U></SPAN><SPAN 
 class=rvts9>: You can read from a memory location by using one of the 
-following expressions:<BR>@addr<BR>@n:addr (where n is the amount of bytes to 
-read, this can be anything smaller then 4 on x32 and smaller then 8 on x64, when 
-specified otherwise, there will be an error). Notice that you should use 
-brackets if you want to do operations with the memory (addr is interpreted as an 
-expression). For example: "(@1:cip)+1" will first read a byte from EIP/RIP and 
-then add one to this value.</SPAN></P>
+following expressions:<BR>@addr<BR>         
+       @n:addr (where n is the amount of bytes to read, 
+this can be anything smaller then 4 on x32 and smaller then 
+8 on x64, when specified otherwise, there will be an error). addr is directly interpreted 
+as a value, when you want to read [addr+1] you should use 
+brackets: @(addr+1), @addr+1 will read: [addr]+1.</SPAN></P>
 <P class=rvps3><SPAN 
+class=rvts9>         
+                 
+            
+               
+            
+     </SPAN><SPAN 
 class=rvts9><U>flags</U>: Debug flags (interpreted as integer) can be used 
 as input. Flags are prefixed with a '!' following the flag name or the bit number their on. 
 Valid flags are: !cf, !pf, !af, !zf, !sf, !tf, !if, !df, !of, !rf, !vm, !ac, !vif, !vip and !id.</SPAN><SPAN class=rvts9></P></SPAN>
@@ -51,4 +57,4 @@ information.</SPAN></P>
 <P class=rvps3><SPAN class=rvts9>  
                 
 Input for arguments can always be done in any of the above forms, except if 
-statedotherwise.</SPAN></P></body>
+statedotherwise.</SPAN></P></head>

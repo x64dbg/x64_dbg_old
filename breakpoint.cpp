@@ -1,4 +1,5 @@
 #include "breakpoint.h"
+#include "debugger.h"
 
 BREAKPOINT* bpinit()
 {
@@ -27,7 +28,7 @@ BREAKPOINT* bpfind(BREAKPOINT* breakpoint_list, const char* name, uint addr, BRE
     return 0;
 }
 
-bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr, BP_TYPE type)
+bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr, short oldbytes, BP_TYPE type)
 {
     if(!breakpoint_list or !addr or bpfind(breakpoint_list, name, addr, 0))
         return false;
@@ -48,6 +49,7 @@ bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr, BP_TYPE typ
     }
     bp->addr=addr;
     bp->type=type;
+    bp->oldbytes=oldbytes;
     BREAKPOINT* cur=breakpoint_list;
     if(!nonext)
     {

@@ -242,12 +242,13 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
         type|=UE_BREAKPOINT_TYPE_UD2;
     else if(strstr(argtype, "short"))
         type|=UE_BREAKPOINT_TYPE_INT3;
-    if(bpfind(bplist, 0, addr, 0) or IsBPXEnabled(addr) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
+    short oldbytes;
+    if(!ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, &oldbytes, sizeof(short), 0) or bpfind(bplist, 0, addr, 0) or IsBPXEnabled(addr) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
     {
         cprintf("error setting breakpoint at "fhex"!\n", addr);
         return true;
     }
-    bpnew(bplist, argname, addr, list_type);
+    bpnew(bplist, argname, addr, oldbytes, list_type);
     cprintf("breakpoint at "fhex" set!\n", addr);
     return true;
 }
