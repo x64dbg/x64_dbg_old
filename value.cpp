@@ -679,11 +679,46 @@ static uint getregister(int* size, const char* string)
 
 bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar)
 {
+    dbg("valfromstring");
     if(!value)
         return false;
     if(!*string)
     {
         *value=0;
+        return true;
+    }
+    if(*string=='@')
+    {
+        if(!IsFileBeingDebugged())
+        {
+            cputs("not debugging");
+            *value=0;
+            if(value_size)
+                *value_size=0;
+            if(isvar)
+                *isvar=true;
+            return true;
+        }
+        int read_size=sizeof(uint);
+        int add=1;
+        if(string[2]==':' and isdigit((string[1])))
+        {
+            add+=2;
+            int new_size=string[1]-0x30;
+            if(new_size<read_size)
+                read_size=new_size;
+        }
+        if(!valfromstring(string+add, value, value_size, isvar))
+            return false;
+        uint addr=*value;
+        *value=0;
+        if(!ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, value, read_size, 0))
+        {
+            cputs("failed to read memory");
+            return false;
+        }
+        if(value_size)
+            *value_size=read_size;
         return true;
     }
     if(mathcontains(string)) //handle math
@@ -703,7 +738,6 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         free(string_);
         return ret;
     }
-
     if(*string=='$') //variable
     {
         if(isvar)

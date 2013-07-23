@@ -8,7 +8,7 @@
 #include "instruction.h"
 #include "disasm\disasm.h"
 
-static PROCESS_INFORMATION* fdProcessInfo;
+PROCESS_INFORMATION* fdProcessInfo;
 static char szFileName[deflen]="";
 bool bFileIsDll;
 BREAKPOINT* bplist;
@@ -211,9 +211,9 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
     argget(cmd, argname, 1, true);
     char argtype[deflen]="";
     bool has_arg2=argget(cmd, argtype, 2, true);
-    if(!has_arg2 and scmp(argname, "ss"))
+    if(!has_arg2 and (scmp(argname, "ss") or scmp(argname, "long") or scmp(argname, "ud2")))
     {
-        strcpy(argtype, "ss");
+        strcpy(argtype, argname);
         *argname=0;
     }
 

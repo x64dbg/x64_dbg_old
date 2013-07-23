@@ -72,7 +72,7 @@ bool mathcontains(const char* text)
 {
     int len=strlen(text);
     for(int i=0; i<len; i++)
-        if(mathisoperator(text[i])>1)
+        if(mathisoperator(text[i]))
             return true;
     return false;
 }
@@ -282,6 +282,7 @@ static void adjustpairs(EXPRESSION* exps, int cur_open, int cur_close, int cur_l
 
 static bool printlayer(char* exp, EXPRESSION* exps, int layer)
 {
+    dbg("printlayer");
     for(int i=0; i<exps->total_pairs; i++)
     {
         if(exps->pairs[i].layer==layer)
@@ -342,6 +343,7 @@ bool mathhandlebrackets(char* expression)
 */
 bool mathfromstring(const char* string, uint* value)
 {
+    dbg("mathfromstring");
     //do math
     int highestop=0;
     int highestop_pos=0;
@@ -354,6 +356,12 @@ bool mathfromstring(const char* string, uint* value)
             highestop=curop;
             highestop_pos=i;
         }
+    }
+    if(!highestop)
+    {
+        if(!valfromstring(string, value, 0, 0))
+            return false;
+        return true;
     }
     char* strleft=(char*)malloc(len+1);
     char* strright=(char*)malloc(len+1);

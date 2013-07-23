@@ -23,4 +23,7 @@ bool cbDebugToggleBPX(const char* cmd);
 bool cbDebugDeleteBPX(const char* cmd);
 bool cbDebugBplist(const char* cmd);
 
+//variables
+extern PROCESS_INFORMATION* fdProcessInfo;
+
 #endif // _DEBUGGER_H
