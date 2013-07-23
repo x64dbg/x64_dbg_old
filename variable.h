@@ -10,7 +10,8 @@ enum VAR_TYPE
 {
     VAR_SYSTEM=1,
     VAR_USER=2,
-    VAR_READONLY=3
+    VAR_READONLY=3,
+    VAR_HIDDEN=4
 };
 
 enum VAR_VALUE_TYPE

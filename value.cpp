@@ -677,17 +677,16 @@ static uint getregister(int* size, const char* string)
     return 0;
 }
 
-bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar)
+bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar, bool silent)
 {
-    dbg("valfromstring");
     if(!value)
         return false;
-    if(!*string)
+    else if(!*string)
     {
         *value=0;
         return true;
     }
-    if(mathcontains(string)) //handle math
+    else if(mathcontains(string)) //handle math
     {
         int len=strlen(string);
         char* string_=(char*)malloc(len+256);
@@ -704,11 +703,12 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         free(string_);
         return ret;
     }
-    if(*string=='@')
+    else if(*string=='@')
     {
         if(!IsFileBeingDebugged())
         {
-            cputs("not debugging");
+            if(!silent)
+                cputs("not debugging");
             *value=0;
             if(value_size)
                 *value_size=0;
@@ -725,30 +725,28 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             if(new_size<read_size)
                 read_size=new_size;
         }
-        if(!valfromstring(string+add, value, value_size, isvar))
+        if(!valfromstring(string+add, value, 0, 0, false))
             return false;
         uint addr=*value;
         *value=0;
         if(!ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, value, read_size, 0))
         {
-            cputs("failed to read memory");
+            if(!silent)
+                cputs("failed to read memory");
             return false;
         }
         if(value_size)
             *value_size=read_size;
-        return true;
-    }
-    if(*string=='$') //variable
-    {
         if(isvar)
             *isvar=true;
-        return varget(string, value, value_size, 0);
+        return true;
     }
-    if(isregister(string)) //register
+    else if(isregister(string)) //register
     {
         if(!IsFileBeingDebugged())
         {
-            cputs("not debugging!");
+            if(!silent)
+                cputs("not debugging!");
             *value=0;
             if(value_size)
                 *value_size=0;
@@ -761,11 +759,12 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             *isvar=true;
         return true;
     }
-    if(*string=='!' and isflag(string+1)) //flag
+    else if(*string=='!' and isflag(string+1)) //flag
     {
         if(!IsFileBeingDebugged())
         {
-            cputs("not debugging");
+            if(!silent)
+                cputs("not debugging");
             *value=0;
             if(value_size)
                 *value_size=0;
@@ -784,6 +783,13 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             *isvar=true;
         return true;
     }
+    else if(varget(string, value, value_size, 0)) //variable?
+    {
+        if(isvar)
+            *isvar=true;
+        return true;
+    }
+
     if(value_size)
         *value_size=0;
     if(isvar)

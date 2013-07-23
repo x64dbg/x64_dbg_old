@@ -18,6 +18,7 @@ struct BREAKPOINT
 {
     char* name;
     uint addr;
+    bool enabled;
     short oldbytes;
     BP_TYPE type;
     BREAKPOINT* next;

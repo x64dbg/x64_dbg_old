@@ -50,8 +50,8 @@ static void cbUserBreakpoint()
         cinsert(log);
         if(cur->type==BPSINGLESHOOT)
             bpdel(bplist, 0, cur->addr);
-        doDisasm(GetContextData(UE_CIP));
     }
+    doDisasm(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -219,9 +219,14 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 
     _strlwr(argtype);
     uint addr=0;
-    if(!valfromstring(argaddr, &addr, 0, 0))
+    if(!valfromstring(argaddr, &addr, 0, 0, false))
     {
         cprintf("invalid addr: \"%s\"\n", argaddr);
+        return true;
+    }
+    if(addr==GetPE32Data(szFileName, 0, UE_OEP)+GetPE32Data(szFileName, 0, UE_IMAGEBASE))
+    {
+        cputs("entry breakpoint will be set automatically");
         return true;
     }
     uint type=0;
@@ -256,13 +261,33 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 bool cbDebugEnableBPX(const char* cmd)
 {
     char arg1[deflen]="";
-    if(!argget(cmd, arg1, 0, false))
+    if(!argget(cmd, arg1, 0, true)) //enable all breakpoints
+    {
+        BREAKPOINT* cur=bplist;
+        if(!cur or !cur->addr)
+        {
+            cputs("no breakpoints!");
+            return true;
+        }
+        bool bNext=true;
+        while(bNext)
+        {
+            if(!SetBPX(cur->addr, cur->type, (void*)cbUserBreakpoint))
+                cprintf("could not enable %.8X\n", cur->addr);
+            else
+                cur->enabled=true;
+            cur=cur->next;
+            if(!cur)
+                bNext=false;
+        }
+        cputs("all breakpoints enabled!");
         return true;
+    }
     BREAKPOINT* bp=bpfind(bplist, arg1, 0, 0);
     if(!bp)
     {
         uint addr=0;
-        if(!valfromstring(arg1, &addr, 0, 0))
+        if(!valfromstring(arg1, &addr, 0, 0, false))
         {
             cprintf("invalid addr: \"%s\"\n", arg1);
             return true;
@@ -274,26 +299,48 @@ bool cbDebugEnableBPX(const char* cmd)
             return true;
         }
     }
-    if(IsBPXEnabled(bp->addr))
+    if(bp->enabled)
     {
         cputs("breakpoint already enabled!");
         return true;
     }
-    if(!EnableBPX(bp->addr))
-        cprintf("failed to enable: \"%s\"\n", arg1);
+    if(!SetBPX(bp->addr, bp->type, (void*)cbUserBreakpoint))
+        cputs("could not enable breakpoint");
+    else
+        bp->enabled=true;
     return true;
 }
 
 bool cbDebugDisableBPX(const char* cmd)
 {
     char arg1[deflen]="";
-    if(!argget(cmd, arg1, 0, false))
+    if(!argget(cmd, arg1, 0, true)) //disable all breakpoints
+    {
+        BREAKPOINT* cur=bplist;
+        if(!cur or !cur->addr)
+        {
+            cputs("no breakpoints!");
+            return true;
+        }
+        bool bNext=true;
+        while(bNext)
+        {
+            if(!DeleteBPX(cur->addr))
+                cprintf("could not disable %.8X\n", cur->addr);
+            else
+                cur->enabled=false;
+            cur=cur->next;
+            if(!cur)
+                bNext=false;
+        }
+        cputs("all breakpoints disabled!");
         return true;
+    }
     BREAKPOINT* bp=bpfind(bplist, arg1, 0, 0);
     if(!bp)
     {
         uint addr=0;
-        if(!valfromstring(arg1, &addr, 0, 0))
+        if(!valfromstring(arg1, &addr, 0, 0, false))
         {
             cprintf("invalid addr: \"%s\"\n", arg1);
             return true;
@@ -305,13 +352,15 @@ bool cbDebugDisableBPX(const char* cmd)
             return true;
         }
     }
-    if(!IsBPXEnabled(bp->addr))
+    if(!bp->enabled)
     {
         cputs("breakpoint already disabled!");
         return true;
     }
-    if(!DisableBPX(bp->addr))
-        cprintf("failed to disable: \"%s\"\n", arg1);
+    if(!DeleteBPX(bp->addr))
+        cputs("could not disable breakpoint");
+    else
+        bp->enabled=false;
     return true;
 }
 
@@ -324,7 +373,7 @@ bool cbDebugToggleBPX(const char* cmd)
     if(!bp)
     {
         uint addr=0;
-        if(!valfromstring(arg1, &addr, 0, 0))
+        if(!valfromstring(arg1, &addr, 0, 0, false))
         {
             cprintf("invalid addr: \"%s\"\n", arg1);
             return true;
@@ -336,18 +385,26 @@ bool cbDebugToggleBPX(const char* cmd)
             return true;
         }
     }
-    bool disable=IsBPXEnabled(bp->addr);
+    bool disable=bp->enabled;
     if(disable)
     {
-        if(!DisableBPX(bp->addr))
-            cprintf("failed to disable: \"%s\"\n", arg1);
-        cputs("breakpoint disabled!");
+        if(!DeleteBPX(bp->addr))
+            cputs("could not disable breakpoint");
+        else
+        {
+            bp->enabled=false;
+            cputs("breakpoint disabled!");
+        }
     }
     else
     {
-        if(!EnableBPX(bp->addr))
-            cprintf("failed to enable: \"%s\"\n", arg1);
-        cputs("breakpoint enabled!");
+        if(!SetBPX(bp->addr, bp->type, (void*)cbUserBreakpoint))
+            cputs("could not disable breakpoint");
+        else
+        {
+            bp->enabled=true;
+            cputs("breakpoint enabled!");
+        }
     }
     varset("$res", (uint)disable, false);
     return true;
@@ -356,13 +413,35 @@ bool cbDebugToggleBPX(const char* cmd)
 bool cbDebugDeleteBPX(const char* cmd)
 {
     char arg1[deflen]="";
-    if(!argget(cmd, arg1, 0, false))
+    if(!argget(cmd, arg1, 0, true)) //delete all breakpoints
+    {
+        BREAKPOINT* cur=bplist;
+        if(!cur or !cur->addr)
+        {
+            cputs("no breakpoints!");
+            return true;
+        }
+        bool bNext=true;
+        while(bNext)
+        {
+            BREAKPOINT* next=cur->next;
+            DeleteBPX(cur->addr);
+            if(cur->name)
+                free(cur->name);
+            free(cur);
+            cur=next;
+            if(!cur)
+                bNext=false;
+        }
+        bplist=0;
+        cputs("all breakpoints deleted!");
         return true;
+    }
     BREAKPOINT* bp=bpfind(bplist, arg1, 0, 0);
     if(!bp)
     {
         uint addr=0;
-        if(!valfromstring(arg1, &addr, 0, 0))
+        if(!valfromstring(arg1, &addr, 0, 0, false))
         {
             cprintf("invalid addr: \"%s\"\n", arg1);
             return true;
@@ -403,7 +482,7 @@ bool cbDebugBplist(const char* cmd)
             type="HW";
         if(cur->type==BPMEMORY)
             type="GP";
-        bool enabled=IsBPXEnabled(cur->addr);
+        bool enabled=cur->enabled;
         if(cur->name)
             cprintf("%d:%s:"fhex":\"%s\"\n", enabled, type, cur->addr, cur->name);
         else

@@ -50,6 +50,7 @@ bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr, short oldby
     bp->addr=addr;
     bp->type=type;
     bp->oldbytes=oldbytes;
+    bp->enabled=true;
     BREAKPOINT* cur=breakpoint_list;
     if(!nonext)
     {

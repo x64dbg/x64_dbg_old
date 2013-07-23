@@ -282,7 +282,6 @@ static void adjustpairs(EXPRESSION* exps, int cur_open, int cur_close, int cur_l
 
 static bool printlayer(char* exp, EXPRESSION* exps, int layer)
 {
-    dbg("printlayer");
     for(int i=0; i<exps->total_pairs; i++)
     {
         if(exps->pairs[i].layer==layer)
@@ -343,8 +342,6 @@ bool mathhandlebrackets(char* expression)
 */
 bool mathfromstring(const char* string, uint* value)
 {
-    dbg("mathfromstring");
-    //do math
     int highestop=0;
     int highestop_pos=0;
     int len=strlen(string);
@@ -359,7 +356,7 @@ bool mathfromstring(const char* string, uint* value)
     }
     if(!highestop)
     {
-        if(!valfromstring(string, value, 0, 0))
+        if(!valfromstring(string, value, 0, 0, false))
             return false;
         return true;
     }
@@ -377,7 +374,7 @@ bool mathfromstring(const char* string, uint* value)
         return false;
     }
     uint right=0;
-    if(!valfromstring(strright, &right, 0, 0))
+    if(!valfromstring(strright, &right, 0, 0, false))
     {
         free(strleft);
         free(strright);
@@ -395,7 +392,7 @@ bool mathfromstring(const char* string, uint* value)
         }
     }
     uint left=0;
-    if(!valfromstring(strleft, &left, 0, 0))
+    if(!valfromstring(strleft, &left, 0, 0, false))
     {
         free(strleft);
         free(strright);

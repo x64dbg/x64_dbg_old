@@ -4,7 +4,6 @@ static VAR* vars;
 
 static VAR* varfind(const char* name, VAR** link)
 {
-    //dbg("varfind");
     VAR* cur=vars;
     if(!cur)
         return 0;
@@ -36,6 +35,8 @@ void varinit()
     //InitDebug variables
     varnew("$hp\1$hProcess", 0, VAR_READONLY);
     varnew("$pid", 0, VAR_READONLY);
+    //hidden variables
+    varnew("$ans\1$an", 0, VAR_HIDDEN);
 }
 
 VAR* vargetptr()
@@ -87,12 +88,15 @@ bool varnew(const char* name_, uint value, VAR_TYPE type)
 
 bool varget(const char* name, uint* value, int* size, VAR_TYPE* type)
 {
-    VAR* found=varfind(name, 0);
+    char newname[deflen]="$";
+    int add=0;
+    if(*name=='$')
+        add=1;
+    strcat(newname, name+add);
+    VAR* found=varfind(newname, 0);
     if(!found)
         return false;
     if(!value)
-        return false;
-    if(*name!='$')
         return false;
     if(type)
         *type=found->type;
@@ -102,10 +106,15 @@ bool varget(const char* name, uint* value, int* size, VAR_TYPE* type)
 
 bool varset(const char* name, uint value, bool setreadonly)
 {
-    VAR* found=varfind(name, 0);
+    char newname[deflen]="$";
+    int add=0;
+    if(*name=='$')
+        add=1;
+    strcat(newname, name+add);
+    VAR* found=varfind(newname, 0);
     if(!found)
         return false;
-    if(!setreadonly and found->type==VAR_READONLY)
+    if(!setreadonly and (found->type==VAR_READONLY or found->type==VAR_HIDDEN))
         return false;
     found->value.value=value;
     return true;
@@ -128,6 +137,8 @@ bool vardel(const char* name_, bool delsystem)
         return false;
     VAR_TYPE type=found->type;
     if(!delsystem and type!=VAR_USER)
+        return false;
+    if(type==VAR_HIDDEN)
         return false;
     free(found->name);
     if(found==vars)
