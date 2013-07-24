@@ -13,7 +13,12 @@ struct INIT_STRUCT
 };
 
 //functions
+void dbgdisablebpx();
+void dbgenablebpx();
+bool dbgisrunning();
+//callbacks
 bool cbDebugInit(const char* cmd);
+bool cbStopDebug(const char* cmd);
 bool cbDebugRun(const char* cmd);
 bool cbDebugSetBPXOptions(const char* cmd);
 bool cbDebugSetBPX(const char* cmd);
@@ -22,6 +27,9 @@ bool cbDebugDisableBPX(const char* cmd);
 bool cbDebugToggleBPX(const char* cmd);
 bool cbDebugDeleteBPX(const char* cmd);
 bool cbDebugBplist(const char* cmd);
+bool cbDebugStepInto(const char* cmd);
+bool cbDebugStepOver(const char* cmd);
+bool cbDebugSingleStep(const char* cmd);
 
 //variables
 extern PROCESS_INFORMATION* fdProcessInfo;

@@ -15,6 +15,52 @@ BREAKPOINT* bplist;
 
 DISASM_INIT dinit;
 
+//static functions
+static void cbStep();
+static void cbSystemBreakpoint(void* ExceptionData);
+static void cbEntryBreakpoint();
+static void cbUserBreakpoint();
+static void doDisasm(uint addr);
+
+void dbgdisablebpx()
+{
+    BREAKPOINT* cur=bplist;
+    if(!cur or !cur->addr)
+        return;
+    bool bNext=true;
+    while(bNext)
+    {
+        if(DeleteBPX(cur->addr))
+            cur->enabled=false;
+        cur=cur->next;
+        if(!cur)
+            bNext=false;
+    }
+}
+
+void dbgenablebpx()
+{
+    BREAKPOINT* cur=bplist;
+    if(!cur or !cur->addr)
+        return;
+    bool bNext=true;
+    while(bNext)
+    {
+        if(SetBPX(cur->addr, cur->type, (void*)cbUserBreakpoint))
+            cur->enabled=true;
+        cur=cur->next;
+        if(!cur)
+            bNext=false;
+    }
+}
+
+bool dbgisrunning()
+{
+    if(!waitislocked(WAITID_RUN))
+        return true;
+    return false;
+}
+
 static void doDisasm(uint addr)
 {
     MEMORY_BASIC_INFORMATION mbi= {0};
@@ -28,7 +74,9 @@ static void doDisasm(uint addr)
         end=(uint)(mbi.BaseAddress)+mbi.RegionSize;
     char* mem=(char*)malloc(34*16);
     memset(mem, 0, 34*16);
+    dbgdisablebpx();
     ReadProcessMemory(fdProcessInfo->hProcess, (void*)start, mem, 34*16, 0);
+    dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
     DisasmDo(mem, start, 0, 34*16, addr-start);
@@ -74,6 +122,15 @@ static void cbSystemBreakpoint(void* ExceptionData)
     doDisasm(GetContextData(UE_CIP));
     //unlock
     unlock(WAITID_SYSBREAK);
+    //lock
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}
+
+static void cbStep()
+{
+    cinsert("stepped!");
+    doDisasm(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -156,6 +213,13 @@ bool cbDebugInit(const char* cmd)
     return true;
 }
 
+bool cbStopDebug(const char* cmd)
+{
+    StopDebug();
+    cbDebugRun("");
+    return true;
+}
+
 bool cbDebugRun(const char* cmd)
 {
     if(!waitislocked(WAITID_RUN))
@@ -224,7 +288,7 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
         cprintf("invalid addr: \"%s\"\n", argaddr);
         return true;
     }
-    if(addr==GetPE32Data(szFileName, 0, UE_OEP)+GetPE32Data(szFileName, 0, UE_IMAGEBASE))
+    if(addr==(uint)(GetPE32Data(szFileName, 0, UE_OEP)+GetPE32Data(szFileName, 0, UE_IMAGEBASE)))
     {
         cputs("entry breakpoint will be set automatically");
         return true;
@@ -248,7 +312,7 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
     else if(strstr(argtype, "short"))
         type|=UE_BREAKPOINT_TYPE_INT3;
     short oldbytes;
-    if(!ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, &oldbytes, sizeof(short), 0) or bpfind(bplist, 0, addr, 0) or IsBPXEnabled(addr) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
+    if(IsBPXEnabled(addr) or !ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, &oldbytes, sizeof(short), 0) or bpfind(bplist, 0, addr, 0) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
     {
         cprintf("error setting breakpoint at "fhex"!\n", addr);
         return true;
@@ -491,5 +555,48 @@ bool cbDebugBplist(const char* cmd)
         if(!cur)
             bNext=false;
     }
+    return true;
+}
+
+bool cbDebugStepInto(const char* cmd)
+{
+    StepInto((void*)cbStep);
+    if(!waitislocked(WAITID_RUN))
+    {
+        cputs("program is already running");
+        return true;
+    }
+    unlock(WAITID_RUN);
+    return true;
+}
+
+bool cbDebugStepOver(const char* cmd)
+{
+    StepOver((void*)cbStep);
+    if(!waitislocked(WAITID_RUN))
+    {
+        cputs("program is already running");
+        return true;
+    }
+    unlock(WAITID_RUN);
+    return true;
+}
+
+bool cbDebugSingleStep(const char* cmd)
+{
+    char arg1[deflen]="";
+    uint stepcount=1;
+    if(argget(cmd, arg1, 0, true))
+    {
+        if(!valfromstring(arg1, &stepcount, 0, 0, true))
+            stepcount=1;
+    }
+    SingleStep((DWORD)stepcount, (void*)cbStep);
+    if(!waitislocked(WAITID_RUN))
+    {
+        cputs("program is already running");
+        return true;
+    }
+    unlock(WAITID_RUN);
     return true;
 }

@@ -38,6 +38,7 @@ static void registercommands()
     cmdnew(cmd, "cls", cbCls, false); //clear the screen
     cmdnew(cmd, "varlist", cbInstrVarList, false); //list variables[arg1:type filter]
     cmdnew(cmd, "InitDebug\1init\1initdbg", cbDebugInit, false); //init debugger arg1:exefile,[arg2:commandline]
+    cmdnew(cmd, "StopDebug\1stop\1dbgstop", cbStopDebug, true); //stop debugger
     cmdnew(cmd, "run\1go\1r\1g", cbDebugRun, true); //unlock WAITID_RUN
     cmdnew(cmd, "SetBPXOptions\1bptype", cbDebugSetBPXOptions, false); //breakpoint type
     cmdnew(cmd, "SetBPX\1bp\1bpx", cbDebugSetBPX, true); //breakpoint
@@ -46,6 +47,9 @@ static void registercommands()
     cmdnew(cmd, "ToggleBPX\1bpt\1bt", cbDebugToggleBPX, true); //breakpoint toggle
     cmdnew(cmd, "DeleteBPX\1bpc\1bc", cbDebugDeleteBPX, true); //breakpoint delete
     cmdnew(cmd, "bplist", cbDebugBplist, true); //breakpoint list
+    cmdnew(cmd, "StepInto\1sti", cbDebugStepInto, true); //StepInto
+    cmdnew(cmd, "StepOver\1step\1sto\1st", cbDebugStepOver, true); //StepOver
+    cmdnew(cmd, "SingleStep\1sstep\1sst", cbDebugSingleStep, true); //SingleStep arg1:count
 }
 
 static HWND GetConsoleHwnd(void)

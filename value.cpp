@@ -729,7 +729,13 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             return false;
         uint addr=*value;
         *value=0;
-        if(!ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, value, read_size, 0))
+        bool isrunning=dbgisrunning();
+        if(!isrunning)
+            dbgdisablebpx();
+        bool rpm=ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, value, read_size, 0);
+        if(!isrunning)
+            dbgenablebpx();
+        if(!rpm)
         {
             if(!silent)
                 cputs("failed to read memory");
