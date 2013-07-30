@@ -85,6 +85,11 @@ int main()
 {
     SetConsoleIcon(LoadIconA(0, MAKEINTRESOURCEA(IDI_ICON1)));
     SetForegroundWindow(GetConsoleHwnd());
+#ifndef _WIN64
+    SetConsoleTitleA("x32_dbg");
+#else
+    SetConsoleTitleA("x64_dbg");
+#endif
     char dir[deflen]="";
     GetModuleFileNameA(GetModuleHandleA(0), dir, deflen);
     int len=strlen(dir);
