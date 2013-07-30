@@ -9,7 +9,8 @@ bool cbBadCmd(const char* cmd)
     uint value=0;
     int valsize=0;
     bool isvar=false;
-    if(valfromstring(cmd, &value, &valsize, &isvar, false)) //dump variable/value/register/etc
+    bool hexonly=false;
+    if(valfromstring(cmd, &value, &valsize, &isvar, false, &hexonly)) //dump variable/value/register/etc
     {
         //printf("[DEBUG] valsize: %d\n", valsize);
         if(valsize)
@@ -19,7 +20,7 @@ bool cbBadCmd(const char* cmd)
         char format_str[deflen]="";
         if(isvar)// and *cmd!='.' and *cmd!='x') //prevent stupid 0=0 stuff
         {
-            if(value>15)
+            if(value>15 and !hexonly)
             {
                 sprintf(format_str, "%%s=%%.%d"fext"X (%%"fext"ud)\n", valsize);
                 printf(format_str, cmd, value, value);
@@ -32,7 +33,7 @@ bool cbBadCmd(const char* cmd)
         }
         else
         {
-            if(value>15)
+            if(value>15 and !hexonly)
             {
                 sprintf(format_str, "%%.%d"fext"X (%%"fext"ud)\n", valsize);
                 printf(format_str, value, value);
@@ -48,7 +49,7 @@ bool cbBadCmd(const char* cmd)
     {
         char cmd_[deflen]="";
         strcpy(cmd_, cmd);
-        int len=strlen(cmd_);
+        /*int len=strlen(cmd_);
         for(int i=0; i<len; i++)
         {
             if(cmd_[i]==' ')
@@ -56,11 +57,8 @@ bool cbBadCmd(const char* cmd)
                 cmd_[i]=0;
                 break;
             }
-        }
-        if(*cmd_=='$')
-            printf("unknown variable: \"%s\"\n", cmd_);
-        else
-            printf("unknown command: \"%s\"\n", cmd_);
+        }*/
+        printf("unknown command/expression: \"%s\"\n", cmd_);
     }
     return true;
 }
@@ -76,12 +74,12 @@ bool cbInstrVar(const char* cmd)
     int add=0;
     if(*arg1=='$')
         add++;
-    if(valfromstring(arg1+add, &value, 0, 0, true))
+    if(valfromstring(arg1+add, &value, 0, 0, true, 0))
     {
         printf("invalid variable name \"%s\"\n", arg1);
         return true;
     }
-    if(!valfromstring(arg2, &value, 0, 0, false))
+    if(!valfromstring(arg2, &value, 0, 0, false, 0))
     {
         printf("invalid value \"%s\"\n", arg2);
         return true;
@@ -119,7 +117,7 @@ bool cbInstrMov(const char* cmd)
     if(!argget(cmd, arg2, 1, false)) //src name
         return true;
     uint set_value=0;
-    if(!valfromstring(arg2, &set_value, 0, 0, true))
+    if(!valfromstring(arg2, &set_value, 0, 0, true, 0))
     {
         printf("invalid src \"%s\"\n", arg2);
         return true;
@@ -127,7 +125,7 @@ bool cbInstrMov(const char* cmd)
     if(!varset(arg1, set_value, false))
     {
         uint value;
-        if(valfromstring(arg1, &value, 0, 0, true))
+        if(valfromstring(arg1, &value, 0, 0, true, 0))
         {
             printf("invalid dest \"%s\"\n", arg1);
             return true;

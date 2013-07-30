@@ -114,10 +114,8 @@ static void cbEntryBreakpoint()
     wait(WAITID_RUN);
 }
 
-static void cbSystemBreakpoint(void* ExceptionData)
+static void cbSystemBreakpointStep()
 {
-    //handle stuff (TLS, main entry, etc)
-    SetCustomHandler(UE_CH_CREATEPROCESS, 0);
     cputs("system breakpoint reached!");
     doDisasm(GetContextData(UE_CIP));
     //unlock
@@ -125,6 +123,13 @@ static void cbSystemBreakpoint(void* ExceptionData)
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
+}
+
+static void cbSystemBreakpoint(void* ExceptionData)
+{
+    //handle stuff (TLS, main entry, etc)
+    SetCustomHandler(UE_CH_CREATEPROCESS, 0);
+    StepInto((void*)cbSystemBreakpointStep);
 }
 
 static void cbStep()
@@ -216,7 +221,7 @@ bool cbDebugInit(const char* cmd)
 bool cbStopDebug(const char* cmd)
 {
     StopDebug();
-    cbDebugRun("");
+    unlock(WAITID_RUN);
     return true;
 }
 
@@ -283,7 +288,7 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 
     _strlwr(argtype);
     uint addr=0;
-    if(!valfromstring(argaddr, &addr, 0, 0, false))
+    if(!valfromstring(argaddr, &addr, 0, 0, false, 0))
     {
         cprintf("invalid addr: \"%s\"\n", argaddr);
         return true;
@@ -351,7 +356,7 @@ bool cbDebugEnableBPX(const char* cmd)
     if(!bp)
     {
         uint addr=0;
-        if(!valfromstring(arg1, &addr, 0, 0, false))
+        if(!valfromstring(arg1, &addr, 0, 0, false, 0))
         {
             cprintf("invalid addr: \"%s\"\n", arg1);
             return true;
@@ -404,7 +409,7 @@ bool cbDebugDisableBPX(const char* cmd)
     if(!bp)
     {
         uint addr=0;
-        if(!valfromstring(arg1, &addr, 0, 0, false))
+        if(!valfromstring(arg1, &addr, 0, 0, false, 0))
         {
             cprintf("invalid addr: \"%s\"\n", arg1);
             return true;
@@ -437,7 +442,7 @@ bool cbDebugToggleBPX(const char* cmd)
     if(!bp)
     {
         uint addr=0;
-        if(!valfromstring(arg1, &addr, 0, 0, false))
+        if(!valfromstring(arg1, &addr, 0, 0, false, 0))
         {
             cprintf("invalid addr: \"%s\"\n", arg1);
             return true;
@@ -505,7 +510,7 @@ bool cbDebugDeleteBPX(const char* cmd)
     if(!bp)
     {
         uint addr=0;
-        if(!valfromstring(arg1, &addr, 0, 0, false))
+        if(!valfromstring(arg1, &addr, 0, 0, false, 0))
         {
             cprintf("invalid addr: \"%s\"\n", arg1);
             return true;
@@ -588,7 +593,7 @@ bool cbDebugSingleStep(const char* cmd)
     uint stepcount=1;
     if(argget(cmd, arg1, 0, true))
     {
-        if(!valfromstring(arg1, &stepcount, 0, 0, true))
+        if(!valfromstring(arg1, &stepcount, 0, 0, true, 0))
             stepcount=1;
     }
     SingleStep((DWORD)stepcount, (void*)cbStep);

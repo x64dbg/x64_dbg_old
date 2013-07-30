@@ -40,7 +40,6 @@ void argformat(char* cmd)
         }
     if(!start)
         start=len;
-    _strlwr(command);
     char arguments_[deflen]="";
     char* arguments=arguments_;
     strcpy(arguments, command+start);

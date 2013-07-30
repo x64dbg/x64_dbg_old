@@ -45,6 +45,7 @@
 		</Compiler>
 		<Linker>
 			<Add library="shlwapi" />
+			<Add library="psapi" />
 		</Linker>
 		<Unit filename="TitanEngine.h" />
 		<Unit filename="_global.cpp" />
@@ -69,6 +70,10 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="math.cpp" />
 		<Unit filename="math.h" />
+		<Unit filename="resource.h" />
+		<Unit filename="resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="threading.cpp" />
 		<Unit filename="threading.h" />
 		<Unit filename="value.cpp" />

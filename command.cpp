@@ -116,8 +116,7 @@ bool cmddel(COMMAND* command_list, const char* name)
 
 void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
 {
-    char command_[deflen]="";
-    char* command=command_;
+    char command[deflen]="";
     bool bLoop=true;
     while(bLoop)
     {

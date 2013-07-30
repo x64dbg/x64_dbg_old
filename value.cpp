@@ -3,6 +3,7 @@
 #include "debugger.h"
 #include "console.h"
 #include "math.h"
+#include <psapi.h>
 
 static bool dosignedcalc=false;
 
@@ -16,7 +17,7 @@ void valuesetsignedcalc(bool a)
     dosignedcalc=a;
 }
 
-bool isflag(const char* string)
+static bool isflag(const char* string)
 {
     if(scmp(string, "cf"))
         return true;
@@ -51,7 +52,7 @@ bool isflag(const char* string)
     return false;
 }
 
-bool isregister(const char* string)
+static bool isregister(const char* string)
 {
     if(scmp(string, "eax"))
         return true;
@@ -145,6 +146,20 @@ bool isregister(const char* string)
         return true;
     if(scmp(string, "cflags"))
         return true;
+
+    if(scmp(string, "gs"))
+        return true;
+    if(scmp(string, "fs"))
+        return true;
+    if(scmp(string, "es"))
+        return true;
+    if(scmp(string, "ds"))
+        return true;
+    if(scmp(string, "cs"))
+        return true;
+    if(scmp(string, "ss"))
+        return true;
+
 #ifndef _WIN64
     return false;
 #endif // _WIN64
@@ -313,6 +328,31 @@ static uint getregister(int* size, const char* string)
     if(scmp(string, "eflags"))
     {
         return GetContextData(UE_EFLAGS);
+    }
+
+    if(scmp(string, "gs"))
+    {
+        return GetContextData(UE_SEG_GS);
+    }
+    if(scmp(string, "fs"))
+    {
+        return GetContextData(UE_SEG_FS);
+    }
+    if(scmp(string, "es"))
+    {
+        return GetContextData(UE_SEG_ES);
+    }
+    if(scmp(string, "ds"))
+    {
+        return GetContextData(UE_SEG_DS);
+    }
+    if(scmp(string, "cs"))
+    {
+        return GetContextData(UE_SEG_CS);
+    }
+    if(scmp(string, "ss"))
+    {
+        return GetContextData(UE_SEG_SS);
     }
 
     if(size)
@@ -677,7 +717,69 @@ static uint getregister(int* size, const char* string)
     return 0;
 }
 
-bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar, bool silent)
+bool valapifromstring(const char* name, uint* value, int* value_size, bool printall, bool* hexonly)
+{
+    dbg("apifromstring");
+    if(!value or !IsFileBeingDebugged())
+        return false;
+    DWORD cbNeeded=1;
+    HMODULE hMods[256];
+    uint addrfound[256];
+    int found=0;
+    int kernelbase=0;
+    if(EnumProcessModules(fdProcessInfo->hProcess, hMods, sizeof(hMods), &cbNeeded))
+    {
+        for(unsigned int i=0; i<(cbNeeded/sizeof(HMODULE)); i++)
+        {
+            char szModName[MAX_PATH];
+            if(!GetModuleFileNameEx(fdProcessInfo->hProcess, hMods[i], szModName, MAX_PATH))
+                cprintf("could not get filename of module "fhex"\n", hMods[i]);
+            char szBaseName[256]="";
+            int len=strlen(szModName);
+            while(szModName[len]!='\\')
+                len--;
+            strcpy(szBaseName, szModName+len+1);
+            HMODULE mod=LoadLibraryExA(szModName, 0, DONT_RESOLVE_DLL_REFERENCES|LOAD_LIBRARY_AS_DATAFILE);
+            if(!mod)
+                cprintf("unable to load library %s\n", szBaseName);
+            uint addr=(uint)GetProcAddress(mod, name);
+            FreeLibrary(mod);
+            if(addr)
+            {
+                if(!strcasecmp(szBaseName, "kernelbase") or !strcasecmp(szBaseName, "kernelbase.dll"))
+                    kernelbase=found;
+                addrfound[found]=ImporterGetRemoteAPIAddressEx(szBaseName, (char*)name);
+                found++;
+            }
+        }
+    }
+    if(!found)
+        return false;
+    if(value_size)
+        *value_size=sizeof(uint);
+    if(hexonly)
+        *hexonly=true;
+    if(kernelbase)
+    {
+        *value=addrfound[kernelbase];
+        if(!printall)
+            return true;
+        for(int i=0; i<found; i++)
+            if(i!=kernelbase)
+                cprintf(fhex"\n", addrfound[i]);
+    }
+    else
+    {
+        *value=*addrfound;
+        if(!printall)
+            return true;
+        for(int i=1; i<found; i++)
+            cprintf(fhex"\n", addrfound[i]);
+    }
+    return true;
+}
+
+bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar, bool silent, bool* hexonly)
 {
     if(!value)
         return false;
@@ -725,7 +827,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             if(new_size<read_size)
                 read_size=new_size;
         }
-        if(!valfromstring(string+add, value, 0, 0, false))
+        if(!valfromstring(string+add, value, 0, 0, false, 0))
             return false;
         uint addr=*value;
         *value=0;
@@ -804,10 +906,10 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
     {
         int len=strlen(string+1);
         if(!string[1])
-            return false;
+            return valapifromstring(string, value, value_size, true, hexonly);
         for(int i=0; i<len; i++)
             if(!isdigit(string[i+1]))
-                return false;
+                return valapifromstring(string, value, value_size, true, hexonly);
         sscanf(string+1, "%"fext"u", value);
         return true;
     }
@@ -817,10 +919,10 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         inc=1;
     int len=strlen(string+inc);
     if(!string[inc])
-        return false;
+        return valapifromstring(string, value, value_size, true, hexonly);
     for(int i=0; i<len; i++)
         if(!isxdigit(string[i+inc]))
-            return false;
+            return valapifromstring(string, value, value_size, true, hexonly);
     sscanf(string+inc, "%"fext"x", value);
     return true;
 }

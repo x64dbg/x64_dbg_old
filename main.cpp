@@ -5,6 +5,7 @@
 #include "instruction.h"
 #include "debugger.h"
 #include "data.h"
+#include "resource.h"
 
 static bool cbStrLen(const char* cmd)
 {
@@ -68,8 +69,21 @@ static HWND GetConsoleHwnd(void)
     return hwndFound;
 }
 
+void SetConsoleIcon(HICON hIcon)
+{
+    HMODULE hMod=GetModuleHandleA("kernel32");
+    if(!hMod)
+        return;
+    typedef DWORD (WINAPI *SCI)(HICON);
+    SCI sci=(SCI)GetProcAddress(hMod, "SetConsoleIcon");
+    if(!sci)
+        return;
+    sci(hIcon);
+}
+
 int main()
 {
+    SetConsoleIcon(LoadIconA(0, MAKEINTRESOURCEA(IDI_ICON1)));
     SetForegroundWindow(GetConsoleHwnd());
     char dir[deflen]="";
     GetModuleFileNameA(GetModuleHandleA(0), dir, deflen);

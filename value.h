@@ -6,8 +6,7 @@
 //functions
 bool valuesignedcalc();
 void valuesetsignedcalc(bool a);
-bool isflag(const char* string);
-bool isregister(const char* string);
-bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar, bool silent);
+bool valapifromstring(const char* name, uint* value, int* value_size, bool printall, bool* hexonly);
+bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar, bool silent, bool* hexonly);
 
 #endif // _VALUE_H
