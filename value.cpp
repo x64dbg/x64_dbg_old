@@ -717,6 +717,397 @@ static uint getregister(int* size, const char* string)
     return 0;
 }
 
+static bool setregister(const char* string, uint value)
+{
+    uint cur=getregister(0, string);
+
+    if(scmp(string, "eax"))
+    {
+        return SetContextData(UE_EAX, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "ebx"))
+    {
+        return SetContextData(UE_EBX, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "ecx"))
+    {
+        return SetContextData(UE_ECX, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "edx"))
+    {
+        return SetContextData(UE_EDX, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "edi"))
+    {
+        return SetContextData(UE_EDI, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "esi"))
+    {
+        return SetContextData(UE_ESI, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "ebp"))
+    {
+        return SetContextData(UE_EBP, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "esp"))
+    {
+        return SetContextData(UE_ESP, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "eip"))
+    {
+        return SetContextData(UE_EIP, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "eflags"))
+    {
+        return SetContextData(UE_EFLAGS, value&0xFFFFFFFF);
+    }
+
+    if(scmp(string, "gs"))
+    {
+        return SetContextData(UE_SEG_GS, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "fs"))
+    {
+        return SetContextData(UE_SEG_FS, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "es"))
+    {
+        return SetContextData(UE_SEG_ES, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "ds"))
+    {
+        return SetContextData(UE_SEG_DS, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "cs"))
+    {
+        return SetContextData(UE_SEG_CS, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "ss"))
+    {
+        return SetContextData(UE_SEG_SS, value&0xFFFFFFFF);
+    }
+
+
+    if(scmp(string, "ax"))
+    {
+        return SetContextData(UE_EAX, (value&0xFFFF)|(GetContextData(UE_EAX)&0xFFFF0000));
+    }
+    if(scmp(string, "bx"))
+    {
+        return SetContextData(UE_EBX, (value&0xFFFF)|(GetContextData(UE_EBX)&0xFFFF0000));
+    }
+    if(scmp(string, "cx"))
+    {
+        return SetContextData(UE_ECX, (value&0xFFFF)|(GetContextData(UE_ECX)&0xFFFF0000));
+    }
+    if(scmp(string, "dx"))
+    {
+        return SetContextData(UE_EDX, (value&0xFFFF)|(GetContextData(UE_EDX)&0xFFFF0000));
+    }
+    if(scmp(string, "si"))
+    {
+        return SetContextData(UE_ESI, (value&0xFFFF)|(GetContextData(UE_ESI)&0xFFFF0000));
+    }
+    if(scmp(string, "di"))
+    {
+        return SetContextData(UE_EDI, (value&0xFFFF)|(GetContextData(UE_EDI)&0xFFFF0000));
+    }
+    if(scmp(string, "bp"))
+    {
+        return SetContextData(UE_EBP, (value&0xFFFF)|(GetContextData(UE_EBP)&0xFFFF0000));
+    }
+    if(scmp(string, "sp"))
+    {
+        return SetContextData(UE_ESP, (value&0xFFFF)|(GetContextData(UE_ESP)&0xFFFF0000));
+    }
+    if(scmp(string, "ip"))
+    {
+        return SetContextData(UE_EIP, (value&0xFFFF)|(GetContextData(UE_EIP)&0xFFFF0000));
+    }
+
+    //TODO: start here
+    if(scmp(string, "ah"))
+    {
+        return SetContextData(UE_EAX, (value&0xFF)<<8);
+    }
+    if(scmp(string, "al"))
+    {
+        return SetContextData(UE_EAX, value&0xFF);
+    }
+    if(scmp(string, "bh"))
+    {
+        return SetContextData(UE_EBX, (value&0xFF)<<8);
+    }
+    if(scmp(string, "bl"))
+    {
+        return SetContextData(UE_EBX, value&0xFF);
+    }
+    if(scmp(string, "ch"))
+    {
+        return SetContextData(UE_ECX, (value&0xFF)<<8);
+    }
+    if(scmp(string, "cl"))
+    {
+        return SetContextData(UE_ECX, value&0xFF);
+    }
+    if(scmp(string, "dh"))
+    {
+        return SetContextData(UE_EDX, (value&0xFF)<<8);
+    }
+    if(scmp(string, "dl"))
+    {
+        return SetContextData(UE_EDX, value&0xFF);
+    }
+    if(scmp(string, "sih"))
+    {
+        return SetContextData(UE_ESI, (value&0xFF)<<8);
+    }
+    if(scmp(string, "sil"))
+    {
+        return SetContextData(UE_ESI, value&0xFF);
+    }
+    if(scmp(string, "dih"))
+    {
+        return SetContextData(UE_EDI, (value&0xFF)<<8);
+    }
+    if(scmp(string, "dil"))
+    {
+        return SetContextData(UE_EDI, value&0xFF);
+    }
+    if(scmp(string, "bph"))
+    {
+        return SetContextData(UE_EBP, (value&0xFF)<<8);
+    }
+    if(scmp(string, "bpl"))
+    {
+        return SetContextData(UE_EBP, value&0xFF);
+    }
+    if(scmp(string, "sph"))
+    {
+        return SetContextData(UE_ESP, (value&0xFF)<<8);
+    }
+    if(scmp(string, "spl"))
+    {
+        return SetContextData(UE_ESP, value&0xFF);
+    }
+
+    if(scmp(string, "dr0"))
+    {
+        return SetContextData(UE_DR0, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "dr1"))
+    {
+        return SetContextData(UE_DR1, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "dr2"))
+    {
+        return SetContextData(UE_DR2, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "dr3"))
+    {
+        return SetContextData(UE_DR3, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "dr6") or scmp(string, "dr4"))
+    {
+        return SetContextData(UE_DR6, value&0xFFFFFFFF);
+    }
+    if(scmp(string, "dr7") or scmp(string, "dr5"))
+    {
+        return SetContextData(UE_DR7, value&0xFFFFFFFF);
+    }
+
+    if(scmp(string, "cip"))
+    {
+        return SetContextData(UE_CIP, value);
+    }
+    if(scmp(string, "csp"))
+    {
+        return SetContextData(UE_CSP, value);
+    }
+    if(scmp(string, "cflags"))
+    {
+        return SetContextData(UE_CFLAGS, value);
+    }
+
+#ifndef _WIN64
+    return 0;
+#endif // _WIN64
+
+    if(scmp(string, "rax"))
+    {
+        return GetContextData(UE_RAX);
+    }
+    if(scmp(string, "rbx"))
+    {
+        return GetContextData(UE_RBX);
+    }
+    if(scmp(string, "rcx"))
+    {
+        return GetContextData(UE_RCX);
+    }
+    if(scmp(string, "rdx"))
+    {
+        return GetContextData(UE_RDX);
+    }
+    if(scmp(string, "rdi"))
+    {
+        return GetContextData(UE_RDI);
+    }
+    if(scmp(string, "rsi"))
+    {
+        return GetContextData(UE_RSI);
+    }
+    if(scmp(string, "rbp"))
+    {
+        return GetContextData(UE_RBP);
+    }
+    if(scmp(string, "rsp"))
+    {
+        return GetContextData(UE_RSP);
+    }
+    if(scmp(string, "rip"))
+    {
+        return GetContextData(UE_RIP);
+    }
+    if(scmp(string, "rflags"))
+    {
+        return GetContextData(UE_RFLAGS);
+    }
+    if(scmp(string, "r8"))
+    {
+        return GetContextData(UE_R8);
+    }
+    if(scmp(string, "r9"))
+    {
+        return GetContextData(UE_R9);
+    }
+    if(scmp(string, "r10"))
+    {
+        return GetContextData(UE_R10);
+    }
+    if(scmp(string, "r11"))
+    {
+        return GetContextData(UE_R11);
+    }
+    if(scmp(string, "r12"))
+    {
+        return GetContextData(UE_R12);
+    }
+    if(scmp(string, "r13"))
+    {
+        return GetContextData(UE_R13);
+    }
+    if(scmp(string, "r14"))
+    {
+        return GetContextData(UE_R14);
+    }
+    if(scmp(string, "r15"))
+    {
+        return GetContextData(UE_R15);
+    }
+
+    if(scmp(string, "r8d"))
+    {
+        return GetContextData(UE_R8)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r9d"))
+    {
+        return GetContextData(UE_R9)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r10d"))
+    {
+        return GetContextData(UE_R10)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r11d"))
+    {
+        return GetContextData(UE_R11)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r12d"))
+    {
+        return GetContextData(UE_R12)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r13d"))
+    {
+        return GetContextData(UE_R13)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r14d"))
+    {
+        return GetContextData(UE_R14)&0xFFFFFFFF;
+    }
+    if(scmp(string, "r15d"))
+    {
+        return GetContextData(UE_R15)&0xFFFFFFFF;
+    }
+
+    if(scmp(string, "r8w"))
+    {
+        return GetContextData(UE_R8)&0xFFFF;
+    }
+    if(scmp(string, "r9w"))
+    {
+        return GetContextData(UE_R9)&0xFFFF;
+    }
+    if(scmp(string, "r10w"))
+    {
+        return GetContextData(UE_R10)&0xFFFF;
+    }
+    if(scmp(string, "r11w"))
+    {
+        return GetContextData(UE_R11)&0xFFFF;
+    }
+    if(scmp(string, "r12w"))
+    {
+        return GetContextData(UE_R12)&0xFFFF;
+    }
+    if(scmp(string, "r13w"))
+    {
+        return GetContextData(UE_R13)&0xFFFF;
+    }
+    if(scmp(string, "r14w"))
+    {
+        return GetContextData(UE_R14)&0xFFFF;
+    }
+    if(scmp(string, "r15w"))
+    {
+        return GetContextData(UE_R15)&0xFFFF;
+    }
+
+    if(scmp(string, "r8b"))
+    {
+        return GetContextData(UE_R8)&0xFF;
+    }
+    if(scmp(string, "r9b"))
+    {
+        return GetContextData(UE_R9)&0xFF;
+    }
+    if(scmp(string, "r10b"))
+    {
+        return GetContextData(UE_R10)&0xFF;
+    }
+    if(scmp(string, "r11b"))
+    {
+        return GetContextData(UE_R11)&0xFF;
+    }
+    if(scmp(string, "r12b"))
+    {
+        return GetContextData(UE_R12)&0xFF;
+    }
+    if(scmp(string, "r13b"))
+    {
+        return GetContextData(UE_R13)&0xFF;
+    }
+    if(scmp(string, "r14b"))
+    {
+        return GetContextData(UE_R14)&0xFF;
+    }
+    if(scmp(string, "r15b"))
+    {
+        return GetContextData(UE_R15)&0xFF;
+    }
+
+    return 0;
+}
+
 bool valapifromstring(const char* name, uint* value, int* value_size, bool printall, bool* hexonly)
 {
     dbg("apifromstring");
@@ -805,7 +1196,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         free(string_);
         return ret;
     }
-    else if(*string=='@')
+    else if(*string=='@') //memory location
     {
         if(!IsFileBeingDebugged())
         {
@@ -925,4 +1316,83 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             return valapifromstring(string, value, value_size, true, hexonly);
     sscanf(string+inc, "%"fext"x", value);
     return true;
+}
+
+bool valtostring(const char* string, uint* value, bool silent)
+{
+    if(!*string or !value)
+        return false;
+    else if(*string=='@') //memory location
+    {
+        if(!IsFileBeingDebugged())
+        {
+            if(!silent)
+                cputs("not debugging");
+            return false;
+        }
+        int read_size=sizeof(uint);
+        int add=1;
+        if(string[2]==':' and isdigit((string[1])))
+        {
+            add+=2;
+            int new_size=string[1]-0x30;
+            if(new_size<read_size)
+                read_size=new_size;
+        }
+        uint temp;
+        if(!valfromstring(string+add, &temp, 0, 0, false, 0))
+            return false;
+        bool isrunning=dbgisrunning();
+        if(!isrunning)
+            dbgdisablebpx();
+        bool wpm=WriteProcessMemory(fdProcessInfo->hProcess, (void*)temp, value, read_size, 0);
+        if(!isrunning)
+            dbgenablebpx();
+        if(!wpm)
+        {
+            if(!silent)
+                cputs("failed to write memory");
+            return false;
+        }
+        return true;
+    }
+    else if(isregister(string)) //register
+    {
+        if(!IsFileBeingDebugged())
+        {
+            if(!silent)
+                cputs("not debugging!");
+            return false;
+        }
+        /**value=getregister(value_size, string);
+        if(isvar)
+            *isvar=true;*/
+        return true;
+    }
+    /*else if(*string=='!' and isflag(string+1)) //flag
+    {
+        if(!IsFileBeingDebugged())
+        {
+            if(!silent)
+                cputs("not debugging");
+            return false;
+        }
+        uint eflags=GetContextData(UE_CFLAGS);
+        if(getflag(eflags, string+1))
+            *value=1;
+        else
+            *value=0;
+        if(value_size)
+            *value_size=0;
+        if(isvar)
+            *isvar=true;
+        return true;
+    }
+    else if(varget(string, &temp, 0, 0)) //variable?
+    {
+        if(isvar)
+            *isvar=true;
+        return true;
+    }*/
+    return false;
 }

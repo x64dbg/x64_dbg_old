@@ -141,6 +141,15 @@ static void cbStep()
     wait(WAITID_RUN);
 }
 
+/*static void cbException(void* ExceptionData)
+{
+    cputs("exception!");
+    doDisasm(GetContextData(UE_CIP));
+    //lock
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}*/
+
 static DWORD WINAPI threadDebugLoop(void* lpParameter)
 {
     //initialize
