@@ -297,7 +297,7 @@ static bool printlayer(char* exp, EXPRESSION* exps, int layer)
             strcpy(backup, exp+open+len+1);
 
             uint value;
-            if(!mathfromstring(temp, &value))
+            if(!mathfromstring(temp, &value, 0, 0))
                 return false;
 
             adjustpairs(exps, open, close, len+1, sprintf(exp+open, "%X", value));
@@ -340,7 +340,7 @@ bool mathhandlebrackets(char* expression)
 /*
 - handle math
 */
-bool mathfromstring(const char* string, uint* value)
+bool mathfromstring(const char* string, uint* value, int* value_size, bool* isvar)
 {
     int highestop=0;
     int highestop_pos=0;
@@ -356,7 +356,7 @@ bool mathfromstring(const char* string, uint* value)
     }
     if(!highestop)
     {
-        if(!valfromstring(string, value, 0, 0, false, 0))
+        if(!valfromstring(string, value, value_size, isvar, false, 0))
             return false;
         return true;
     }

@@ -285,6 +285,48 @@ static int getflag(uint eflags, const char* string)
     return 0;
 }
 
+static bool setflag(const char* string, bool set)
+{
+    uint eflags=GetContextData(UE_CFLAGS);
+    uint xorval=0;
+    uint flag=0;
+    if(scmp(string, "cf"))
+        flag=0x1;
+    else if(scmp(string, "pf"))
+        flag=0x4;
+    else if(scmp(string, "af"))
+        flag=0x10;
+    else if(scmp(string, "zf"))
+        flag=0x40;
+    else if(scmp(string, "sf"))
+        flag=0x80;
+    else if(scmp(string, "tf"))
+        flag=0x100;
+    else if(scmp(string, "if"))
+        flag=0x200;
+    else if(scmp(string, "df"))
+        flag=0x400;
+    else if(scmp(string, "of"))
+        flag=0x800;
+    else if(scmp(string, "rf"))
+        flag=0x10000;
+    else if(scmp(string, "vm"))
+        flag=0x20000;
+    else if(scmp(string, "ac"))
+        flag=0x40000;
+    else if(scmp(string, "vif"))
+        flag=0x80000;
+    else if(scmp(string, "vip"))
+        flag=0x100000;
+    else if(scmp(string, "id"))
+        flag=0x200000;
+    if(eflags&flag and !set)
+        xorval=flag;
+    else if(set)
+        xorval=flag;
+    return SetContextData(UE_CFLAGS, eflags^xorval);
+}
+
 static uint getregister(int* size, const char* string)
 {
     if(size)
@@ -526,12 +568,7 @@ static uint getregister(int* size, const char* string)
         return GetContextData(UE_CFLAGS);
     }
 
-#ifndef _WIN64
-    if(size)
-        *size=0;
-    return 0;
-#endif // _WIN64
-
+#ifdef _WIN64
     if(size)
         *size=8;
     if(scmp(string, "rax"))
@@ -711,6 +748,7 @@ static uint getregister(int* size, const char* string)
     {
         return GetContextData(UE_R15)&0xFF;
     }
+#endif //_WIN64
 
     if(size)
         *size=0;
@@ -719,393 +757,202 @@ static uint getregister(int* size, const char* string)
 
 static bool setregister(const char* string, uint value)
 {
-    uint cur=getregister(0, string);
-
     if(scmp(string, "eax"))
-    {
         return SetContextData(UE_EAX, value&0xFFFFFFFF);
-    }
     if(scmp(string, "ebx"))
-    {
         return SetContextData(UE_EBX, value&0xFFFFFFFF);
-    }
     if(scmp(string, "ecx"))
-    {
         return SetContextData(UE_ECX, value&0xFFFFFFFF);
-    }
     if(scmp(string, "edx"))
-    {
         return SetContextData(UE_EDX, value&0xFFFFFFFF);
-    }
     if(scmp(string, "edi"))
-    {
         return SetContextData(UE_EDI, value&0xFFFFFFFF);
-    }
     if(scmp(string, "esi"))
-    {
         return SetContextData(UE_ESI, value&0xFFFFFFFF);
-    }
     if(scmp(string, "ebp"))
-    {
         return SetContextData(UE_EBP, value&0xFFFFFFFF);
-    }
     if(scmp(string, "esp"))
-    {
         return SetContextData(UE_ESP, value&0xFFFFFFFF);
-    }
     if(scmp(string, "eip"))
-    {
         return SetContextData(UE_EIP, value&0xFFFFFFFF);
-    }
     if(scmp(string, "eflags"))
-    {
         return SetContextData(UE_EFLAGS, value&0xFFFFFFFF);
-    }
 
     if(scmp(string, "gs"))
-    {
         return SetContextData(UE_SEG_GS, value&0xFFFFFFFF);
-    }
     if(scmp(string, "fs"))
-    {
         return SetContextData(UE_SEG_FS, value&0xFFFFFFFF);
-    }
     if(scmp(string, "es"))
-    {
         return SetContextData(UE_SEG_ES, value&0xFFFFFFFF);
-    }
     if(scmp(string, "ds"))
-    {
         return SetContextData(UE_SEG_DS, value&0xFFFFFFFF);
-    }
     if(scmp(string, "cs"))
-    {
         return SetContextData(UE_SEG_CS, value&0xFFFFFFFF);
-    }
     if(scmp(string, "ss"))
-    {
         return SetContextData(UE_SEG_SS, value&0xFFFFFFFF);
-    }
-
 
     if(scmp(string, "ax"))
-    {
         return SetContextData(UE_EAX, (value&0xFFFF)|(GetContextData(UE_EAX)&0xFFFF0000));
-    }
     if(scmp(string, "bx"))
-    {
         return SetContextData(UE_EBX, (value&0xFFFF)|(GetContextData(UE_EBX)&0xFFFF0000));
-    }
     if(scmp(string, "cx"))
-    {
         return SetContextData(UE_ECX, (value&0xFFFF)|(GetContextData(UE_ECX)&0xFFFF0000));
-    }
     if(scmp(string, "dx"))
-    {
         return SetContextData(UE_EDX, (value&0xFFFF)|(GetContextData(UE_EDX)&0xFFFF0000));
-    }
     if(scmp(string, "si"))
-    {
         return SetContextData(UE_ESI, (value&0xFFFF)|(GetContextData(UE_ESI)&0xFFFF0000));
-    }
     if(scmp(string, "di"))
-    {
         return SetContextData(UE_EDI, (value&0xFFFF)|(GetContextData(UE_EDI)&0xFFFF0000));
-    }
     if(scmp(string, "bp"))
-    {
         return SetContextData(UE_EBP, (value&0xFFFF)|(GetContextData(UE_EBP)&0xFFFF0000));
-    }
     if(scmp(string, "sp"))
-    {
         return SetContextData(UE_ESP, (value&0xFFFF)|(GetContextData(UE_ESP)&0xFFFF0000));
-    }
     if(scmp(string, "ip"))
-    {
         return SetContextData(UE_EIP, (value&0xFFFF)|(GetContextData(UE_EIP)&0xFFFF0000));
-    }
 
-    //TODO: start here
     if(scmp(string, "ah"))
-    {
-        return SetContextData(UE_EAX, (value&0xFF)<<8);
-    }
+        return SetContextData(UE_EAX, ((value&0xFF)<<8)|(GetContextData(UE_EAX)&0xFFFF00FF));
     if(scmp(string, "al"))
-    {
-        return SetContextData(UE_EAX, value&0xFF);
-    }
+        return SetContextData(UE_EAX, (value&0xFF)|(GetContextData(UE_EAX)&0xFFFFFF00));
     if(scmp(string, "bh"))
-    {
-        return SetContextData(UE_EBX, (value&0xFF)<<8);
-    }
+        return SetContextData(UE_EBX, ((value&0xFF)<<8)|(GetContextData(UE_EBX)&0xFFFF00FF));
     if(scmp(string, "bl"))
-    {
-        return SetContextData(UE_EBX, value&0xFF);
-    }
+        return SetContextData(UE_EBX, (value&0xFF)|(GetContextData(UE_EBX)&0xFFFFFF00));
     if(scmp(string, "ch"))
-    {
-        return SetContextData(UE_ECX, (value&0xFF)<<8);
-    }
+        return SetContextData(UE_ECX, ((value&0xFF)<<8)|(GetContextData(UE_ECX)&0xFFFF00FF));
     if(scmp(string, "cl"))
-    {
-        return SetContextData(UE_ECX, value&0xFF);
-    }
+        return SetContextData(UE_ECX, (value&0xFF)|(GetContextData(UE_ECX)&0xFFFFFF00));
     if(scmp(string, "dh"))
-    {
-        return SetContextData(UE_EDX, (value&0xFF)<<8);
-    }
+        return SetContextData(UE_EDX, ((value&0xFF)<<8)|(GetContextData(UE_EDX)&0xFFFF00FF));
     if(scmp(string, "dl"))
-    {
-        return SetContextData(UE_EDX, value&0xFF);
-    }
+        return SetContextData(UE_EDX, (value&0xFF)|(GetContextData(UE_EDX)&0xFFFFFF00));
     if(scmp(string, "sih"))
-    {
-        return SetContextData(UE_ESI, (value&0xFF)<<8);
-    }
+        return SetContextData(UE_ESI, ((value&0xFF)<<8)|(GetContextData(UE_ESI)&0xFFFF00FF));
     if(scmp(string, "sil"))
-    {
-        return SetContextData(UE_ESI, value&0xFF);
-    }
+        return SetContextData(UE_ESI, (value&0xFF)|(GetContextData(UE_ESI)&0xFFFFFF00));
     if(scmp(string, "dih"))
-    {
-        return SetContextData(UE_EDI, (value&0xFF)<<8);
-    }
+        return SetContextData(UE_EDI, ((value&0xFF)<<8)|(GetContextData(UE_EDI)&0xFFFF00FF));
     if(scmp(string, "dil"))
-    {
-        return SetContextData(UE_EDI, value&0xFF);
-    }
+        return SetContextData(UE_EDI, (value&0xFF)|(GetContextData(UE_EDI)&0xFFFFFF00));
     if(scmp(string, "bph"))
-    {
-        return SetContextData(UE_EBP, (value&0xFF)<<8);
-    }
+        return SetContextData(UE_EBP, ((value&0xFF)<<8)|(GetContextData(UE_EBP)&0xFFFF00FF));
     if(scmp(string, "bpl"))
-    {
-        return SetContextData(UE_EBP, value&0xFF);
-    }
+        return SetContextData(UE_EBP, (value&0xFF)|(GetContextData(UE_EBP)&0xFFFFFF00));
     if(scmp(string, "sph"))
-    {
-        return SetContextData(UE_ESP, (value&0xFF)<<8);
-    }
+        return SetContextData(UE_ESP, ((value&0xFF)<<8)|(GetContextData(UE_ESP)&0xFFFF00FF));
     if(scmp(string, "spl"))
-    {
-        return SetContextData(UE_ESP, value&0xFF);
-    }
+        return SetContextData(UE_ESP, (value&0xFF)|(GetContextData(UE_ESP)&0xFFFFFF00));
 
     if(scmp(string, "dr0"))
-    {
-        return SetContextData(UE_DR0, value&0xFFFFFFFF);
-    }
+        return SetContextData(UE_DR0, value);
     if(scmp(string, "dr1"))
-    {
-        return SetContextData(UE_DR1, value&0xFFFFFFFF);
-    }
+        return SetContextData(UE_DR1, value);
     if(scmp(string, "dr2"))
-    {
-        return SetContextData(UE_DR2, value&0xFFFFFFFF);
-    }
+        return SetContextData(UE_DR2, value);
     if(scmp(string, "dr3"))
-    {
-        return SetContextData(UE_DR3, value&0xFFFFFFFF);
-    }
+        return SetContextData(UE_DR3, value);
     if(scmp(string, "dr6") or scmp(string, "dr4"))
-    {
-        return SetContextData(UE_DR6, value&0xFFFFFFFF);
-    }
+        return SetContextData(UE_DR6, value);
     if(scmp(string, "dr7") or scmp(string, "dr5"))
-    {
-        return SetContextData(UE_DR7, value&0xFFFFFFFF);
-    }
+        return SetContextData(UE_DR7, value);
 
     if(scmp(string, "cip"))
-    {
         return SetContextData(UE_CIP, value);
-    }
     if(scmp(string, "csp"))
-    {
         return SetContextData(UE_CSP, value);
-    }
     if(scmp(string, "cflags"))
-    {
         return SetContextData(UE_CFLAGS, value);
-    }
 
-#ifndef _WIN64
-    return 0;
-#endif // _WIN64
-
+#ifdef _WIN64
     if(scmp(string, "rax"))
-    {
-        return GetContextData(UE_RAX);
-    }
+        return SetContextData(UE_RAX, value);
     if(scmp(string, "rbx"))
-    {
-        return GetContextData(UE_RBX);
-    }
+        return SetContextData(UE_RBX, value);
     if(scmp(string, "rcx"))
-    {
-        return GetContextData(UE_RCX);
-    }
+        return SetContextData(UE_RCX, value);
     if(scmp(string, "rdx"))
-    {
-        return GetContextData(UE_RDX);
-    }
+        return SetContextData(UE_RDX, value);
     if(scmp(string, "rdi"))
-    {
-        return GetContextData(UE_RDI);
-    }
+        return SetContextData(UE_RDI, value);
     if(scmp(string, "rsi"))
-    {
-        return GetContextData(UE_RSI);
-    }
+        return SetContextData(UE_RAX, value);
     if(scmp(string, "rbp"))
-    {
-        return GetContextData(UE_RBP);
-    }
+        return SetContextData(UE_RBP, value);
     if(scmp(string, "rsp"))
-    {
-        return GetContextData(UE_RSP);
-    }
+        return SetContextData(UE_RSP, value);
     if(scmp(string, "rip"))
-    {
-        return GetContextData(UE_RIP);
-    }
+        return SetContextData(UE_RAX, value);
     if(scmp(string, "rflags"))
-    {
-        return GetContextData(UE_RFLAGS);
-    }
+        return SetContextData(UE_RFLAGS, value);
     if(scmp(string, "r8"))
-    {
-        return GetContextData(UE_R8);
-    }
+        return SetContextData(UE_R8, value);
     if(scmp(string, "r9"))
-    {
-        return GetContextData(UE_R9);
-    }
+        return SetContextData(UE_R9, value);
     if(scmp(string, "r10"))
-    {
-        return GetContextData(UE_R10);
-    }
+        return SetContextData(UE_R10, value);
     if(scmp(string, "r11"))
-    {
-        return GetContextData(UE_R11);
-    }
+        return SetContextData(UE_R11, value);
     if(scmp(string, "r12"))
-    {
-        return GetContextData(UE_R12);
-    }
+        return SetContextData(UE_R12, value);
     if(scmp(string, "r13"))
-    {
-        return GetContextData(UE_R13);
-    }
+        return SetContextData(UE_R13, value);
     if(scmp(string, "r14"))
-    {
-        return GetContextData(UE_R14);
-    }
+        return SetContextData(UE_R14, value);
     if(scmp(string, "r15"))
-    {
-        return GetContextData(UE_R15);
-    }
+        return SetContextData(UE_R15, value);
 
     if(scmp(string, "r8d"))
-    {
-        return GetContextData(UE_R8)&0xFFFFFFFF;
-    }
+        return SetContextData(UE_R8, (value&0xFFFFFFFF)|(GetContextData(UE_R8)&0xFFFFFFFF00000000));
     if(scmp(string, "r9d"))
-    {
-        return GetContextData(UE_R9)&0xFFFFFFFF;
-    }
+        return SetContextData(UE_R9, (value&0xFFFFFFFF)|(GetContextData(UE_R9)&0xFFFFFFFF00000000));
     if(scmp(string, "r10d"))
-    {
-        return GetContextData(UE_R10)&0xFFFFFFFF;
-    }
+        return SetContextData(UE_R10, (value&0xFFFFFFFF)|(GetContextData(UE_R10)&0xFFFFFFFF00000000));
     if(scmp(string, "r11d"))
-    {
-        return GetContextData(UE_R11)&0xFFFFFFFF;
-    }
+        return SetContextData(UE_R11, (value&0xFFFFFFFF)|(GetContextData(UE_R11)&0xFFFFFFFF00000000));
     if(scmp(string, "r12d"))
-    {
-        return GetContextData(UE_R12)&0xFFFFFFFF;
-    }
+        return SetContextData(UE_R12, (value&0xFFFFFFFF)|(GetContextData(UE_R12)&0xFFFFFFFF00000000));
     if(scmp(string, "r13d"))
-    {
-        return GetContextData(UE_R13)&0xFFFFFFFF;
-    }
+        return SetContextData(UE_R13, (value&0xFFFFFFFF)|(GetContextData(UE_R13)&0xFFFFFFFF00000000));
     if(scmp(string, "r14d"))
-    {
-        return GetContextData(UE_R14)&0xFFFFFFFF;
-    }
+        return SetContextData(UE_R14, (value&0xFFFFFFFF)|(GetContextData(UE_R14)&0xFFFFFFFF00000000));
     if(scmp(string, "r15d"))
-    {
-        return GetContextData(UE_R15)&0xFFFFFFFF;
-    }
+        return SetContextData(UE_R15, (value&0xFFFFFFFF)|(GetContextData(UE_R15)&0xFFFFFFFF00000000));
 
     if(scmp(string, "r8w"))
-    {
-        return GetContextData(UE_R8)&0xFFFF;
-    }
+        return SetContextData(UE_R8, (value&0xFFFF)|(GetContextData(UE_R8)&0xFFFFFFFFFFFF0000));
     if(scmp(string, "r9w"))
-    {
-        return GetContextData(UE_R9)&0xFFFF;
-    }
+        return SetContextData(UE_R9, (value&0xFFFF)|(GetContextData(UE_R9)&0xFFFFFFFFFFFF0000));
     if(scmp(string, "r10w"))
-    {
-        return GetContextData(UE_R10)&0xFFFF;
-    }
+        return SetContextData(UE_R10, (value&0xFFFF)|(GetContextData(UE_R10)&0xFFFFFFFFFFFF0000));
     if(scmp(string, "r11w"))
-    {
-        return GetContextData(UE_R11)&0xFFFF;
-    }
+        return SetContextData(UE_R11, (value&0xFFFF)|(GetContextData(UE_R11)&0xFFFFFFFFFFFF0000));
     if(scmp(string, "r12w"))
-    {
-        return GetContextData(UE_R12)&0xFFFF;
-    }
+        return SetContextData(UE_R12, (value&0xFFFF)|(GetContextData(UE_R12)&0xFFFFFFFFFFFF0000));
     if(scmp(string, "r13w"))
-    {
-        return GetContextData(UE_R13)&0xFFFF;
-    }
+        return SetContextData(UE_R13, (value&0xFFFF)|(GetContextData(UE_R13)&0xFFFFFFFFFFFF0000));
     if(scmp(string, "r14w"))
-    {
-        return GetContextData(UE_R14)&0xFFFF;
-    }
+        return SetContextData(UE_R14, (value&0xFFFF)|(GetContextData(UE_R14)&0xFFFFFFFFFFFF0000));
     if(scmp(string, "r15w"))
-    {
-        return GetContextData(UE_R15)&0xFFFF;
-    }
-
+        return SetContextData(UE_R15, (value&0xFFFF)|(GetContextData(UE_R15)&0xFFFFFFFFFFFF0000));
     if(scmp(string, "r8b"))
-    {
-        return GetContextData(UE_R8)&0xFF;
-    }
+        return SetContextData(UE_R8, (value&0xFF)|(GetContextData(UE_R8)&0xFFFFFFFFFFFFFF00));
     if(scmp(string, "r9b"))
-    {
-        return GetContextData(UE_R9)&0xFF;
-    }
+        return SetContextData(UE_R9, (value&0xFF)|(GetContextData(UE_R9)&0xFFFFFFFFFFFFFF00));
     if(scmp(string, "r10b"))
-    {
-        return GetContextData(UE_R10)&0xFF;
-    }
+        return SetContextData(UE_R10, (value&0xFF)|(GetContextData(UE_R10)&0xFFFFFFFFFFFFFF00));
     if(scmp(string, "r11b"))
-    {
-        return GetContextData(UE_R11)&0xFF;
-    }
+        return SetContextData(UE_R11, (value&0xFF)|(GetContextData(UE_R11)&0xFFFFFFFFFFFFFF00));
     if(scmp(string, "r12b"))
-    {
-        return GetContextData(UE_R12)&0xFF;
-    }
+        return SetContextData(UE_R12, (value&0xFF)|(GetContextData(UE_R12)&0xFFFFFFFFFFFFFF00));
     if(scmp(string, "r13b"))
-    {
-        return GetContextData(UE_R13)&0xFF;
-    }
+        return SetContextData(UE_R13, (value&0xFF)|(GetContextData(UE_R13)&0xFFFFFFFFFFFFFF00));
     if(scmp(string, "r14b"))
-    {
-        return GetContextData(UE_R14)&0xFF;
-    }
+        return SetContextData(UE_R14, (value&0xFF)|(GetContextData(UE_R14)&0xFFFFFFFFFFFFFF00));
     if(scmp(string, "r15b"))
-    {
-        return GetContextData(UE_R15)&0xFF;
-    }
+        return SetContextData(UE_R15, (value&0xFF)|(GetContextData(UE_R15)&0xFFFFFFFFFFFFFF00));
+#endif // _WIN64
 
-    return 0;
+    return false;
 }
 
 bool valapifromstring(const char* name, uint* value, int* value_size, bool printall, bool* hexonly)
@@ -1192,7 +1039,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             free(string_);
             return false;
         }
-        bool ret=mathfromstring(string_+add, value);
+        bool ret=mathfromstring(string_+add, value, value_size, isvar);
         free(string_);
         return ret;
     }
@@ -1364,12 +1211,9 @@ bool valtostring(const char* string, uint* value, bool silent)
                 cputs("not debugging!");
             return false;
         }
-        /**value=getregister(value_size, string);
-        if(isvar)
-            *isvar=true;*/
-        return true;
+        return setregister(string, *value);
     }
-    /*else if(*string=='!' and isflag(string+1)) //flag
+    else if(*string=='!' and isflag(string+1)) //flag
     {
         if(!IsFileBeingDebugged())
         {
@@ -1377,22 +1221,11 @@ bool valtostring(const char* string, uint* value, bool silent)
                 cputs("not debugging");
             return false;
         }
-        uint eflags=GetContextData(UE_CFLAGS);
-        if(getflag(eflags, string+1))
-            *value=1;
-        else
-            *value=0;
-        if(value_size)
-            *value_size=0;
-        if(isvar)
-            *isvar=true;
+        bool set=false;
+        if(*value)
+            set=true;
+        setflag(string+1, set);
         return true;
     }
-    else if(varget(string, &temp, 0, 0)) //variable?
-    {
-        if(isvar)
-            *isvar=true;
-        return true;
-    }*/
-    return false;
+    return varset(string, *value, false); //variable
 }

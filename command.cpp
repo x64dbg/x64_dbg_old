@@ -114,6 +114,37 @@ bool cmddel(COMMAND* command_list, const char* name)
     return true;
 }
 
+static void specialformat(char* string)
+{
+    int len=strlen(string);
+    char* found=strstr(string, "=");
+    char* str=(char*)malloc(len*2);
+        memset(str, 0, len*2);
+    if(found) //contains =
+    {
+        char* a=(found-1);
+        *found=0;
+        found++;
+        if(mathisoperator(*a)>2) //x*=3 -> x=x*3
+        {
+            char op=*a;
+            *a=0;
+            sprintf(str, "mov %s,%s%c%s", string, string, op, found);
+        }
+        else
+            sprintf(str, "mov %s,%s", string, found);
+        strcpy(string, str);
+    }
+    else if((string[len-1]=='+' and string[len-2]=='+') or (string[len-1]=='-' and string[len-2]=='-')) //eax++/eax--
+    {
+        string[len-2]=0;
+        char op=string[len-1];
+        sprintf(str, "mov %s,%s%c1", string, string, op);
+        strcpy(string, str);
+    }
+    free(str);
+}
+
 void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
 {
     char command[deflen]="";
@@ -129,6 +160,11 @@ void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
         {
             argformat(command);
             COMMAND* cmd=cmdget(command_list, command);
+            if(!cmd)
+            {
+                specialformat(command);
+                cmd=cmdget(command_list, command);
+            }
             if(!cmd)
             {
                 mathformat(command);

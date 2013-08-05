@@ -117,17 +117,15 @@ bool cbInstrMov(const char* cmd)
     if(!argget(cmd, arg2, 1, false)) //src name
         return true;
     uint set_value=0;
-    if(!valfromstring(arg2, &set_value, 0, 0, true, 0))
+    if(!valfromstring(arg2, &set_value, 0, 0, false, 0))
     {
         printf("invalid src \"%s\"\n", arg2);
         return true;
     }
-    if(!valtostring(arg1, &set_value, false))
-    {
-        printf("invalid dest \"%s\"\n", arg1);
-        return true;
-    }
-    /*if(!varset(arg1, set_value, false))
+    bool isvar=false;
+    uint temp;
+    valfromstring(arg1, &temp, 0, &isvar, true, 0);
+    if(!isvar or !valtostring(arg1, &set_value, false))
     {
         uint value;
         if(valfromstring(arg1, &value, 0, 0, true, 0))
@@ -137,12 +135,7 @@ bool cbInstrMov(const char* cmd)
         }
         varnew(arg1, set_value, VAR_USER);
     }
-    uint value=0;
-    varget(arg1, &value, 0, 0);
-    if(value>15)
-        printf("%s=%"fext"X (%"fext"ud)\n", arg1, value, value);
-    else
-        printf("%s=%"fext"X\n", arg1, value);*/
+    cbBadCmd(arg1);
     return true;
 }
 
