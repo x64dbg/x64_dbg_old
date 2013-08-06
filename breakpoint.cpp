@@ -3,7 +3,7 @@
 
 BREAKPOINT* bpinit()
 {
-    BREAKPOINT* bp=(BREAKPOINT*)malloc(sizeof(BREAKPOINT));
+    BREAKPOINT* bp=(BREAKPOINT*)emalloc(sizeof(BREAKPOINT));
     memset(bp, 0, sizeof(BREAKPOINT));
     return bp;
 }
@@ -40,11 +40,11 @@ bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr, short oldby
         nonext=true;
     }
     else
-        bp=(BREAKPOINT*)malloc(sizeof(BREAKPOINT));
+        bp=(BREAKPOINT*)emalloc(sizeof(BREAKPOINT));
     memset(bp, 0, sizeof(BREAKPOINT));
     if(name and *name)
     {
-        bp->name=(char*)malloc(strlen(name)+1);
+        bp->name=(char*)emalloc(strlen(name)+1);
         strcpy(bp->name, name);
     }
     bp->addr=addr;
@@ -68,8 +68,8 @@ bool bpsetname(BREAKPOINT* breakpoint_list, uint addr, const char* name)
     BREAKPOINT* found=bpfind(breakpoint_list, 0, addr, 0);
     if(!found)
         return false;
-    free(found->name);
-    found->name=(char*)malloc(strlen(name)+1);
+    efree(found->name);
+    found->name=(char*)emalloc(strlen(name)+1);
     strcpy(found->name, name);
     return true;
 }
@@ -81,7 +81,7 @@ bool bpdel(BREAKPOINT* breakpoint_list, const char* name, uint addr)
     if(!found)
         return false;
     if(found->name)
-        free(found->name);
+        efree(found->name);
     if(found==breakpoint_list)
     {
         BREAKPOINT* next=breakpoint_list->next;
@@ -89,7 +89,7 @@ bool bpdel(BREAKPOINT* breakpoint_list, const char* name, uint addr)
         {
             memcpy(breakpoint_list, breakpoint_list->next, sizeof(BREAKPOINT));
             breakpoint_list->next=next->next;
-            free(next);
+            efree(next);
         }
         else
             memset(breakpoint_list, 0, sizeof(BREAKPOINT));
@@ -97,7 +97,7 @@ bool bpdel(BREAKPOINT* breakpoint_list, const char* name, uint addr)
     else
     {
         prev->next=found->next;
-        free(found);
+        efree(found);
     }
     return true;
 }

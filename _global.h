@@ -68,6 +68,8 @@ enum BITMASK
 };
 
 //functions
+void* emalloc(size_t size);
+void efree(void* ptr);
 bool arraycontains(const char* cmd_list, const char* cmd);
 bool scmp(const char* a, const char* b);
 void formathex(char* string);

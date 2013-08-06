@@ -15,11 +15,12 @@ html,body {
 </head>
 
 <body>
-<P><STRONG>Calculations<BR></STRONG>The debugger allows 
-usage of basic math operations, just type an expression in the command window 
-and the result will be displayed in the console.</P>
-<P><STRONG>Operators</STRONG><BR>You can use the following operators 
-in your expression. They are resolved in the order of the list.</P>
+<P><STRONG>Calculations<BR></STRONG>The debugger allows usage of basic math 
+operations, just type an expression in the 
+command window and the result will be displayed in the console. Apart from 
+calculations, it allows quick&nbsp;variable changes using a C-like syntax.</P>
+<P><STRONG>Operators</STRONG><BR>  You can use the 
+following operators in your expression. They are processed in the following order:</P>
 <P><U>1:</U><U>brackets</U>: '(' and ')' Brackets are 
 resolved first, there is no need for a terminating bracket, unless you want to 
 use one.</P>
@@ -38,4 +39,12 @@ in C.</P>
 <P><U>7:xor</U>: '^' Just the regular XOR operation like in 
 C.</P>
 <P><U>8:or</U>: '|' Just the regular OR operation like in 
-C.</P></head>
+C.</P>
+<P><STRONG>Quick-Assigning<BR></STRONG>Changing memory, a 
+variable, register or&nbsp;flag can be easily done using a C-like 
+syntax:</P>
+<P><U>a?=b</U>: '?' can be any mathematical operation. 'a' 
+can be any register, flag, variable or memory location. 'b' can be anything that is recognized as a mathmatical 
+input.</P>
+<P><U>a++/a--</U>: 'a' can be any register, flag, variable or memory 
+location.</P></body>

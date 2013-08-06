@@ -32,6 +32,8 @@ void dbgdisablebpx()
     {
         if(DeleteBPX(cur->addr))
             cur->enabled=false;
+        else
+            cputs("error: DeleteBPX");
         cur=cur->next;
         if(!cur)
             bNext=false;
@@ -48,6 +50,8 @@ void dbgenablebpx()
     {
         if(SetBPX(cur->addr, cur->type, (void*)cbUserBreakpoint))
             cur->enabled=true;
+        else
+            cputs("error: SetBPX");
         cur=cur->next;
         if(!cur)
             bNext=false;
@@ -69,10 +73,10 @@ static void doDisasm(uint addr)
     uint start=addr-16*16;
     if(start<base)
         start=base;
-    uint end=addr+16*16;
+    /*uint end=addr+16*16;
     if(end>(uint)(mbi.BaseAddress)+mbi.RegionSize)
-        end=(uint)(mbi.BaseAddress)+mbi.RegionSize;
-    char* mem=(char*)malloc(34*16);
+        end=(uint)(mbi.BaseAddress)+mbi.RegionSize;*/
+    char* mem=(char*)emalloc(34*16);
     memset(mem, 0, 34*16);
     dbgdisablebpx();
     ReadProcessMemory(fdProcessInfo->hProcess, (void*)start, mem, 34*16, 0);
@@ -80,7 +84,7 @@ static void doDisasm(uint addr)
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
     DisasmDo(mem, start, 0, 34*16, addr-start);
-    free(mem);
+    efree(mem);
 }
 
 static void cbUserBreakpoint()
@@ -209,7 +213,7 @@ bool cbDebugInit(const char* cmd)
     char* currentfolder=0;
     if(DirExists(currentfolder))
         currentfolder=arg3;
-    INIT_STRUCT* init=(INIT_STRUCT*)malloc(sizeof(INIT_STRUCT));
+    INIT_STRUCT* init=(INIT_STRUCT*)emalloc(sizeof(INIT_STRUCT));
     memset(init, 0, sizeof(INIT_STRUCT));
     init->exe=arg1;
     init->commandline=commandline;
@@ -331,8 +335,10 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
         cprintf("error setting breakpoint at "fhex"!\n", addr);
         return true;
     }
-    bpnew(bplist, argname, addr, oldbytes, list_type);
-    cprintf("breakpoint at "fhex" set!\n", addr);
+    if(!bpnew(bplist, argname, addr, oldbytes, list_type))
+        cprintf("breakpoint at "fhex" set!\n", addr);
+    else
+        cputs("problem setting breakpoint!");
     return true;
 }
 
@@ -505,13 +511,13 @@ bool cbDebugDeleteBPX(const char* cmd)
             BREAKPOINT* next=cur->next;
             DeleteBPX(cur->addr);
             if(cur->name)
-                free(cur->name);
-            free(cur);
+                efree(cur->name);
+            efree(cur);
             cur=next;
             if(!cur)
                 bNext=false;
         }
-        bplist=0;
+        memset(bplist, 0, sizeof(BREAKPOINT));
         cputs("all breakpoints deleted!");
         return true;
     }
@@ -543,6 +549,7 @@ bool cbDebugDeleteBPX(const char* cmd)
 bool cbDebugBplist(const char* cmd)
 {
     BREAKPOINT* cur=bplist;
+    dbg("cbDebugBplist");
     if(!cur or !cur->addr)
     {
         cputs("no breakpoints!");
@@ -612,5 +619,14 @@ bool cbDebugSingleStep(const char* cmd)
         return true;
     }
     unlock(WAITID_RUN);
+    return true;
+}
+
+bool cbDebugHide(const char* cmd)
+{
+    if(HideDebugger(fdProcessInfo->hProcess, UE_HIDE_BASIC))
+        cputs("debugger hidden");
+    else
+        cputs("something went wrong");
     return true;
 }

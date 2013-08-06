@@ -11,3 +11,4 @@ test.exe
 bin/TitanEngine.dll
 bin/x64_dbg.chm
 bin/x32/test2.exe
+bin/x32/unpackme.exe

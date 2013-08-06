@@ -156,7 +156,7 @@ bool cbInstrVarList(const char* cmd)
         cputs("no variables");
         return true;
     }
-    uint value=0;
+
     bool bNext=true;
     while(bNext)
     {
@@ -166,7 +166,7 @@ bool cbInstrVarList(const char* cmd)
         for(int i=0; i<len; i++)
             if(name[i]==1)
                 name[i]='/';
-        value=(uint)cur->value.value;
+        uint value=(uint)cur->value.value;
         if(cur->type!=VAR_HIDDEN)
         {
             if(filter)

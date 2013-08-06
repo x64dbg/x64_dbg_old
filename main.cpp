@@ -51,6 +51,7 @@ static void registercommands()
     cmdnew(cmd, "StepInto\1sti", cbDebugStepInto, true); //StepInto
     cmdnew(cmd, "StepOver\1step\1sto\1st", cbDebugStepOver, true); //StepOver
     cmdnew(cmd, "SingleStep\1sstep\1sst", cbDebugSingleStep, true); //SingleStep arg1:count
+    cmdnew(cmd, "HideDebugger\1dbh\1hide", cbDebugHide, true); //Hide Debugger
 }
 
 static HWND GetConsoleHwnd(void)

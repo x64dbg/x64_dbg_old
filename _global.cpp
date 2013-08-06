@@ -1,5 +1,21 @@
 #include "_global.h"
 
+void* emalloc(size_t size)
+{
+    unsigned char* a=new unsigned char[size];
+    if(!a)
+    {
+        MessageBoxA(0, "Could not allocate memory", "Error", MB_ICONERROR);
+        ExitProcess(1);
+    }
+    return a;
+}
+
+void efree(void* ptr)
+{
+    delete[] (unsigned char*)ptr;
+}
+
 bool arraycontains(const char* cmd_list, const char* cmd)
 {
     if(!cmd_list or !cmd)
@@ -35,26 +51,26 @@ void formathex(char* string)
 {
     int len=strlen(string);
     _strupr(string);
-    char* new_string=(char*)malloc(len+1);
+    char* new_string=(char*)emalloc(len+1);
     memset(new_string, 0, len+1);
     for(int i=0,j=0; i<len; i++)
         if(isxdigit(string[i]))
             j+=sprintf(new_string+j, "%c", string[i]);
     strcpy(string, new_string);
-    free(new_string);
+    efree(new_string);
 }
 
 void formatdec(char* string)
 {
     int len=strlen(string);
     _strupr(string);
-    char* new_string=(char*)malloc(len+1);
+    char* new_string=(char*)emalloc(len+1);
     memset(new_string, 0, len+1);
     for(int i=0,j=0; i<len; i++)
         if(isdigit(string[i]))
             j+=sprintf(new_string+j, "%c", string[i]);
     strcpy(string, new_string);
-    free(new_string);
+    efree(new_string);
 }
 
 bool FileExists(const char* file)

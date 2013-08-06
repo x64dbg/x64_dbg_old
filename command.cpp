@@ -26,7 +26,7 @@ static COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
 
 COMMAND* cmdinit()
 {
-    COMMAND* cmd=(COMMAND*)malloc(sizeof(COMMAND));
+    COMMAND* cmd=(COMMAND*)emalloc(sizeof(COMMAND));
     memset(cmd, 0, sizeof(COMMAND));
     return cmd;
 }
@@ -43,9 +43,9 @@ bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool d
         nonext=true;
     }
     else
-        cmd=(COMMAND*)malloc(sizeof(COMMAND));
+        cmd=(COMMAND*)emalloc(sizeof(COMMAND));
     memset(cmd, 0, sizeof(COMMAND));
-    cmd->name=(char*)malloc(strlen(name)+1);
+    cmd->name=(char*)emalloc(strlen(name)+1);
     strcpy(cmd->name, name);
     cmd->cbCommand=cbCommand;
     cmd->debugonly=debugonly;
@@ -93,7 +93,7 @@ bool cmddel(COMMAND* command_list, const char* name)
     COMMAND* found=cmdfind(command_list, name, &prev);
     if(!found)
         return false;
-    free(found->name);
+    efree(found->name);
     if(found==command_list)
     {
         COMMAND* next=command_list->next;
@@ -101,7 +101,7 @@ bool cmddel(COMMAND* command_list, const char* name)
         {
             memcpy(command_list, command_list->next, sizeof(COMMAND));
             command_list->next=next->next;
-            free(next);
+            efree(next);
         }
         else
             memset(command_list, 0, sizeof(COMMAND));
@@ -109,22 +109,34 @@ bool cmddel(COMMAND* command_list, const char* name)
     else
     {
         prev->next=found->next;
-        free(found);
+        efree(found);
     }
     return true;
 }
 
 static void specialformat(char* string)
 {
+    dbg("specialformat");
     int len=strlen(string);
     char* found=strstr(string, "=");
-    char* str=(char*)malloc(len*2);
-        memset(str, 0, len*2);
+    char* str=(char*)emalloc(len*2);
+    if(!str)
+    {
+        cputs("error: malloc");
+        return;
+    }
+    memset(str, 0, len*2);
     if(found) //contains =
     {
         char* a=(found-1);
         *found=0;
         found++;
+        if(!*found)
+        {
+            *found='=';
+            efree(str);
+            return;
+        }
         if(mathisoperator(*a)>2) //x*=3 -> x=x*3
         {
             char op=*a;
@@ -142,12 +154,14 @@ static void specialformat(char* string)
         sprintf(str, "mov %s,%s%c1", string, string, op);
         strcpy(string, str);
     }
-    free(str);
+    efree(str);
 }
 
 void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
 {
-    char command[deflen]="";
+    //char command[deflen]="";
+    char* command=(char*)emalloc(deflen);
+    memset(command, 0, deflen);
     bool bLoop=true;
     while(bLoop)
     {
@@ -188,4 +202,5 @@ void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
             }
         }
     }
+    efree(command);
 }

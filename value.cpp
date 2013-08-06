@@ -1029,18 +1029,18 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
     else if(mathcontains(string)) //handle math
     {
         int len=strlen(string);
-        char* string_=(char*)malloc(len+256);
+        char* string_=(char*)emalloc(len+256);
         strcpy(string_, string);
         int add=0;
         while(mathisoperator(string_[add])>2)
             add++;
         if(!mathhandlebrackets(string_+add))
         {
-            free(string_);
+            efree(string_);
             return false;
         }
         bool ret=mathfromstring(string_+add, value, value_size, isvar);
-        free(string_);
+        efree(string_);
         return ret;
     }
     else if(*string=='@') //memory location
