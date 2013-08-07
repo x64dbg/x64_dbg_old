@@ -12,6 +12,7 @@ PROCESS_INFORMATION* fdProcessInfo;
 static char szFileName[deflen]="";
 bool bFileIsDll;
 BREAKPOINT* bplist;
+static bool isStepping=false;
 
 DISASM_INIT dinit;
 
@@ -20,7 +21,6 @@ static void cbStep();
 static void cbSystemBreakpoint(void* ExceptionData);
 static void cbEntryBreakpoint();
 static void cbUserBreakpoint();
-static void doDisasm(uint addr);
 
 void dbgdisablebpx()
 {
@@ -65,7 +65,7 @@ bool dbgisrunning()
     return false;
 }
 
-static void doDisasm(uint addr)
+void doDisasm(uint addr)
 {
     MEMORY_BASIC_INFORMATION mbi= {0};
     VirtualQueryEx(fdProcessInfo->hProcess, (void*)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
@@ -118,8 +118,37 @@ static void cbEntryBreakpoint()
     wait(WAITID_RUN);
 }
 
+static void cbAfterException(void* ExceptionData)
+{
+    EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
+    if(!edi->dwFirstChance)
+        SetNextDbgContinueStatus(DBG_CONTINUE);
+}
+
+static void cbException(void* ExceptionData)
+{
+    EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
+    uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
+    if(edi->dwFirstChance)
+        return;
+    else if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT and IsBPXEnabled(addr))
+        return;
+    else if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_SINGLE_STEP and isStepping)
+        return;
+
+    char msg[1024]="";
+    sprintf(msg, "exception on %.8X!", addr);
+    cinsert(msg);
+    doDisasm(GetContextData(UE_CIP));
+    //lock
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}
+
 static void cbSystemBreakpointStep()
 {
+    SetCustomHandler(UE_CH_EVERYTHINGELSE, (void*)cbException); //set exception handler
+    SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
     cputs("system breakpoint reached!");
     doDisasm(GetContextData(UE_CIP));
     //unlock
@@ -139,20 +168,12 @@ static void cbSystemBreakpoint(void* ExceptionData)
 static void cbStep()
 {
     cinsert("stepped!");
+    isStepping=false;
     doDisasm(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
 }
-
-/*static void cbException(void* ExceptionData)
-{
-    cputs("exception!");
-    doDisasm(GetContextData(UE_CIP));
-    //lock
-    lock(WAITID_RUN);
-    wait(WAITID_RUN);
-}*/
 
 static DWORD WINAPI threadDebugLoop(void* lpParameter)
 {
@@ -174,6 +195,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     varset("$pid", fdProcessInfo->dwProcessId, true);
     bplist=bpinit();
     SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbSystemBreakpoint);
+    SetEngineVariable(UE_ENGINE_PASS_ALL_EXCEPTIONS, true);
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
     DeleteFileA("DLLLoader.exe");
@@ -582,6 +604,7 @@ bool cbDebugBplist(const char* cmd)
 bool cbDebugStepInto(const char* cmd)
 {
     StepInto((void*)cbStep);
+    isStepping=true;
     if(!waitislocked(WAITID_RUN))
     {
         cputs("program is already running");
@@ -594,6 +617,7 @@ bool cbDebugStepInto(const char* cmd)
 bool cbDebugStepOver(const char* cmd)
 {
     StepOver((void*)cbStep);
+    isStepping=true;
     if(!waitislocked(WAITID_RUN))
     {
         cputs("program is already running");
@@ -612,7 +636,9 @@ bool cbDebugSingleStep(const char* cmd)
         if(!valfromstring(arg1, &stepcount, 0, 0, true, 0))
             stepcount=1;
     }
+
     SingleStep((DWORD)stepcount, (void*)cbStep);
+    isStepping=true;
     if(!waitislocked(WAITID_RUN))
     {
         cputs("program is already running");

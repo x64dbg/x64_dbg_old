@@ -3,6 +3,7 @@
 #include "debugger.h"
 #include "console.h"
 #include "math.h"
+#include "disasm\disasm.h"
 #include <psapi.h>
 
 static bool dosignedcalc=false;
@@ -1211,7 +1212,10 @@ bool valtostring(const char* string, uint* value, bool silent)
                 cputs("not debugging!");
             return false;
         }
-        return setregister(string, *value);
+        bool ok=setregister(string, *value);
+        if(strstr(string, "ip"))
+            doDisasm(GetContextData(UE_CIP));
+        return ok;
     }
     else if(*string=='!' and isflag(string+1)) //flag
     {
