@@ -335,7 +335,7 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
         cprintf("error setting breakpoint at "fhex"!\n", addr);
         return true;
     }
-    if(!bpnew(bplist, argname, addr, oldbytes, list_type))
+    if(bpnew(bplist, argname, addr, oldbytes, list_type))
         cprintf("breakpoint at "fhex" set!\n", addr);
     else
         cputs("problem setting breakpoint!");
