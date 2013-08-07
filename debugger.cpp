@@ -121,17 +121,14 @@ static void cbEntryBreakpoint()
 static void cbAfterException(void* ExceptionData)
 {
     EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
-    if(!edi->dwFirstChance)
-        SetNextDbgContinueStatus(DBG_CONTINUE);
+    SetNextDbgContinueStatus(DBG_CONTINUE);
 }
 
 static void cbException(void* ExceptionData)
 {
     EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
     uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
-    if(edi->dwFirstChance)
-        return;
-    else if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT and IsBPXEnabled(addr))
+    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT and IsBPXEnabled(addr))
         return;
     else if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_SINGLE_STEP and isStepping)
         return;
@@ -147,8 +144,8 @@ static void cbException(void* ExceptionData)
 
 static void cbSystemBreakpointStep()
 {
-    SetCustomHandler(UE_CH_EVERYTHINGELSE, (void*)cbException); //set exception handler
-    SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
+    //SetCustomHandler(UE_CH_EVERYTHINGELSE, (void*)cbException);
+    //SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
     cputs("system breakpoint reached!");
     doDisasm(GetContextData(UE_CIP));
     //unlock
