@@ -91,6 +91,7 @@ int main()
 #else
     SetConsoleTitleA("x64_dbg");
 #endif
+    DeleteFileA("DLLLoader.exe");
     char dir[deflen]="";
     GetModuleFileNameA(GetModuleHandleA(0), dir, deflen);
     int len=strlen(dir);
