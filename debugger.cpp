@@ -76,14 +76,18 @@ void doDisasm(uint addr)
     /*uint end=addr+16*16;
     if(end>(uint)(mbi.BaseAddress)+mbi.RegionSize)
         end=(uint)(mbi.BaseAddress)+mbi.RegionSize;*/
-    char* mem=(char*)emalloc(34*16);
-    memset(mem, 0, 34*16);
+    char* mem=(char*)emalloc(300*16);
+    memset(mem, 0x90, 300*16);
     dbgdisablebpx();
-    ReadProcessMemory(fdProcessInfo->hProcess, (void*)start, mem, 34*16, 0);
+    uint size=300*16;
+    uint end=(uint)(mbi.BaseAddress)+mbi.RegionSize;
+    if((start+size)>end)
+        size=end-start;
+    ReadProcessMemory(fdProcessInfo->hProcess, (void*)start, mem, size, 0);
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
-    DisasmDo(mem, start, 0, 34*16, addr-start);
+    DisasmDo(mem, start, 0, size, addr-start);
     efree(mem);
 }
 
@@ -120,7 +124,6 @@ static void cbEntryBreakpoint()
 
 static void cbAfterException(void* ExceptionData)
 {
-    EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
     SetNextDbgContinueStatus(DBG_CONTINUE);
 }
 
@@ -145,7 +148,7 @@ static void cbException(void* ExceptionData)
 static void cbSystemBreakpointStep()
 {
     //SetCustomHandler(UE_CH_EVERYTHINGELSE, (void*)cbException);
-    //SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
+    SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
     cputs("system breakpoint reached!");
     doDisasm(GetContextData(UE_CIP));
     //unlock
