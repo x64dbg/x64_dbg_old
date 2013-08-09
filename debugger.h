@@ -33,6 +33,7 @@ bool cbDebugStepOver(const char* cmd);
 bool cbDebugSingleStep(const char* cmd);
 bool cbDebugHide(const char* cmd);
 bool cbDebugDisasm(const char* cmd);
+bool cbDebugMemoryBpx(const char* cmd);
 
 //variables
 extern PROCESS_INFORMATION* fdProcessInfo;

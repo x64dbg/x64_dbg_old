@@ -8,6 +8,7 @@ void* emalloc(size_t size)
         MessageBoxA(0, "Could not allocate memory", "Error", MB_ICONERROR);
         ExitProcess(1);
     }
+    memset(a, 0, size);
     return a;
 }
 

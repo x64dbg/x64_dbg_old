@@ -31,10 +31,8 @@ void dbgdisablebpx()
     bool bNext=true;
     while(bNext)
     {
-        if(DeleteBPX(cur->addr))
+        if(IsBPXEnabled(cur->addr) and DeleteBPX(cur->addr))
             cur->enabled=false;
-        else
-            cputs("error: DeleteBPX");
         cur=cur->next;
         if(!cur)
             bNext=false;
@@ -49,10 +47,8 @@ void dbgenablebpx()
     bool bNext=true;
     while(bNext)
     {
-        if(SetBPX(cur->addr, cur->type, (void*)cbUserBreakpoint))
+        if(!IsBPXEnabled(cur->addr) and SetBPX(cur->addr, cur->type, (void*)cbUserBreakpoint))
             cur->enabled=true;
-        else
-            cputs("error: SetBPX");
         cur=cur->next;
         if(!cur)
             bNext=false;
@@ -110,6 +106,27 @@ static void cbUserBreakpoint()
     wait(WAITID_RUN);
 }
 
+static void cbMemoryBreakpoint()
+{
+    uint cip=GetContextData(UE_CIP);
+    uint base=memfindbaseaddr(fdProcessInfo->hProcess, cip, 0);
+    BREAKPOINT* cur=bpfind(bplist, 0, base, 0);
+    if(!cur)
+        cinsert("breakpoint reached not in list!");
+    else
+    {
+        char log[50]="";
+        sprintf(log, "breakpoint at "fhex"!", cur->addr);
+        cinsert(log);
+    }
+    if(!cur->oldbytes) //is auto-restoring?
+        bpdel(bplist, 0, base);
+    doDisasm(cip);
+    //lock
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}
+
 static void cbEntryBreakpoint()
 {
     cinsert("entry point reached!");
@@ -121,6 +138,12 @@ static void cbEntryBreakpoint()
 
 static void cbAfterException(void* ExceptionData)
 {
+    EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
+    uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
+    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT and IsBPXEnabled(addr))
+        return;
+    else if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_SINGLE_STEP and isStepping)
+        return;
     SetNextDbgContinueStatus(DBG_CONTINUE);
 }
 
@@ -146,6 +169,7 @@ static void cbSystemBreakpointStep()
 {
     //SetCustomHandler(UE_CH_EVERYTHINGELSE, (void*)cbException);
     SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
+    //SetCustomHandler(UE_CH_PAGEGUARD, (void*)cbGuardPage);
     cputs("system breakpoint reached!");
     doDisasm(GetContextData(UE_CIP));
     //unlock
@@ -229,14 +253,21 @@ bool cbDebugInit(const char* cmd)
 
     char arg3[deflen]="";
     argget(cmd, arg3, 2, true);
-    char* currentfolder=0;
-    if(DirExists(currentfolder))
-        currentfolder=arg3;
+
+    char currentfolder[deflen]="";
+    strcpy(currentfolder, arg1);
+    int len=strlen(currentfolder);
+    while(currentfolder[len]!='\\' and len!=0)
+        len--;
+    currentfolder[len]=0;
+    if(DirExists(arg3))
+        strcpy(currentfolder, arg3);
     INIT_STRUCT* init=(INIT_STRUCT*)emalloc(sizeof(INIT_STRUCT));
     memset(init, 0, sizeof(INIT_STRUCT));
     init->exe=arg1;
     init->commandline=commandline;
-    init->currentfolder=currentfolder;
+    if(*currentfolder)
+        init->currentfolder=currentfolder;
 
     //initialize
     waitclear(); //clear waiting flags
@@ -317,7 +348,6 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
         strcpy(argtype, argname);
         *argname=0;
     }
-
     _strlwr(argtype);
     uint addr=0;
     if(!valfromstring(argaddr, &addr, 0, 0, false, 0))
@@ -349,7 +379,8 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
     else if(strstr(argtype, "short"))
         type|=UE_BREAKPOINT_TYPE_INT3;
     short oldbytes;
-    if(IsBPXEnabled(addr) or !ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, &oldbytes, sizeof(short), 0) or bpfind(bplist, 0, addr, 0) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
+    BREAKPOINT* found=bpfind(bplist, 0, addr, 0);
+    if(IsBPXEnabled(addr) or !ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, &oldbytes, sizeof(short), 0) or (found and found->type==BPNORMAL) or !SetBPX(addr, type, (void*)cbUserBreakpoint))
     {
         cprintf("error setting breakpoint at "fhex"!\n", addr);
         return true;
@@ -407,7 +438,7 @@ bool cbDebugEnableBPX(const char* cmd)
         cputs("breakpoint already enabled!");
         return true;
     }
-    if(!SetBPX(bp->addr, bp->type, (void*)cbUserBreakpoint))
+    if(bp->type!=BPNORMAL or !SetBPX(bp->addr, bp->type, (void*)cbUserBreakpoint))
         cputs("could not enable breakpoint");
     else
         bp->enabled=true;
@@ -460,7 +491,7 @@ bool cbDebugDisableBPX(const char* cmd)
         cputs("breakpoint already disabled!");
         return true;
     }
-    if(!DeleteBPX(bp->addr))
+    if(bp->type!=BPNORMAL or !DeleteBPX(bp->addr))
         cputs("could not disable breakpoint");
     else
         bp->enabled=false;
@@ -531,7 +562,8 @@ bool cbDebugDeleteBPX(const char* cmd)
             DeleteBPX(cur->addr);
             if(cur->name)
                 efree(cur->name);
-            efree(cur);
+            if(cur!=bplist)
+                efree(cur);
             cur=next;
             if(!cur)
                 bNext=false;
@@ -660,7 +692,51 @@ bool cbDebugDisasm(const char* cmd)
     uint addr=GetContextData(UE_EIP);
     if(argget(cmd, arg1, 0, true))
         if(!valfromstring(arg1, &addr, 0, 0, true, 0))
-            addr=GetContextData(UE_EIP);
+            addr=GetContextData(UE_CIP);
     doDisasm(addr);
+    return true;
+}
+
+bool cbDebugMemoryBpx(const char* cmd)
+{
+    char arg1[deflen]=""; //addr
+    if(!argget(cmd, arg1, 0, false))
+        return true;
+    uint addr;
+    if(!valfromstring(arg1, &addr, 0, 0, false, 0))
+        return true;
+    bool restore=false;
+    char arg2[deflen]=""; //restore
+    if(argget(cmd, arg2, 1, true))
+        restore=true;
+    uint type=UE_MEMORY;
+    char arg3[deflen]=""; //type
+    if(argget(cmd, arg3, 2, true))
+    {
+        switch(*arg3)
+        {
+        case 'r':
+            type=UE_MEMORY_READ;
+            break;
+        case 'w':
+            type=UE_MEMORY_WRITE;
+            break;
+        default:
+            cputs("invalid type (argument ignored)");
+            break;
+        }
+    }
+    uint size=0;
+    uint base=memfindbaseaddr(fdProcessInfo->hProcess, addr, &size);
+    BREAKPOINT* found=bpfind(bplist, 0, base, 0);
+    if((found and found->type==BPMEMORY) or !SetMemoryBPXEx(base, size, type, restore, (void*)cbMemoryBreakpoint))
+    {
+        cputs("error setting memory breakpoint!");
+        return true;
+    }
+    if(bpnew(bplist, 0, addr, restore, BPMEMORY))
+        cprintf("memory breakpoint at "fhex" set!\n", addr);
+    else
+        cputs("problem setting breakpoint (report please)!");
     return true;
 }

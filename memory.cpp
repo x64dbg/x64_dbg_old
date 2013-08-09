@@ -13,7 +13,7 @@ uint memfindbaseaddr(HANDLE hProcess, uint addr, uint* size)
     {
         numBytes=VirtualQueryEx(hProcess, (LPCVOID)MyAddress, (MEMORY_BASIC_INFORMATION*)&mbi, sizeof(mbi));
         newAddress=(uint)mbi.BaseAddress+mbi.RegionSize;
-        if(addr<newAddress and addr>=MyAddress)
+        if(mbi.State==MEM_COMMIT and addr<newAddress and addr>=MyAddress)
         {
             if(size)
                 *size=mbi.RegionSize;
