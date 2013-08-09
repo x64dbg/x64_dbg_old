@@ -7,6 +7,7 @@
 #include "breakpoint.h"
 #include "instruction.h"
 #include "disasm\disasm.h"
+#include "memory.h"
 
 PROCESS_INFORMATION* fdProcessInfo;
 static char szFileName[deflen]="";
@@ -67,27 +68,23 @@ bool dbgisrunning()
 
 void doDisasm(uint addr)
 {
-    MEMORY_BASIC_INFORMATION mbi= {0};
-    VirtualQueryEx(fdProcessInfo->hProcess, (void*)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
-    uint base=(uint)mbi.BaseAddress;
+    uint basesize;
+    uint base=memfindbaseaddr(fdProcessInfo->hProcess, addr, &basesize);
     uint start=addr-16*16;
     if(start<base)
         start=base;
-    /*uint end=addr+16*16;
-    if(end>(uint)(mbi.BaseAddress)+mbi.RegionSize)
-        end=(uint)(mbi.BaseAddress)+mbi.RegionSize;*/
-    char* mem=(char*)emalloc(300*16);
-    memset(mem, 0x90, 300*16);
+    uint disasmsize=500*16;
+    uint end=(uint)base+basesize;
+    if((start+disasmsize)>end)
+        disasmsize=end-start;
     dbgdisablebpx();
-    uint size=300*16;
-    uint end=(uint)(mbi.BaseAddress)+mbi.RegionSize;
-    if((start+size)>end)
-        size=end-start;
-    ReadProcessMemory(fdProcessInfo->hProcess, (void*)start, mem, size, 0);
+    char* mem=(char*)emalloc(500*16);
+    memset(mem, 0xFF, 500*16);
+    ReadProcessMemory(fdProcessInfo->hProcess, (void*)start, mem, disasmsize, 0);
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
-    DisasmDo(mem, start, 0, size, addr-start);
+    DisasmDo(mem, start, 0, disasmsize, addr-start, GetContextData(UE_EIP));
     efree(mem);
 }
 
@@ -654,5 +651,16 @@ bool cbDebugHide(const char* cmd)
         cputs("debugger hidden");
     else
         cputs("something went wrong");
+    return true;
+}
+
+bool cbDebugDisasm(const char* cmd)
+{
+    char arg1[deflen]="";
+    uint addr=GetContextData(UE_EIP);
+    if(argget(cmd, arg1, 0, true))
+        if(!valfromstring(arg1, &addr, 0, 0, true, 0))
+            addr=GetContextData(UE_EIP);
+    doDisasm(addr);
     return true;
 }

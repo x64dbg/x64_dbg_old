@@ -70,6 +70,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="math.cpp" />
 		<Unit filename="math.h" />
+		<Unit filename="memory.cpp" />
+		<Unit filename="memory.h" />
 		<Unit filename="resource.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
