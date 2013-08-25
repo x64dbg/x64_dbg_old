@@ -176,7 +176,7 @@ static void cbLoadDll(void* ExceptionData)
 static void cbSystemBreakpointStep()
 {
     SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
-    SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
+    SetCustomHandler(UE_CH_AFTERUNHANDLEDEXCEPTION, (void*)cbAfterException);
     //SetCustomHandler(UE_CH_PAGEGUARD, (void*)cbGuardPage);
     //SetCustomHandler(UE_CH_LOADDLL, (void*)cbLoadDll);
     cputs("system breakpoint reached!");
