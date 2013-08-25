@@ -91,11 +91,33 @@ static void cbUserBreakpoint()
         cinsert("breakpoint reached not in list!");
     else
     {
+        const char* apiname=(const char*)ImporterGetAPINameFromDebugee(fdProcessInfo->hProcess, cur->addr);
         char log[deflen]="";
-        if(cur->name)
-            sprintf(log, "breakpoint \"%s\" at "fhex"!", cur->name, cur->addr);
+        if(apiname)
+        {
+            const char* dllname_=(const char*)ImporterGetDLLNameFromDebugee(fdProcessInfo->hProcess, cur->addr);
+            char dllname[256]="";
+            strcpy(dllname, dllname_);
+            _strlwr(dllname);
+            int len=strlen(dllname);
+            for(int i=len-1; i!=0; i--)
+                if(dllname[i]=='.')
+                {
+                    dllname[i]=0;
+                    break;
+                }
+            if(cur->name)
+                sprintf(log, "breakpoint \"%s\" at %s.%s ("fhex")!", cur->name, dllname, apiname, cur->addr);
+            else
+                sprintf(log, "breakpoint at %s.%s ("fhex")!", dllname, apiname, cur->addr);
+        }
         else
-            sprintf(log, "breakpoint at "fhex"!", cur->addr);
+        {
+            if(cur->name)
+                sprintf(log, "breakpoint \"%s\" at "fhex"!", cur->name, cur->addr);
+            else
+                sprintf(log, "breakpoint at "fhex"!", cur->addr);
+        }
         cinsert(log);
         if(cur->type==BPSINGLESHOOT)
             bpdel(bplist, 0, cur->addr);
