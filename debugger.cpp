@@ -14,6 +14,7 @@ static char szFileName[deflen]="";
 bool bFileIsDll;
 BREAKPOINT* bplist;
 static bool isStepping=false;
+static bool isRtrStepping=false;
 
 DISASM_INIT dinit;
 
@@ -210,21 +211,27 @@ static void cbStep()
 static void cbRtrFinalStep()
 {
     cinsert("returned!");
-    isStepping=false;
+    isRtrStepping=false;
     doDisasm(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
 }
 
-static void cbRtrStep()
+static unsigned char getCIPch()
 {
+    char ch;
     dbgdisablebpx();
-    char ch=0;
     ReadProcessMemory(fdProcessInfo->hProcess, (void*)GetContextData(UE_CIP), &ch, 1, 0);
     dbgenablebpx();
-    if(ch==0xC2 or ch==0xC3)
-        StepOver((void*)cbRtrFinalStep);
+    return ch;
+}
+
+static void cbRtrStep()
+{
+    unsigned int cipch=getCIPch();
+    if(cipch==0xC3 or cipch==0xC2)
+        cbRtrFinalStep();
     else
         StepOver((void*)cbRtrStep);
 }
@@ -324,6 +331,8 @@ bool cbStopDebug(const char* cmd)
 
 bool cbDebugRun(const char* cmd)
 {
+    if(isRtrStepping)
+        return cbDebugRtr(cmd);
     if(!waitislocked(WAITID_RUN))
     {
         cputs("program is already running");
@@ -668,26 +677,14 @@ bool cbDebugStepInto(const char* cmd)
 {
     StepInto((void*)cbStep);
     isStepping=true;
-    if(!waitislocked(WAITID_RUN))
-    {
-        cputs("program is already running");
-        return true;
-    }
-    unlock(WAITID_RUN);
-    return true;
+    return cbDebugRun(cmd);
 }
 
 bool cbDebugStepOver(const char* cmd)
 {
     StepOver((void*)cbStep);
     isStepping=true;
-    if(!waitislocked(WAITID_RUN))
-    {
-        cputs("program is already running");
-        return true;
-    }
-    unlock(WAITID_RUN);
-    return true;
+    return cbDebugRun(cmd);
 }
 
 bool cbDebugSingleStep(const char* cmd)
@@ -702,13 +699,7 @@ bool cbDebugSingleStep(const char* cmd)
 
     SingleStep((DWORD)stepcount, (void*)cbStep);
     isStepping=true;
-    if(!waitislocked(WAITID_RUN))
-    {
-        cputs("program is already running");
-        return true;
-    }
-    unlock(WAITID_RUN);
-    return true;
+    return cbDebugRun(cmd);
 }
 
 bool cbDebugHide(const char* cmd)
@@ -777,7 +768,8 @@ bool cbDebugMemoryBpx(const char* cmd)
 
 bool cbDebugRtr(const char* cmd)
 {
-    isStepping=true;
-    cbRtrStep();
+    StepOver((void*)cbRtrStep);
+    cbDebugRun(cmd);
+    isRtrStepping=true;
     return true;
 }
