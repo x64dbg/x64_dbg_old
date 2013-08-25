@@ -80,7 +80,7 @@ void doDisasm(uint addr)
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
-    DisasmDo(mem, start, 0, disasmsize, addr-start, GetContextData(UE_EIP));
+    DisasmDo(mem, start, 0, disasmsize, addr-start, GetContextData(UE_CIP));
     efree(mem);
 }
 

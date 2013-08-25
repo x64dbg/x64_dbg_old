@@ -19,7 +19,7 @@ extern "C"
 #endif
 
 void DLL_EXPORT DisasmInit(DISASM_INIT* initstruct);
-unsigned int* DLL_EXPORT DisasmDo(char* mem, unsigned int mem_va, unsigned int codebase, unsigned int code_size, int ip, uint real_eip);
+uint* DLL_EXPORT DisasmDo(char* mem, uint mem_va, uint codebase, uint code_size, uint ip, uint real_eip);
 
 #ifdef __cplusplus
 }
