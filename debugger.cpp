@@ -14,7 +14,6 @@ static char szFileName[deflen]="";
 bool bFileIsDll;
 BREAKPOINT* bplist;
 static bool isStepping=false;
-static bool isRtrStepping=false;
 
 DISASM_INIT dinit;
 
@@ -211,7 +210,6 @@ static void cbStep()
 static void cbRtrFinalStep()
 {
     cinsert("returned!");
-    isRtrStepping=false;
     doDisasm(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
@@ -331,8 +329,6 @@ bool cbStopDebug(const char* cmd)
 
 bool cbDebugRun(const char* cmd)
 {
-    if(isRtrStepping)
-        return cbDebugRtr(cmd);
     if(!waitislocked(WAITID_RUN))
     {
         cputs("program is already running");
@@ -770,6 +766,5 @@ bool cbDebugRtr(const char* cmd)
 {
     StepOver((void*)cbRtrStep);
     cbDebugRun(cmd);
-    isRtrStepping=true;
     return true;
 }
