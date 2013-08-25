@@ -193,3 +193,18 @@ bool cbInstrVarList(const char* cmd)
     }
     return true;
 }
+
+bool cbInstrChd(const char* cmd)
+{
+    char arg1[deflen]="";
+    if(!argget(cmd, arg1, 0, false))
+        return true;
+    if(!DirExists(arg1))
+    {
+        cputs("directory doesn't exist");
+        return true;
+    }
+    SetCurrentDirectoryA(arg1);
+    cputs("current directory changed!");
+    return true;
+}

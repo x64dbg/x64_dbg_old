@@ -136,29 +136,39 @@ static void cbEntryBreakpoint()
     wait(WAITID_RUN);
 }
 
+static int ecount=0;
+
 static void cbAfterException(void* ExceptionData)
 {
     EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
     uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
-    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT and IsBPXEnabled(addr))
-        return;
-    else if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_SINGLE_STEP and isStepping)
+    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT or edi->ExceptionRecord.ExceptionCode==EXCEPTION_SINGLE_STEP)
         return;
     SetNextDbgContinueStatus(DBG_CONTINUE);
+    char msg[50]="";
+    ecount++;
+    sprintf(msg, "exception %d passed "fhex" (%.8X)", ecount, addr, edi->ExceptionRecord.ExceptionCode);
+    cinsert(msg);
 }
 
 static void cbException(void* ExceptionData)
 {
     EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
     uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
-    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT and IsBPXEnabled(addr))
+    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT or edi->ExceptionRecord.ExceptionCode==STATUS_SINGLE_STEP)
         return;
-    else if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_SINGLE_STEP and isStepping)
-        return;
-
     char msg[1024]="";
-    sprintf(msg, "exception on %.8X!", addr);
+    sprintf(msg, "exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
     cinsert(msg);
+    doDisasm(GetContextData(UE_CIP));
+    //lock
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}
+
+static void cbLoadDll(void* ExceptionData)
+{
+    puts("dll loaded!");
     doDisasm(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
@@ -167,9 +177,10 @@ static void cbException(void* ExceptionData)
 
 static void cbSystemBreakpointStep()
 {
-    //SetCustomHandler(UE_CH_EVERYTHINGELSE, (void*)cbException);
+    SetCustomHandler(UE_CH_EVERYTHINGELSE, (void*)cbException);
     SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
     //SetCustomHandler(UE_CH_PAGEGUARD, (void*)cbGuardPage);
+    //SetCustomHandler(UE_CH_LOADDLL, (void*)cbLoadDll);
     cputs("system breakpoint reached!");
     doDisasm(GetContextData(UE_CIP));
     //unlock
@@ -196,6 +207,28 @@ static void cbStep()
     wait(WAITID_RUN);
 }
 
+static void cbRtrFinalStep()
+{
+    cinsert("returned!");
+    isStepping=false;
+    doDisasm(GetContextData(UE_CIP));
+    //lock
+    lock(WAITID_RUN);
+    wait(WAITID_RUN);
+}
+
+static void cbRtrStep()
+{
+    dbgdisablebpx();
+    char ch=0;
+    ReadProcessMemory(fdProcessInfo->hProcess, (void*)GetContextData(UE_CIP), &ch, 1, 0);
+    dbgenablebpx();
+    if(ch==0xC2 or ch==0xC3)
+        StepOver((void*)cbRtrFinalStep);
+    else
+        StepOver((void*)cbRtrStep);
+}
+
 static DWORD WINAPI threadDebugLoop(void* lpParameter)
 {
     //initialize
@@ -214,9 +247,10 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     strcpy(szFileName, init->exe);
     varset("$hp", (uint)fdProcessInfo->hProcess, true);
     varset("$pid", fdProcessInfo->dwProcessId, true);
+    ecount=0;
     bplist=bpinit();
     SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbSystemBreakpoint);
-    SetEngineVariable(UE_ENGINE_PASS_ALL_EXCEPTIONS, true);
+    //SetEngineVariable(UE_ENGINE_PASS_ALL_EXCEPTIONS, true);
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
     DeleteFileA("DLLLoader.exe");
@@ -738,5 +772,12 @@ bool cbDebugMemoryBpx(const char* cmd)
         cprintf("memory breakpoint at "fhex" set!\n", addr);
     else
         cputs("problem setting breakpoint (report please)!");
+    return true;
+}
+
+bool cbDebugRtr(const char* cmd)
+{
+    isStepping=true;
+    cbRtrStep();
     return true;
 }

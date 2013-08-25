@@ -9,5 +9,6 @@ bool cbInstrVar(const char* cmd);
 bool cbInstrVarDel(const char* cmd);
 bool cbInstrMov(const char* cmd);
 bool cbInstrVarList(const char* cmd);
+bool cbInstrChd(const char* cmd);
 
 #endif // _INSTRUCTIONS_H

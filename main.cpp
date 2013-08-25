@@ -54,6 +54,8 @@ static void registercommands()
     cmdnew(cmd, "HideDebugger\1dbh\1hide", cbDebugHide, true); //HideDebugger
     cmdnew(cmd, "disasm\1dis\1d", cbDebugDisasm, true); //doDisasm
     cmdnew(cmd, "SetMemoryBPX\1membp\1bpm", cbDebugMemoryBpx, true); //SetMemoryBPX
+    cmdnew(cmd, "chd", cbInstrChd, false); //Change directory
+    cmdnew(cmd, "rtr", cbDebugRtr, true); //rtr
 }
 
 static HWND GetConsoleHwnd(void)
