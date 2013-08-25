@@ -142,8 +142,6 @@ static void cbAfterException(void* ExceptionData)
 {
     EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
     uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
-    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT or edi->ExceptionRecord.ExceptionCode==EXCEPTION_SINGLE_STEP)
-        return;
     SetNextDbgContinueStatus(DBG_CONTINUE);
     char msg[50]="";
     ecount++;
@@ -155,8 +153,8 @@ static void cbException(void* ExceptionData)
 {
     EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
     uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
-    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT or edi->ExceptionRecord.ExceptionCode==STATUS_SINGLE_STEP)
-        return;
+    if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT)
+        SetContextData(UE_CIP, (uint)edi->ExceptionRecord.ExceptionAddress);
     char msg[1024]="";
     sprintf(msg, "exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
     cinsert(msg);
@@ -177,7 +175,7 @@ static void cbLoadDll(void* ExceptionData)
 
 static void cbSystemBreakpointStep()
 {
-    SetCustomHandler(UE_CH_EVERYTHINGELSE, (void*)cbException);
+    SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
     SetCustomHandler(UE_CH_AFTEREXCEPTIONPROCESSING, (void*)cbAfterException);
     //SetCustomHandler(UE_CH_PAGEGUARD, (void*)cbGuardPage);
     //SetCustomHandler(UE_CH_LOADDLL, (void*)cbLoadDll);
@@ -194,7 +192,8 @@ static void cbSystemBreakpoint(void* ExceptionData)
 {
     //handle stuff (TLS, main entry, etc)
     SetCustomHandler(UE_CH_CREATEPROCESS, 0);
-    StepInto((void*)cbSystemBreakpointStep);
+    cbSystemBreakpointStep();
+    //StepInto((void*)cbSystemBreakpointStep);
 }
 
 static void cbStep()
@@ -254,7 +253,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     varset("$pid", fdProcessInfo->dwProcessId, true);
     ecount=0;
     bplist=bpinit();
-    SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbSystemBreakpoint);
+    SetCustomHandler(UE_CH_SYSTEMBREAKPOINT, (void*)cbSystemBreakpoint);
     //SetEngineVariable(UE_ENGINE_PASS_ALL_EXCEPTIONS, true);
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
