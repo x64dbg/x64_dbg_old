@@ -9,8 +9,6 @@
 #include "disasm\disasm.h"
 #include "memory.h"
 
-#define UE_MEMORY_EXECUTE UE_MEMORY_WRITE+1
-
 PROCESS_INFORMATION* fdProcessInfo;
 static char szFileName[deflen]="";
 bool bFileIsDll;
@@ -154,20 +152,17 @@ static void cbHardwareBreakpoint(void* ExceptionAddress)
     wait(WAITID_RUN);
 }
 
-static void cbMemoryBreakpoint()
+static void cbMemoryBreakpoint(void* ExceptionAddress)
 {
     uint cip=GetContextData(UE_CIP);
-    uint base=memfindbaseaddr(fdProcessInfo->hProcess, cip, 0);
+    uint size;
+    uint base=memfindbaseaddr(fdProcessInfo->hProcess, (uint)ExceptionAddress, &size);
     BREAKPOINT* cur=bpfind(bplist, 0, base, 0, BPMEMORY);
     if(!cur)
-        cinsert("breakpoint reached not in list!");
+        cinsert("memory breakpoint reached not in list!");
     else
     {
-        unsigned char type=cur->oldbytes&0xF;
-        if(type==UE_MEMORY_EXECUTE) //only break when inside breakpoint range
-        {
-
-        }
+        //unsigned char type=cur->oldbytes&0xF;
         char log[50]="";
         if(cur->name)
             sprintf(log, "memory breakpoint \"%s\" on "fhex"!", cur->name, cur->addr);
@@ -176,7 +171,7 @@ static void cbMemoryBreakpoint()
         cinsert(log);
     }
     if(!(cur->oldbytes>>4)) //is auto-restoring?
-        bpdel(bplist, 0, base, BPMEMORY);
+        bpdel(bplist, 0, base, BPMEMORY); //delete from breakpoint list
     doDisasm(cip);
     //lock
     lock(WAITID_RUN);
@@ -798,11 +793,19 @@ bool cbDebugMemoryBpx(const char* cmd)
         return true;
     bool restore=false;
     char arg2[deflen]=""; //restore
-    if(argget(cmd, arg2, 1, true))
-        restore=true;
-    uint type=UE_MEMORY;
     char arg3[deflen]=""; //type
-    if(argget(cmd, arg3, 2, true))
+    argget(cmd, arg3, 2, true);
+    if(argget(cmd, arg2, 1, true))
+    {
+        if(*arg2=='1')
+            restore=true;
+        else if(*arg2=='0')
+            restore=false;
+        else
+            strcpy(arg3, arg2);
+    }
+    uint type=UE_MEMORY;
+    if(*arg3)
     {
         switch(*arg3)
         {
@@ -814,6 +817,7 @@ bool cbDebugMemoryBpx(const char* cmd)
             break;
         case 'x':
             type=UE_MEMORY_EXECUTE; //EXECUTE
+            break;
         default:
             cputs("invalid type (argument ignored)");
             break;
@@ -822,12 +826,12 @@ bool cbDebugMemoryBpx(const char* cmd)
     uint size=0;
     uint base=memfindbaseaddr(fdProcessInfo->hProcess, addr, &size);
     BREAKPOINT* found=bpfind(bplist, 0, base, 0, BPMEMORY);
-    if(found or !SetMemoryBPXEx(base, size, type, (restore<<4)|type, (void*)cbMemoryBreakpoint))
+    if(found or !SetMemoryBPXEx(base, size, type, restore, (void*)cbMemoryBreakpoint))
     {
         cputs("error setting memory breakpoint!");
         return true;
     }
-    if(bpnew(bplist, 0, addr, restore, BPMEMORY))
+    if(bpnew(bplist, 0, addr, (restore<<4)|type, BPMEMORY))
         cprintf("memory breakpoint at "fhex" set!\n", addr);
     else
         cputs("problem setting breakpoint (report please)!");
