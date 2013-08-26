@@ -56,6 +56,7 @@ static void registercommands()
     cmdnew(cmd, "SetMemoryBPX\1membp\1bpm", cbDebugMemoryBpx, true); //SetMemoryBPX
     cmdnew(cmd, "chd", cbInstrChd, false); //Change directory
     cmdnew(cmd, "rtr", cbDebugRtr, true); //rtr
+    cmdnew(cmd, "SetHardwareBreakpoint\1bph\1bphws", cbDebugSetHardwareBreakpoint, true); //hardware breakpoint
 }
 
 static HWND GetConsoleHwnd(void)

@@ -3,6 +3,7 @@
 #include "debugger.h"
 #include "console.h"
 #include "math.h"
+#include "memory.h"
 #include "disasm\disasm.h"
 #include <psapi.h>
 
@@ -1073,7 +1074,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         bool isrunning=dbgisrunning();
         if(!isrunning)
             dbgdisablebpx();
-        bool rpm=ReadProcessMemory(fdProcessInfo->hProcess, (void*)addr, value, read_size, 0);
+        bool rpm=readmem(fdProcessInfo->hProcess, (void*)addr, value, read_size, 0);
         if(!isrunning)
             dbgenablebpx();
         if(!rpm)

@@ -8,15 +8,22 @@ BREAKPOINT* bpinit()
     return bp;
 }
 
-BREAKPOINT* bpfind(BREAKPOINT* breakpoint_list, const char* name, uint addr, BREAKPOINT** link)
+BREAKPOINT* bpfind(BREAKPOINT* breakpoint_list, const char* name, uint addr, BREAKPOINT** link, BP_TYPE type)
 {
+    dbg("bpfind");
     BREAKPOINT* cur=breakpoint_list;
     if(!cur or !cur->addr)
         return 0;
     BREAKPOINT* prev=0;
     while(cur)
     {
-        if((name and arraycontains(cur->name, name)) or cur->addr==addr)
+        BP_TYPE bptype=cur->type;
+        if(bptype==BPSINGLESHOOT)
+            bptype=BPNORMAL;
+        BP_TYPE realtype=type;
+        if(realtype==BPSINGLESHOOT)
+            realtype=BPNORMAL;
+        if(((name and arraycontains(cur->name, name)) or cur->addr==addr) and (bptype==BPNOTYPE or bptype==realtype))
         {
             if(link)
                 *link=prev;
@@ -30,7 +37,7 @@ BREAKPOINT* bpfind(BREAKPOINT* breakpoint_list, const char* name, uint addr, BRE
 
 bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr, short oldbytes, BP_TYPE type)
 {
-    if(!breakpoint_list or !addr or bpfind(breakpoint_list, name, addr, 0))
+    if(!breakpoint_list or !addr or bpfind(breakpoint_list, name, addr, 0, type))
         return false;
     BREAKPOINT* bp;
     bool nonext=false;
@@ -63,9 +70,9 @@ bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr, short oldby
 
 bool bpsetname(BREAKPOINT* breakpoint_list, uint addr, const char* name)
 {
-    if(!name or !*name or !addr or bpfind(breakpoint_list, name, 0, 0))
+    if(!name or !*name or !addr or bpfind(breakpoint_list, name, 0, 0, BPNOTYPE))
         return false;
-    BREAKPOINT* found=bpfind(breakpoint_list, 0, addr, 0);
+    BREAKPOINT* found=bpfind(breakpoint_list, 0, addr, 0, BPNOTYPE);
     if(!found)
         return false;
     efree(found->name);
@@ -74,10 +81,10 @@ bool bpsetname(BREAKPOINT* breakpoint_list, uint addr, const char* name)
     return true;
 }
 
-bool bpdel(BREAKPOINT* breakpoint_list, const char* name, uint addr)
+bool bpdel(BREAKPOINT* breakpoint_list, const char* name, uint addr, BP_TYPE type)
 {
     BREAKPOINT* prev=0;
-    BREAKPOINT* found=bpfind(breakpoint_list, name, addr, &prev);
+    BREAKPOINT* found=bpfind(breakpoint_list, name, addr, &prev, type);
     if(!found)
         return false;
     if(found->name)

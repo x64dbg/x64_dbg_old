@@ -35,6 +35,7 @@ bool cbDebugHide(const char* cmd);
 bool cbDebugDisasm(const char* cmd);
 bool cbDebugMemoryBpx(const char* cmd);
 bool cbDebugRtr(const char* cmd);
+bool cbDebugSetHardwareBreakpoint(const char* cmd);
 
 //variables
 extern PROCESS_INFORMATION* fdProcessInfo;

@@ -27,3 +27,14 @@ uint memfindbaseaddr(HANDLE hProcess, uint addr, uint* size)
     while(numBytes);
     return 0;
 }
+
+bool readmem(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, DWORD nSize, SIZE_T* lpNumberOfBytesRead)
+{
+    uint size;
+    uint base=memfindbaseaddr(hProcess, (uint)lpBaseAddress, &size);
+    DWORD oldprotect;
+    VirtualProtectEx(hProcess, (void*)base, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+    bool ret=ReadProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
+    VirtualProtectEx(hProcess, (void*)base, size, oldprotect, &oldprotect);
+    return ret;
+}
