@@ -951,3 +951,40 @@ bool cbDebugFree(const char* cmd)
     varset("$res", ok, false);
     return true;
 }
+
+bool cbDebugMemset(const char* cmd)
+{
+    char arg1[deflen]=""; //addr
+    char arg2[deflen]=""; //value
+    char arg3[deflen]=""; //size
+    uint addr;
+    uint value;
+    uint size;
+    if(!argget(cmd, arg1, 0, false) or !argget(cmd, arg2, 1, false))
+        return true;
+    if(!valfromstring(arg1, &addr, 0, 0, false, 0) or !valfromstring(arg2, &value, 0, 0, false, 0))
+        return true;
+    if(argget(cmd, arg3, 2, true))
+    {
+        if(!valfromstring(arg3, &size, 0, 0, false, 0))
+            return true;
+    }
+    else
+    {
+        uint base=memfindbaseaddr(fdProcessInfo->hProcess, addr, &size);
+        if(!base)
+        {
+            cputs("invalid address specified");
+            return true;
+        }
+        uint diff=addr-base;
+        addr=base+diff;
+        size-=diff;
+    }
+    BYTE fi=value&0xFF;
+    if(!Fill((void*)addr, size&0xFFFFFFFF, &fi))
+        puts("memset failed");
+    else
+        cprintf("memory "fhex" (size: %.8X) set to %.2X\n", addr, size&0xFFFFFFFF, value&0xFF);
+    return true;
+}

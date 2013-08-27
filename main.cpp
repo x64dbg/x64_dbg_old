@@ -60,6 +60,7 @@ static void registercommands()
     cmdnew(cmd, "SetHardwareBreakpoint\1bph\1bphws", cbDebugSetHardwareBreakpoint, true); //hardware breakpoint
     cmdnew(cmd, "alloc", cbDebugAlloc, true); //allocate memory
     cmdnew(cmd, "free", cbDebugFree, true); //free memory
+    cmdnew(cmd, "Fill\1memset", cbDebugMemset, true); //memset
 }
 
 int main()
