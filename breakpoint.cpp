@@ -1,9 +1,25 @@
 #include "breakpoint.h"
 #include "debugger.h"
 
-BREAKPOINT* bpinit()
+BREAKPOINT* bpinit(BREAKPOINT* breakpoint_list)
 {
-    BREAKPOINT* bp=(BREAKPOINT*)emalloc(sizeof(BREAKPOINT));
+    BREAKPOINT* cur=breakpoint_list;
+    bool bNext=true;
+    if(!cur)
+        bNext=false;
+    while(bNext)
+    {
+        BREAKPOINT* next=cur->next;
+        bpdel(breakpoint_list, 0, cur->addr, BPNORMAL);
+        cur=next;
+        if(!cur)
+            bNext=false;
+    }
+    BREAKPOINT* bp;
+    if(!breakpoint_list)
+        bp=(BREAKPOINT*)emalloc(sizeof(BREAKPOINT));
+    else
+        bp=breakpoint_list;
     memset(bp, 0, sizeof(BREAKPOINT));
     return bp;
 }

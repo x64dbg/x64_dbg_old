@@ -12,7 +12,7 @@
 PROCESS_INFORMATION* fdProcessInfo;
 static char szFileName[deflen]="";
 bool bFileIsDll;
-BREAKPOINT* bplist;
+BREAKPOINT* bplist=0;
 static bool isStepping=false;
 
 DISASM_INIT dinit;
@@ -224,12 +224,12 @@ static void cbLoadDll(void* ExceptionData)
     wait(WAITID_RUN);
 }
 
-static void cbSystemBreakpointStep()
+static void cbSystemBreakpoint(void* ExceptionData)
 {
+    //handle stuff (TLS, main entry, etc)
+    SetCustomHandler(UE_CH_SYSTEMBREAKPOINT, 0);
     SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
     SetCustomHandler(UE_CH_AFTERUNHANDLEDEXCEPTION, (void*)cbAfterException);
-    //SetCustomHandler(UE_CH_PAGEGUARD, (void*)cbGuardPage);
-    //SetCustomHandler(UE_CH_LOADDLL, (void*)cbLoadDll);
     cputs("system breakpoint reached!");
     doDisasm(GetContextData(UE_CIP));
     //unlock
@@ -237,14 +237,6 @@ static void cbSystemBreakpointStep()
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
-}
-
-static void cbSystemBreakpoint(void* ExceptionData)
-{
-    //handle stuff (TLS, main entry, etc)
-    SetCustomHandler(UE_CH_CREATEPROCESS, 0);
-    cbSystemBreakpointStep();
-    //StepInto((void*)cbSystemBreakpointStep);
 }
 
 static void cbStep()
@@ -303,7 +295,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     varset("$hp", (uint)fdProcessInfo->hProcess, true);
     varset("$pid", fdProcessInfo->dwProcessId, true);
     ecount=0;
-    bplist=bpinit();
+    bplist=bpinit(bplist);
     SetCustomHandler(UE_CH_SYSTEMBREAKPOINT, (void*)cbSystemBreakpoint);
     //SetEngineVariable(UE_ENGINE_PASS_ALL_EXCEPTIONS, true);
     //run debug loop (returns when process debugging is stopped)
@@ -847,22 +839,32 @@ bool cbDebugRtr(const char* cmd)
 
 bool cbDebugSetHardwareBreakpoint(const char* cmd)
 {
-    char arg1[deflen]="";
+    char arg1[deflen]=""; //addr
     if(!argget(cmd, arg1, 0, false))
         return true;
     uint addr;
     if(!valfromstring(arg1, &addr, 0, 0, false, 0))
         return true;
     uint type=UE_HARDWARE_EXECUTE;
-    char arg2[deflen]="";
+    char arg2[deflen]=""; //type
     if(argget(cmd, arg2, 1, true))
     {
-        if(strstr(arg2, "rw") or strstr(arg2, "readwrite"))
+        switch(*arg2)
+        {
+        case 'r':
             type=UE_HARDWARE_READWRITE;
-        else if(strstr(arg2, "w") or strstr(arg2, "write"))
+            break;
+        case 'w':
             type=UE_HARDWARE_WRITE;
+            break;
+        case 'x':
+            break;
+        default:
+            puts("invlalid type, assuming 'x'");
+            break;
+        }
     }
-    char arg3[deflen]="";
+    char arg3[deflen]=""; //size
     uint size=UE_HARDWARE_SIZE_1;
     if(argget(cmd, arg3, 2, true))
     {

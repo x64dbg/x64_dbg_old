@@ -107,3 +107,33 @@ int cprintf(const char* format, ...)
     consolesetlasty();
     return ret;
 }
+
+HWND GetConsoleHwnd(void)
+{
+#define MY_BUFSIZE 1024 // Buffer size for console window titles.
+    static HWND hwndFound=0;         // This is what is returned to the caller.
+    if(hwndFound)
+        return hwndFound;
+    char pszNewWindowTitle[MY_BUFSIZE]; // Contains fabricated
+    char pszOldWindowTitle[MY_BUFSIZE]; // Contains original
+    GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);
+    wsprintf(pszNewWindowTitle,"%d/%d", GetTickCount(), GetCurrentProcessId());
+    SetConsoleTitle(pszNewWindowTitle);
+    Sleep(40);
+    hwndFound=FindWindow(NULL, pszNewWindowTitle);
+    SetConsoleTitle(pszOldWindowTitle);
+    Sleep(100);
+    return hwndFound;
+}
+
+void SetConsoleIcon(HICON hIcon)
+{
+    HMODULE hMod=GetModuleHandleA("kernel32");
+    if(!hMod)
+        return;
+    typedef DWORD (WINAPI *SCI)(HICON);
+    SCI sci=(SCI)GetProcAddress(hMod, "SetConsoleIcon");
+    if(!sci)
+        return;
+    sci(hIcon);
+}

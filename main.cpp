@@ -6,6 +6,7 @@
 #include "debugger.h"
 #include "data.h"
 #include "resource.h"
+#include "console.h"
 
 static bool cbStrLen(const char* cmd)
 {
@@ -57,34 +58,6 @@ static void registercommands()
     cmdnew(cmd, "chd", cbInstrChd, false); //Change directory
     cmdnew(cmd, "rtr", cbDebugRtr, true); //rtr
     cmdnew(cmd, "SetHardwareBreakpoint\1bph\1bphws", cbDebugSetHardwareBreakpoint, true); //hardware breakpoint
-}
-
-static HWND GetConsoleHwnd(void)
-{
-#define MY_BUFSIZE 1024 // Buffer size for console window titles.
-    HWND hwndFound;         // This is what is returned to the caller.
-    char pszNewWindowTitle[MY_BUFSIZE]; // Contains fabricated
-    char pszOldWindowTitle[MY_BUFSIZE]; // Contains original
-    GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);
-    wsprintf(pszNewWindowTitle,"%d/%d", GetTickCount(), GetCurrentProcessId());
-    SetConsoleTitle(pszNewWindowTitle);
-    Sleep(40);
-    hwndFound=FindWindow(NULL, pszNewWindowTitle);
-    SetConsoleTitle(pszOldWindowTitle);
-    Sleep(100);
-    return hwndFound;
-}
-
-void SetConsoleIcon(HICON hIcon)
-{
-    HMODULE hMod=GetModuleHandleA("kernel32");
-    if(!hMod)
-        return;
-    typedef DWORD (WINAPI *SCI)(HICON);
-    SCI sci=(SCI)GetProcAddress(hMod, "SetConsoleIcon");
-    if(!sci)
-        return;
-    sci(hIcon);
 }
 
 int main()
