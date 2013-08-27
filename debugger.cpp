@@ -911,3 +911,43 @@ bool cbDebugSetHardwareBreakpoint(const char* cmd)
         cputs("problem setting breakpoint (report please)!");
     return true;
 }
+
+bool cbDebugAlloc(const char* cmd)
+{
+    char arg1[deflen]=""; //size
+    uint size=0x1000;
+    if(argget(cmd, arg1, 0, true))
+        if(!valfromstring(arg1, &size, 0, 0, false, 0))
+            return true;
+    uint mem=(uint)VirtualAllocEx(fdProcessInfo->hProcess, 0, size, MEM_COMMIT|MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    if(!mem)
+        puts("VirtualAllocEx failed");
+    else
+        cprintf(fhex"\n", mem);
+    if(mem)
+        varset("$lastalloc", mem, true);
+    varset("$res", mem, false);
+    return true;
+}
+
+bool cbDebugFree(const char* cmd)
+{
+    uint lastalloc;
+    varget("$lastalloc", &lastalloc, 0, 0);
+    char arg1[deflen]=""; //addr
+    uint addr=lastalloc;
+    if(argget(cmd, arg1, 0, true))
+    {
+        if(!valfromstring(arg1, &addr, 0, 0, false, 0))
+            return true;
+    }
+    else if(!lastalloc)
+        puts("lastalloc is zero, provide a page address");
+    if(addr==lastalloc)
+        varset("$lastalloc", 0, true);
+    bool ok=VirtualFreeEx(fdProcessInfo->hProcess, (void*)addr, 0, MEM_RELEASE);
+    if(!ok)
+        puts("VirtualFreeEx failed");
+    varset("$res", ok, false);
+    return true;
+}

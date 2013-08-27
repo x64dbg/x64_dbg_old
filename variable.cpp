@@ -37,6 +37,8 @@ void varinit()
     varnew("$pid", 0, VAR_READONLY);
     //hidden variables
     varnew("$ans\1$an", 0, VAR_HIDDEN);
+    //read-only variables
+    varnew("$lastalloc", 0, VAR_READONLY);
 }
 
 VAR* vargetptr()
