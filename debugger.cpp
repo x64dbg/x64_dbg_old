@@ -6,7 +6,8 @@
 #include "value.h"
 #include "breakpoint.h"
 #include "instruction.h"
-#include "disasm\disasm.h"
+#include "gui\disasm.h"
+#include "gui\memmap.h"
 #include "memory.h"
 
 PROCESS_INFORMATION* fdProcessInfo;
@@ -64,11 +65,11 @@ bool dbgisrunning()
     return false;
 }
 
-void doDisasm(uint addr)
+void DebugUpdateGui(uint disasm_addr)
 {
     uint basesize;
-    uint base=memfindbaseaddr(fdProcessInfo->hProcess, addr, &basesize);
-    uint start=addr-16*16;
+    uint base=memfindbaseaddr(fdProcessInfo->hProcess, disasm_addr, &basesize);
+    uint start=disasm_addr-16*16;
     if(start<base)
         start=base;
     uint disasmsize=500*16;
@@ -82,8 +83,9 @@ void doDisasm(uint addr)
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
-    DisasmDo(mem, start, 0, disasmsize, addr-start, GetContextData(UE_CIP));
+    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, GetContextData(UE_CIP));
     efree(mem);
+    ViewMemoryMap(fdProcessInfo->hProcess);
 }
 
 static void cbUserBreakpoint()
@@ -124,7 +126,7 @@ static void cbUserBreakpoint()
         if(cur->type==BPSINGLESHOOT)
             bpdel(bplist, 0, cur->addr, BPNORMAL);
     }
-    doDisasm(GetContextData(UE_CIP));
+    DebugUpdateGui(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -146,7 +148,7 @@ static void cbHardwareBreakpoint(void* ExceptionAddress)
             sprintf(log, "hardware breakpoint "fhex"!", cur->addr);
         cinsert(log);
     }
-    doDisasm(cip);
+    DebugUpdateGui(cip);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -172,7 +174,7 @@ static void cbMemoryBreakpoint(void* ExceptionAddress)
     }
     if(!(cur->oldbytes>>4)) //is auto-restoring?
         bpdel(bplist, 0, base, BPMEMORY); //delete from breakpoint list
-    doDisasm(cip);
+    DebugUpdateGui(cip);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -181,7 +183,7 @@ static void cbMemoryBreakpoint(void* ExceptionAddress)
 static void cbEntryBreakpoint()
 {
     cinsert("entry point reached!");
-    doDisasm(GetContextData(UE_CIP));
+    DebugUpdateGui(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -209,7 +211,7 @@ static void cbException(void* ExceptionData)
     char msg[1024]="";
     sprintf(msg, "exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
     cinsert(msg);
-    doDisasm(GetContextData(UE_CIP));
+    DebugUpdateGui(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -218,7 +220,7 @@ static void cbException(void* ExceptionData)
 static void cbLoadDll(void* ExceptionData)
 {
     puts("dll loaded!");
-    doDisasm(GetContextData(UE_CIP));
+    DebugUpdateGui(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -231,7 +233,7 @@ static void cbSystemBreakpoint(void* ExceptionData)
     SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
     SetCustomHandler(UE_CH_AFTERUNHANDLEDEXCEPTION, (void*)cbAfterException);
     cputs("system breakpoint reached!");
-    doDisasm(GetContextData(UE_CIP));
+    DebugUpdateGui(GetContextData(UE_CIP));
     //unlock
     unlock(WAITID_SYSBREAK);
     //lock
@@ -243,7 +245,7 @@ static void cbStep()
 {
     cinsert("stepped!");
     isStepping=false;
-    doDisasm(GetContextData(UE_CIP));
+    DebugUpdateGui(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -252,7 +254,7 @@ static void cbStep()
 static void cbRtrFinalStep()
 {
     cinsert("returned!");
-    doDisasm(GetContextData(UE_CIP));
+    DebugUpdateGui(GetContextData(UE_CIP));
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -771,7 +773,7 @@ bool cbDebugDisasm(const char* cmd)
     if(argget(cmd, arg1, 0, true))
         if(!valfromstring(arg1, &addr, 0, 0, true, 0))
             addr=GetContextData(UE_CIP);
-    doDisasm(addr);
+    DebugUpdateGui(addr);
     return true;
 }
 

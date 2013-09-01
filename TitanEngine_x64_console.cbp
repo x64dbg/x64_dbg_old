@@ -19,7 +19,7 @@
 					<Add option="-s" />
 					<Add library=".\TitanEngine_x86.a" />
 					<Add library=".\libdbg_x32.a" />
-					<Add library=".\disasm\libdisasm_x32.a" />
+					<Add library=".\gui\libgui_x32.a" />
 				</Linker>
 			</Target>
 			<Target title="x64">
@@ -36,13 +36,14 @@
 					<Add option="-s" />
 					<Add library=".\TitanEngine_x64.a" />
 					<Add library=".\libdbg_x64.a" />
-					<Add library=".\disasm\libdisasm_x64.a" />
+					<Add library=".\gui\libgui_x64.a" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions -Wno-format" />
+			<Add directory="$(project_dir)" />
 		</Compiler>
 		<Linker>
 			<Add library="shlwapi" />
@@ -63,9 +64,8 @@
 		<Unit filename="dbg.h" />
 		<Unit filename="debugger.cpp" />
 		<Unit filename="debugger.h" />
-		<Unit filename="disasm/disasm.h">
-			<Option target="x32" />
-		</Unit>
+		<Unit filename="gui/disasm.h" />
+		<Unit filename="gui/memmap.h" />
 		<Unit filename="instruction.cpp" />
 		<Unit filename="instruction.h" />
 		<Unit filename="main.cpp" />

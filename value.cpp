@@ -4,7 +4,7 @@
 #include "console.h"
 #include "math.h"
 #include "memory.h"
-#include "disasm\disasm.h"
+#include "gui\disasm.h"
 #include <psapi.h>
 
 static bool dosignedcalc=false;
@@ -1215,7 +1215,7 @@ bool valtostring(const char* string, uint* value, bool silent)
         }
         bool ok=setregister(string, *value);
         if(strstr(string, "ip"))
-            doDisasm(GetContextData(UE_CIP));
+            DebugUpdateGui(GetContextData(UE_CIP));
         return ok;
     }
     else if(*string=='!' and isflag(string+1)) //flag

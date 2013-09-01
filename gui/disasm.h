@@ -1,7 +1,7 @@
 #ifndef __DISASM_H__
 #define __DISASM_H__
 
-#include <windows.h>
+#include <_global.h>
 
 typedef void (*CBCONTEXTMENU)(int,int);
 

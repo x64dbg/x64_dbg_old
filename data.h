@@ -3,45 +3,29 @@
 
 #include "_global.h"
 
-struct DATA;
-
-//typedefs
-typedef void (*CBTYPE)(DATA*);
-
-//structs
-struct TYPE
+enum DATA_TYPE //how to display the current struct entry?
 {
-    unsigned int* length;
-    unsigned int* data_type;
-    CBTYPE cbType;
+    thex, //%X
+    tint, //%d
+    tuint, //%u
+    ttext, //%c
 };
 
-struct DISASM_OPTIONS
+struct STRUCT_INFO
 {
-    uint mem_va;
-    unsigned int codebase;
-    unsigned int code_size;
-    unsigned int ip;
-    uint reserved[16];
-};
-
-struct STACK_OPTIONS
-{
-    uint mem_va;
-    unsigned int sp;
+    unsigned int size; //size of one entry (with type) (max 256)
+    DATA_TYPE display_type; //display type
+    unsigned int count; //number of entries with the same content (reserved[12])
+    void* description; //reserved for later use (for example name of variable)
 };
 
 struct DATA
 {
-    unsigned int flags;
-    unsigned char* mem;
-    unsigned int mem_size;
-    TYPE type;
-    union
-    {
-        DISASM_OPTIONS disasm;
-        STACK_OPTIONS stack;
-    } options;
+    uint page_start; //remote/local memory
+    uint page_size; //size of memory
+    uint ip; //real start of data (relative from page_start)
+    int struct_size; //number of entries in a struct
+    STRUCT_INFO* info; //actual info
 };
 
 #endif // _DATA_H
