@@ -1074,7 +1074,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         bool isrunning=dbgisrunning();
         if(!isrunning)
             dbgdisablebpx();
-        bool rpm=readmem(fdProcessInfo->hProcess, (void*)addr, value, read_size, 0);
+        bool rpm=memread(fdProcessInfo->hProcess, (void*)addr, value, read_size, 0);
         if(!isrunning)
             dbgenablebpx();
         if(!rpm)

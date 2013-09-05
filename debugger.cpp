@@ -79,7 +79,7 @@ void DebugUpdateGui(uint disasm_addr)
     dbgdisablebpx();
     char* mem=(char*)emalloc(500*16);
     memset(mem, 0xFF, 500*16);
-    readmem(fdProcessInfo->hProcess, (void*)start, mem, disasmsize, 0);
+    memread(fdProcessInfo->hProcess, (void*)start, mem, disasmsize, 0);
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
@@ -264,7 +264,7 @@ static unsigned char getCIPch()
 {
     char ch;
     dbgdisablebpx();
-    readmem(fdProcessInfo->hProcess, (void*)GetContextData(UE_CIP), &ch, 1, 0);
+    memread(fdProcessInfo->hProcess, (void*)GetContextData(UE_CIP), &ch, 1, 0);
     dbgenablebpx();
     return ch;
 }
@@ -463,7 +463,7 @@ bool cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
         type|=UE_BREAKPOINT_TYPE_INT3;
     short oldbytes;
     BREAKPOINT* found=bpfind(bplist, 0, addr, 0, BPNORMAL);
-    if(IsBPXEnabled(addr) or !readmem(fdProcessInfo->hProcess, (void*)addr, &oldbytes, sizeof(short), 0) or found or !SetBPX(addr, type, (void*)cbUserBreakpoint))
+    if(IsBPXEnabled(addr) or !memread(fdProcessInfo->hProcess, (void*)addr, &oldbytes, sizeof(short), 0) or found or !SetBPX(addr, type, (void*)cbUserBreakpoint))
     {
         cprintf("error setting breakpoint at "fhex"!\n", addr);
         return true;
@@ -921,7 +921,7 @@ bool cbDebugAlloc(const char* cmd)
     if(argget(cmd, arg1, 0, true))
         if(!valfromstring(arg1, &size, 0, 0, false, 0))
             return true;
-    uint mem=(uint)VirtualAllocEx(fdProcessInfo->hProcess, 0, size, MEM_COMMIT|MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    uint mem=(uint)memalloc(fdProcessInfo->hProcess, 0, size, PAGE_EXECUTE_READWRITE);
     if(!mem)
         puts("VirtualAllocEx failed");
     else

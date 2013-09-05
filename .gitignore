@@ -8,3 +8,4 @@ CppCheckResults.xml
 .cccc/
 bin/x32/test2.exe
 bin/x32/unpackme.exe
+TitanEngine_x64_console.bmarks

@@ -28,7 +28,7 @@ uint memfindbaseaddr(HANDLE hProcess, uint addr, uint* size)
     return 0;
 }
 
-bool readmem(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, DWORD nSize, SIZE_T* lpNumberOfBytesRead)
+bool memread(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, DWORD nSize, SIZE_T* lpNumberOfBytesRead)
 {
     uint size;
     uint base=memfindbaseaddr(hProcess, (uint)lpBaseAddress, &size);
@@ -37,4 +37,9 @@ bool readmem(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, DWORD n
     bool ret=ReadProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
     VirtualProtectEx(hProcess, (void*)base, size, oldprotect, &oldprotect);
     return ret;
+}
+
+void* memalloc(HANDLE hProcess, uint addr, DWORD size, DWORD fdProtect)
+{
+    return VirtualAllocEx(hProcess, (void*)addr, size, MEM_RESERVE|MEM_COMMIT, fdProtect);
 }
