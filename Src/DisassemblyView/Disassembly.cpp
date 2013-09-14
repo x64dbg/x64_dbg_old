@@ -9,126 +9,169 @@ Disassembly::Disassembly(QWidget *parent) :AbstractTableView(parent)
 
     mIsLastInstDisplayed = false;
 
+    mGuiState = Disassembly::NoState;
+
     setRowCount(mMemoryView->size());
 
     qDebug() << "size" << mMemoryView->size();
 }
 
 
-void Disassembly::AbstractMemberFunction(void)
+
+void Disassembly::mouseMoveEvent(QMouseEvent* event)
 {
-    qDebug() << "Disassembly: AbstractMemberFunction";
-}
+    qDebug() << "Disassembly::mouseMoveEvent";
 
-/*
-void Disassembly::sliderMovedAction(int type, int value, int delta)
-{
-    qDebug() << "Disassembly: sliderMovedAction: value " << value << " delta " << delta;
+    bool wAccept = true;
 
-    int rva = value;
-
-    if(type != QAbstractSlider::SliderMove)
+    if(mGuiState == Disassembly::MultiRowsSelectionState)
     {
-        if(delta < 0)
+        qDebug() << "State = MultiRowsSelectionState";
+
+        if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {
-            rva = getPreviousInstructionRVA(rva, qAbs(delta));
-        }
-        else
-        {
-            rva = getNextInstructionRVA(rva, qAbs(delta));
-        }
+            int wRowIndex = getIndexFromCount(getTableOffset(), getRowOffsetFromY(transY(event->y())));
 
-        setScrollBarValue(rva);
-    }
-    else
-    {
-        if(delta < 0)
-        {
-            rva = getPreviousInstructionRVA(rva + delta, 1);
-        }
-        else
-        {
-            rva = getNextInstructionRVA(rva + delta, 1);
-        }
-
-        setTableOffset(rva);
-        getScrollbar()->setValue(rva);
-    }
-}
-*/
-
-QString Disassembly::getStringToPrint(int rowBase, int rowOffset, int col)
-{
-   // qDebug() << "Disassembly : getStringToPrint : row : " << row;
-    QString string = "";
-    int wRva = getIndexFromCount(rowBase, rowOffset);
-
-    qDebug() << "getStringToPrint rowBase:" << rowBase << "rowOffset:" << rowOffset << "col:" << col << "wRva:" << wRva;
-
-    if(wRva < mMemoryView->size())
-    {
-        Instruction_t instruction = DisassembleAt(wRva);
-        qDebug() << "instruction rva:" << instruction.rva << "lentgh:" << instruction.lentgh;
-        qDebug() << "mIsLastInstDisplayed:" << mIsLastInstDisplayed;
-
-        if(rowOffset == 0)// && (int)instruction.rva + (int)instruction.lentgh - 1 < getRowCount() - 1)
-            mIsLastInstDisplayed = false;
-
-        if(mIsLastInstDisplayed == false)
-        {
-            switch(col)
+            if(wRowIndex < getRowCount())
             {
-                case 0:
-                {
-                    ulong addr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
-                    //string = QString("%1").arg(addr, 8, 16, QChar('0')).toUpper();
-                    string += QString::number(instruction.rva);
-                    break;
-                }
-                case 1:
-                {
-                    for(int i = 0; i < instruction.dump.size(); i++)
-                        string += QString("%1").arg((unsigned char)(instruction.dump.at(i)), 2, 16, QChar('0')).toUpper();
-                    break;
-                }
-                case 2:
-                {
-                    string = instruction.instStr.toUpper();
-                    break;
-                }
-                case 3:
-                {
-                    break;
-                }
-                default:
-                    break;
-            }
+                expandSelectionUpTo(wRowIndex);
 
-            if((int)instruction.rva + (int)instruction.lentgh - 1 >= getRowCount() - 1)
-                mIsLastInstDisplayed = true;
+                this->viewport()->repaint();
+
+                wAccept = false;
+            }
         }
     }
 
-    return string;
+    if(wAccept == true)
+        AbstractTableView::mouseMoveEvent(event);
 }
 
 
-bool Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
+
+void Disassembly::mousePressEvent(QMouseEvent* event)
 {
+    qDebug() << "Disassembly::mousePressEvent";
 
-    if(col == 1)
+    bool wAccept = false;
+
+    if(((event->buttons() & Qt::LeftButton) != 0) && ((event->buttons() & Qt::RightButton) == 0))
     {
-        int wAddr = getIndexFromCount(rowBase, rowOffset);
+        if(getGuiState() == AbstractTableView::NoState)
+        {
+            if(event->y() > getHeaderHeigth())
+            {
+                int wRowIndex = getIndexFromCount(getTableOffset(), getRowOffsetFromY(transY(event->y())));
 
-        paintGraphicDump(painter, x + 5, y, wAddr);
+                if(wRowIndex < getRowCount())
+                {
+                    setSingleSelection(wRowIndex);
 
-        // Draw cell content
-        painter->drawText(QRect(x + 15, y, getColumnWidth(col) - 15, getRowHeight()), 0, getStringToPrint(rowBase, rowOffset, col));
+                    mGuiState = Disassembly::MultiRowsSelectionState;
 
-        return true;
+                    viewport()->repaint();
+
+                    wAccept = true;
+                }
+            }
+        }
+    }
+
+    if(wAccept == false)
+        AbstractTableView::mousePressEvent(event);
+}
+
+
+
+void Disassembly::mouseReleaseEvent(QMouseEvent* event)
+{
+    bool wAccept = true;
+
+    if((event->buttons() & Qt::LeftButton) == 0)
+    {
+        if(mGuiState == Disassembly::MultiRowsSelectionState)
+        {
+            mGuiState = Disassembly::NoState;
+
+            this->viewport()->repaint();
+
+            wAccept = false;
+        }
+    }
+
+    if(wAccept == true)
+        AbstractTableView::mouseReleaseEvent(event);
+}
+
+
+int Disassembly::sliderMovedAction(int type, int value, int delta)
+{
+    if(type == QAbstractSlider::SliderMove)
+    {
+        int newValue;
+
+        if(value + delta > 0)
+        {
+            newValue = getIndexFromCount(value + delta, -1);
+            newValue = getIndexFromCount(newValue, 1);
+        }
+        else
+            newValue = 0;
+
+        return newValue;
     }
     else
-        return false;
+    {
+        return getIndexFromCount(value, delta);
+    }
+}
+
+
+QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
+{
+    //return QString("Disassembly: Col:") + QString::number(col) + "Row:" + QString::number(rowBase + rowOffset);
+
+    QString wStr = "";
+    int wRva = getIndexFromCount(rowBase, rowOffset);
+    Instruction_t wInst = DisassembleAt(wRva);
+
+    if(isSelected(rowBase, rowOffset) == true)
+        painter->fillRect(QRect(x, y, w, h), QBrush(QColor(192,192,192)));
+
+    switch(col)
+    {
+        case 0:
+        {
+            //ulong wAddr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
+            //wStr = QString("%1").arg(wAddr, 8, 16, QChar('0')).toUpper();
+            wStr += QString::number(wInst.rva);
+            break;
+        }
+
+        case 1:
+        {
+            for(int i = 0; i < wInst.dump.size(); i++)
+                wStr += QString("%1").arg((unsigned char)(wInst.dump.at(i)), 2, 16, QChar('0')).toUpper();
+
+            paintGraphicDump(painter, x + 5, y, wRva);
+
+            // Draw cell content
+            painter->drawText(QRect(x + 15, y, getColumnWidth(col) - 15, getRowHeight()), 0, wStr);
+
+            wStr = "";
+            break;
+        }
+
+        case 2:
+        {
+            wStr = wInst.instStr.toUpper();
+            break;
+        }
+
+        default:
+            break;
+    }
+    return wStr;
 }
 
 void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
@@ -281,16 +324,7 @@ Instruction_t Disassembly::DisassembleAt(ulong rva, ulong count)
                                 Selection Management
 ************************************************************************************/
 void Disassembly::expandSelectionUpTo(int to)
-{/*
-    int wRowDelta = to - getTableOffset();
-    int wAddr = to;
-
-    if(wRowDelta < 0)
-        wAddr = getPreviousInstructionRVA(getTableOffset(), wRowDelta);
-    else if(wRowDelta > 0)
-        wAddr = getNextInstructionRVA(getTableOffset(), wRowDelta);
-*/
-    //wAddr = to;
+{
     if(to < mSelection.firstSelectedIndex)
     {
         mSelection.fromIndex = to;
@@ -305,15 +339,7 @@ void Disassembly::expandSelectionUpTo(int to)
 
 
 void Disassembly::setSingleSelection(int index)
-{/*
-    int wRowDelta = index - getTableOffset();
-    int wAddr = index;
-
-    if(wRowDelta < 0)
-        wAddr = getPreviousInstructionRVA(getTableOffset(), wRowDelta);
-    else if(wRowDelta > 0)
-        wAddr = getNextInstructionRVA(getTableOffset(), wRowDelta);
-*/
+{
     mSelection.firstSelectedIndex = index;
     mSelection.fromIndex = index;
     mSelection.toIndex = index;
@@ -326,45 +352,19 @@ int Disassembly::getInitialSelection()
 }
 
 
-bool Disassembly::isSelected(int index)
+bool Disassembly::isSelected(int base, int offset)
 {
-    int wRowDelta = index - getTableOffset();
-    int wAddr = index;
+    int wAddr = base;
 
-    if(wRowDelta < 0)
-        wAddr = getPreviousInstructionRVA(getTableOffset(), wRowDelta);
-    else if(wRowDelta > 0)
-        wAddr = getNextInstructionRVA(getTableOffset(), wRowDelta);
+    if(offset < 0)
+        wAddr = getPreviousInstructionRVA(getTableOffset(), offset);
+    else if(offset > 0)
+        wAddr = getNextInstructionRVA(getTableOffset(), offset);
 
     if(wAddr >= mSelection.fromIndex && wAddr <= mSelection.toIndex)
         return true;
     else
         return false;
-}
-
-void Disassembly::selectNext()
-{
-    int wAddr = getNextInstructionRVA(mSelection.firstSelectedIndex, 1);
-
-    if(wAddr > getRowCount() - 1)
-        wAddr = getRowCount() - 1;
-
-    mSelection.firstSelectedIndex = wAddr;
-    mSelection.fromIndex = wAddr;
-    mSelection.toIndex = wAddr;
-}
-
-
-void Disassembly::selectPrevious()
-{
-    int wAddr = getPreviousInstructionRVA(mSelection.firstSelectedIndex, 1);
-
-    if(wAddr < 0)
-        wAddr = 0;
-
-    mSelection.firstSelectedIndex = wAddr;
-    mSelection.fromIndex = wAddr;
-    mSelection.toIndex = wAddr;
 }
 
 
@@ -387,188 +387,6 @@ int Disassembly::getIndexFromCount(int index, int count)
 
     return wAddr;
 }
-
-
-/*
-QString Disassembly::getStringToPrint(int topTableAddress, int rowIndex, int colIndex) //getStringToPrint(int row, int col)
-{
-    ulong ip = getNextInstructionRVA(topTableAddress, rowIndex);
-    QString string = "";
-
-    if(ip < mMemoryView->size())
-    {
-        Instruction_t instruction = DisassembleAt(ip);
-
-        switch(colIndex)
-        {
-            case 0:
-            {
-                ulong addr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
-                string = QString("%1").arg(addr, 8, 16, QChar('0')).toUpper();
-                break;
-            }
-            case 1:
-            {
-                for(int i = 0; i < instruction.dump.size(); i++)
-                    string += QString("%1").arg((unsigned char)(instruction.dump.at(i)), 2, 16, QChar('0')).toUpper();
-                break;
-            }
-            case 2:
-            {
-                string = instruction.instStr.toUpper();
-                break;
-            }
-            case 3:
-            {
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    return string;
-}
-
-
-void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int topTableRVA, int rowIndex)
-{
-    ulong selHeadRVA = getSelectionHead();
-    ulong rva = getNextInstructionRVA(topTableRVA, rowIndex);
-    Instruction_t instruction = DisassembleAt(selHeadRVA);
-    Int32 branchType = instruction.disasm.Instruction.BranchType;
-    GraphicDump_t wPict = GD_Nothing;
-
-    if(     branchType == (Int32)JO      ||
-            branchType == (Int32)JC      ||
-            branchType == (Int32)JE      ||
-            branchType == (Int32)JA      ||
-            branchType == (Int32)JS      ||
-            branchType == (Int32)JP      ||
-            branchType == (Int32)JL      ||
-            branchType == (Int32)JG      ||
-            branchType == (Int32)JB      ||
-            branchType == (Int32)JECXZ   ||
-            branchType == (Int32)JmpType ||
-            branchType == (Int32)RetType ||
-            branchType == (Int32)JNO     ||
-            branchType == (Int32)JNC     ||
-            branchType == (Int32)JNE     ||
-            branchType == (Int32)JNA     ||
-            branchType == (Int32)JNS     ||
-            branchType == (Int32)JNP     ||
-            branchType == (Int32)JNL     ||
-            branchType == (Int32)JNG     ||
-            branchType == (Int32)JNB)
-    {
-        ulong destRVA = (ulong)instruction.disasm.Instruction.AddrValue;
-
-        if(destRVA > (ulong)mMemoryView->getBase())
-        {
-            destRVA -= (ulong)mMemoryView->getBase();
-
-            if(destRVA < selHeadRVA)
-            {
-                if(rva == destRVA)
-                    wPict = GD_HeadFromBottom;
-                else if(rva > destRVA && rva < selHeadRVA)
-                    wPict = GD_Vert;
-                else if(rva == selHeadRVA)
-                    wPict = GD_FootToTop;
-            }
-            else if(destRVA > selHeadRVA)
-            {
-                if(rva == selHeadRVA)
-                    wPict = GD_FootToBottom;
-                else if(rva > selHeadRVA && rva < destRVA)
-                    wPict = GD_Vert;
-                else if(rva == destRVA)
-                    wPict = GD_HeadFromTop;
-            }
-        }
-    }
-
-    painter->save() ;
-    painter->setPen(QColor(0, 0, 0));
-
-    if(wPict == GD_Vert)
-    {
-        painter->drawLine(x, y, x, y + rowHeight());
-    }
-    else if(wPict == GD_FootToBottom)
-    {
-        painter->drawLine(x, y + rowHeight() / 2, x + 5, y + rowHeight() / 2);
-        painter->drawLine(x, y + rowHeight() / 2, x, y + rowHeight());
-    }
-    if(wPict == GD_FootToTop)
-    {
-        painter->drawLine(x, y + rowHeight() / 2, x + 5, y + rowHeight() / 2);
-        painter->drawLine(x, y, x, y + rowHeight() / 2);
-    }
-    else if(wPict == GD_HeadFromBottom)
-    {
-        QPoint wPoints[] = {
-             QPoint(x + 3, y + rowHeight() / 2 - 2),
-             QPoint(x + 5, y + rowHeight() / 2),
-             QPoint(x + 3, y + rowHeight() / 2 + 2),
-         };
-
-        painter->drawLine(x, y + rowHeight() / 2, x + 5, y + rowHeight() / 2);
-        painter->drawLine(x, y + rowHeight() / 2, x, y + rowHeight());
-        painter->drawPolyline(wPoints, 3);
-    }
-    if(wPict == GD_HeadFromTop)
-    {
-        QPoint wPoints[] = {
-             QPoint(x + 3, y + rowHeight() / 2 - 2),
-             QPoint(x + 5, y + rowHeight() / 2),
-             QPoint(x + 3, y + rowHeight() / 2 + 2),
-         };
-
-        painter->drawLine(x, y + rowHeight() / 2, x + 5, y + rowHeight() / 2);
-        painter->drawLine(x, y, x, y + rowHeight() / 2);
-        painter->drawPolyline(wPoints, 3);
-    }
-
-    painter->restore();
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -26,7 +26,7 @@ SOURCES += \
     Src/Disassembler/QBeaEngine.cpp \
     Src/DisassemblyView/AbstractTableView.cpp \
     Src/DisassemblyView/Disassembly.cpp \
-    Src/DisassemblyView/StdTable.cpp \
+    #Src/DisassemblyView/StdTable.cpp \
     Src/DisassemblyView/HexDump.cpp
 
 HEADERS  += \
@@ -43,7 +43,7 @@ HEADERS  += \
     Src/DisassemblyView/AbstractTableView.h \
     Src/DisassemblyView/Disassembly.h \
     Src/Global/NewTypes.h \
-    Src/DisassemblyView/StdTable.h \
+    #Src/DisassemblyView/StdTable.h \
     Src/DisassemblyView/HexDump.h
 
 INCLUDEPATH += \

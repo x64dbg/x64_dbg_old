@@ -14,15 +14,28 @@ public:
     explicit HexDump(QWidget *parent = 0);
 
 
-    void AbstractMemberFunction(void);
-    QString getStringToPrint(int rowBase, int rowOffset, int col);
+    //QString getStringToPrint(int rowBase, int rowOffset, int col);
+    void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
 
-    
+    QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+    void paintGraphicDump(QPainter* painter, int x, int y, int addr);
+
+    // Selection Management
+    void expandSelectionUpTo(int to);
+    void setSingleSelection(int index);
+    int getInitialSelection();
+    bool isSelected(int base, int offset);
+
+
 signals:
     
 public slots:
 
 private:
+    enum GuiState_t {NoState, MultiRowsSelectionState};
+
     typedef struct _SelectionData_t
     {
         int firstSelectedIndex;
@@ -31,10 +44,14 @@ private:
     } SelectionData_t;
 
     MapViewOfMem* mMemoryView;
-    QBeaEngine* mDisasm;
 
     SelectionData_t mSelection;
     
+    GuiState_t mGuiState;
+
+    int mByteWidth;
+
+    int mDumpByteWidth;
 };
 
 #endif // DUMP_H

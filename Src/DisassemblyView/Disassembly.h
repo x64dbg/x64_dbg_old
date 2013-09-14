@@ -14,26 +14,27 @@ public:
     explicit Disassembly(QWidget *parent = 0);
 
     void AbstractMemberFunction(void);
-    //void sliderMovedAction(int type, int value, int delta);
+    int sliderMovedAction(int type, int value, int delta);
 
-    QString getStringToPrint(int rowBase, int rowOffset, int col);
-
+    //QString getStringToPrint(int rowBase, int rowOffset, int col);
+    void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
 
     int getPreviousInstructionRVA(int address, int count);
     int getNextInstructionRVA(int address, int count);
     Instruction_t DisassembleAt(ulong rva);
     Instruction_t DisassembleAt(ulong rva, ulong count);
 
-    bool paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+    QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
     void paintGraphicDump(QPainter* painter, int x, int y, int addr);
 
     // Selection Management
     void expandSelectionUpTo(int to);
     void setSingleSelection(int index);
     int getInitialSelection();
-    bool isSelected(int index);
-    void selectNext();
-    void selectPrevious();
+    bool isSelected(int base, int offset);
+
 
     int getIndexFromCount(int index, int count);
 
@@ -42,6 +43,7 @@ signals:
 public slots:
 
 private:
+    enum GuiState_t {NoState, MultiRowsSelectionState};
     enum GraphicDump_t {GD_Nothing, GD_FootToTop, GD_FootToBottom, GD_HeadFromTop, GD_HeadFromBottom, GD_Vert}; // GD_FootToTop = '- , GD_FootToBottom = ,- , GD_HeadFromTop = '-> , GD_HeadFromBottom = ,-> , GD_Vert = |
 
     typedef struct _SelectionData_t
@@ -57,6 +59,8 @@ private:
     SelectionData_t mSelection;
 
     bool mIsLastInstDisplayed;
+
+    GuiState_t mGuiState;
     
 };
 

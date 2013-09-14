@@ -7,7 +7,9 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
     mTableOffset = 0;
     mHeader = (Header_t){true, 20, -1};
 
-    setFont(QFont("Monospace", 8));
+    QFont font("Monospace", 9);
+    font.setStyleHint(QFont::TypeWriter);
+    setFont(font);
 
     int wRowsHeight = QFontMetrics(this->font()).height();
     wRowsHeight = (wRowsHeight * 105) / 100;
@@ -30,18 +32,13 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 
     setMouseTracking(true);
 
-
-    mMultiSelTimer = new QTimer(this);
-    mMultiSelTimer->start(100);
-
-    connect(mMultiSelTimer, SIGNAL(timeout()), this, SLOT(multiSelTimerSlot()));
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), this, SLOT(vertSliderActionSlot(int)));
 }
 
 
 void AbstractTableView::callVirtual()
 {
-    AbstractMemberFunction();
+    //AbstractMemberFunction();
 }
 
 
@@ -95,22 +92,13 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
     {
         for(int i = 0; i < wViewableRowsCount; i++)
         {
-            // Highlight selected rows
-            /*
-            if(isSelected(mTableOffset + i) == true)
-                wPainter.fillRect(QRect(x, y, getColumnWidth(j), getRowHeight()), QBrush(QColor(192,192,192)));
-                */
-
-            paintSelection(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
-
             //  Draw cell content
             if((mTableOffset + i) < getRowCount())
             {
-               bool wFlag = paintContent(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
-
-                if(wFlag == false)
-                    wPainter.drawText(QRect(x + 4, y, getColumnWidth(j) - 4, getRowHeight()), Qt::AlignVCenter | Qt::AlignLeft, getStringToPrint(mTableOffset, i, j));
+               QString wStr = paintContent(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
+               wPainter.drawText(QRect(x + 4, y, getColumnWidth(j) - 4, getRowHeight()), Qt::AlignVCenter | Qt::AlignLeft, wStr);
             }
+
             // Draw cell right border
             wPainter.save() ;
             wPainter.setPen(QColor(128, 128, 128));
@@ -126,15 +114,9 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
     }
 }
 
-bool AbstractTableView::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
+QString AbstractTableView::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
 {
-    return false;
-}
-
-void AbstractTableView::paintSelection(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
-{
-    if(isSelected(rowBase + rowOffset) == true)
-        painter->fillRect(QRect(x, y, getColumnWidth(col), getRowHeight()), QBrush(QColor(192,192,192)));
+    return QString("Col:") + QString::number(col) + "Row:" + QString::number(rowBase + rowOffset);
 }
 
 
@@ -179,16 +161,48 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
                 {
                     setCursor(Qt::SplitHCursor);
                     mColResizeData.splitHandle = true;
+                    mGuiState = AbstractTableView::ReadyToResize;
                 }
-                else if ((wHandle == false) && (wHasCursor == true))
+                if ((wHandle == false) && (wHasCursor == true))
                 {
                     unsetCursor();
                     mColResizeData.splitHandle = false;
+                    mGuiState = AbstractTableView::NoState;
                 }
             }
             else
             {
                 QWidget::mouseMoveEvent(event);
+            }
+            break;
+        }
+        case AbstractTableView::ReadyToResize:
+        {
+            qDebug() << "State = ReadyToResize";
+
+            int wColIndex = getColumnIndexFromX(event->x());
+            int wStartPos = getColumnPosition(wColIndex); // Position X of the start of column
+            int wEndPos = getColumnPosition(wColIndex) + getColumnWidth(wColIndex); // Position X of the end of column
+
+            if(event->buttons() == Qt::NoButton)
+            {
+                bool wHandle = true;
+
+                if(((wColIndex != 0) && (event->x() >= wStartPos) && (event->x() <= (wStartPos + 2))) || ((wColIndex != (getColumnCount() - 1)) && (event->x() <= wEndPos) && (event->x() >= (wEndPos - 2))))
+                {
+                    wHandle = true;
+                }
+                else
+                {
+                    wHandle = false;
+                }
+
+                if ((wHandle == false) && (mGuiState == AbstractTableView::ReadyToResize))
+                {
+                    unsetCursor();
+                    mColResizeData.splitHandle = false;
+                    mGuiState = AbstractTableView::NoState;
+                }
             }
             break;
         }
@@ -206,23 +220,6 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
 
             this->viewport()->repaint();
 
-            break;
-        }
-        case AbstractTableView::MultiRowsSelectionState:
-        {
-            qDebug() << "State = MultiRowsSelectionState";
-
-            if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
-            {
-                int wRowIndex = getIndexFromCount(mTableOffset, getRowOffsetFromY(transY(event->y())));
-
-                if(wRowIndex < getRowCount())
-                {
-                    expandSelectionUpTo(wRowIndex);
-
-                    this->viewport()->repaint();
-                }
-            }
             break;
         }
         case AbstractTableView::HeaderButtonPressed:
@@ -294,19 +291,6 @@ void AbstractTableView::mousePressEvent(QMouseEvent* event)
 
             this->viewport()->repaint();
         }
-        else
-        {
-            int wRowIndex = getIndexFromCount(mTableOffset, getRowOffsetFromY(transY(event->y())));
-
-            if(wRowIndex < getRowCount())
-            {
-                setSingleSelection(wRowIndex);
-
-                mGuiState = AbstractTableView::MultiRowsSelectionState;
-
-                viewport()->repaint();
-            }
-        }
     }
 
     //QWidget::mousePressEvent(event);
@@ -325,10 +309,6 @@ void AbstractTableView::mouseReleaseEvent(QMouseEvent* event)
     if((event->buttons() & Qt::LeftButton) == 0)
     {
         if(mGuiState == AbstractTableView::ResizeColumnState)
-        {
-            mGuiState = AbstractTableView::NoState;
-        }
-        else if(mGuiState == AbstractTableView::MultiRowsSelectionState)
         {
             mGuiState = AbstractTableView::NoState;
         }
@@ -367,49 +347,10 @@ void AbstractTableView::mouseReleaseEvent(QMouseEvent* event)
 void AbstractTableView::keyPressEvent(QKeyEvent* event)
 {
     int key = event->key();
-    int wSelIndex = getInitialSelection();
-    int viewableRowsCount = getViewableRowsCount() - 1;
-    int wNewSliderValue = mTableOffset;
 
-    if(key == Qt::Key_Up)
-    {
-        //wSelIndex -= wSelIndex <= 0 ? 0 : 1;
-        wSelIndex = getIndexFromCount(wSelIndex, -1);
+    if(key == Qt::Key_Up || key == Qt::Key_Down)
+        upDownKeyPressed(key);
 
-        if(wSelIndex <= mTableOffset)
-        {
-            wNewSliderValue = wSelIndex;
-        }
-        else if(wSelIndex > getIndexFromCount(mTableOffset, viewableRowsCount - 1))
-        {
-            wNewSliderValue = getIndexFromCount(wSelIndex, -viewableRowsCount + 1);
-        }
-
-        selectPrevious();
-    }
-    else if(key == Qt::Key_Down)
-    {
-        //wSelIndex += wSelIndex < getRowCount() - 1 ? 1 : 0;
-        wSelIndex = getIndexFromCount(wSelIndex, 1);
-
-        if(wSelIndex < mTableOffset)
-        {
-            wNewSliderValue = wSelIndex;
-        }
-        else if(wSelIndex >= getIndexFromCount(mTableOffset, viewableRowsCount - 1))
-        {
-            wNewSliderValue = getIndexFromCount(wSelIndex, -viewableRowsCount + 1);
-        }
-
-        selectNext();
-    }
-
-    if(wNewSliderValue != mTableOffset)
-    {
-        verticalScrollBar()->setValue(wNewSliderValue);
-        verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
-    }
-    viewport()->repaint();
 }
 
 
@@ -447,64 +388,67 @@ void AbstractTableView::wheelEvent(QWheelEvent* event)
  */
 void AbstractTableView::vertSliderActionSlot(int action)
 {
-    int wSliderPosition = 0;
+    int wSliderPosition = verticalScrollBar()->sliderPosition();
     int wOldValue = mTableOffset;
     int wDelta;
 
-    if(verticalScrollBar()->sliderPosition() < 0)
+    // Saturate slider postion value
+    if(wSliderPosition < 0)
         wSliderPosition = 0;
-    else if(verticalScrollBar()->sliderPosition() > getRowCount() - 1)
+    else if(wSliderPosition > getRowCount() - 1)
         wSliderPosition = getRowCount() - 1;
     else
-        wSliderPosition = verticalScrollBar()->sliderPosition();
+        wSliderPosition = wSliderPosition;
 
+    // Compute Delta
     wDelta = wSliderPosition - wOldValue;
-    qDebug() << "wDelta " << wDelta;
-    qDebug() << "mTableOffset " << mTableOffset;
 
-    qDebug() << "Scroll Action Slot " << wSliderPosition;
+    qDebug() << "Scroll Action Slot : wSliderPosition: " << wSliderPosition << " mTableOffset: " << mTableOffset << " wDelta: " << wDelta;
 
     switch(action)
     {
         case QAbstractSlider::SliderSingleStepSub:
         {
             qDebug() << "SliderSingleStepSub";
-            int value = wSliderPosition;
-            mTableOffset = getIndexFromCount(mTableOffset, wDelta);
+            mTableOffset += wDelta;//= getIndexFromCount(mTableOffset, wDelta);
+
+            break;
         }
-        break;
 
         case QAbstractSlider::SliderPageStepSub:
         {
             qDebug() << "SliderPageStepSub";
-            int value = wSliderPosition;
-            mTableOffset = getIndexFromCount(mTableOffset, wDelta);
+            mTableOffset += wDelta;//= getIndexFromCount(mTableOffset, wDelta);
+
+            break;
         }
-        break;
 
         case QAbstractSlider::SliderSingleStepAdd:
         {
             qDebug() << "SliderSingleStepAdd";
-            int value = wSliderPosition;
-            mTableOffset = getIndexFromCount(mTableOffset, wDelta);
+            mTableOffset += wDelta;//= getIndexFromCount(mTableOffset, wDelta);
+
+            break;
         }
-        break;
 
         case QAbstractSlider::SliderPageStepAdd:
         {
             qDebug() << "SliderPageStepAdd";
-            int value = wSliderPosition;
-            mTableOffset = getIndexFromCount(mTableOffset, wDelta);
+            mTableOffset += wDelta;//= getIndexFromCount(mTableOffset, wDelta);
+            break;
         }
-        break;
 
         case QAbstractSlider::SliderToMinimum:
+            break;
+
         case QAbstractSlider::SliderToMaximum:
+            break;
+
         case QAbstractSlider::SliderMove:
         {
             qDebug() << "SliderMove";
             int value = wSliderPosition;
-
+            /*
             if(value > 0)
             {
                 mTableOffset = getIndexFromCount(value, -1);
@@ -514,26 +458,27 @@ void AbstractTableView::vertSliderActionSlot(int action)
             {
                 mTableOffset = 0;
             }
+            */
+            mTableOffset = value;
 
-            // mTableOffset = value;
+            break;
         }
-        break;
 
         case QAbstractSlider::SliderNoAction:
         {
             qDebug() << "SliderNoAction";
-            int value = wSliderPosition;
-            mTableOffset = getIndexFromCount(mTableOffset, wDelta);
+            mTableOffset+= wDelta;// = getIndexFromCount(mTableOffset, wDelta);
+
+            break;
         }
-        break;
 
         default:
             break;
     }
 
-    verticalScrollBar()->setValue(mTableOffset);
+    mTableOffset = sliderMovedAction(action, wOldValue, wDelta);
 
-    sliderMovedAction(action, wOldValue, wSliderPosition - wOldValue);
+    verticalScrollBar()->setValue(mTableOffset);
 
     qDebug() << "New mTableOffset: " << mTableOffset;
 
@@ -541,48 +486,22 @@ void AbstractTableView::vertSliderActionSlot(int action)
 }
 
 
-/**
- * @brief       This method is the slot connected to the timeout() signal from the timer used for the multilines selection.
- *
- * @return      Nothing.
- */
-void AbstractTableView::multiSelTimerSlot()
+void AbstractTableView::upDownKeyPressed(int key)
 {
-    //qDebug() << "timeout";
+    int wSliderPosition = verticalScrollBar()->sliderPosition();
 
-    if(mGuiState == AbstractTableView::MultiRowsSelectionState)
+    if(key == Qt::Key_Up)
     {
-        int wY = transY(this->mapFromGlobal(QCursor::pos()).y());
-
-        if((wY < 0) || (wY > getTableHeigth()))
-        {
-            int wNewScrollBarValue;
-            int viewableRowsCount = getViewableRowsCount();
-            int wNewMultiSelEnd;
-
-            wY = (wY < 0) ? wY : (wY - getTableHeigth());
-
-            if(wY < 0)
-            {
-                wNewScrollBarValue = getIndexFromCount(mTableOffset, wY);
-                wNewScrollBarValue = (wNewScrollBarValue < 0) ? 0 : wNewScrollBarValue;
-                wNewMultiSelEnd = wNewScrollBarValue;
-            }
-            else if(wY > 0)
-            {
-                wNewScrollBarValue = getIndexFromCount(mTableOffset, wY);
-                wNewScrollBarValue = (wNewScrollBarValue > getRowCount() - 1) ? getRowCount() - 1 : wNewScrollBarValue;
-                wNewMultiSelEnd = getIndexFromCount(wNewScrollBarValue, viewableRowsCount - 1);
-                wNewMultiSelEnd = (wNewMultiSelEnd > getRowCount() - 1) ? getRowCount() - 1 : wNewMultiSelEnd;
-            }
-
-            expandSelectionUpTo(wNewMultiSelEnd);
-
-            verticalScrollBar()->setValue(wNewScrollBarValue);
-            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
-        }
+        verticalScrollBar()->setValue(wSliderPosition - 1);
+        verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
+    }
+    else if(key == Qt::Key_Down)
+    {
+        verticalScrollBar()->setValue(wSliderPosition + 1);
+        verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
     }
 }
+
 
 
 /**
@@ -624,112 +543,11 @@ void AbstractTableView::setScrollBarValue(int value)
  *
  * @return      Nothing.
  */
-void AbstractTableView::sliderMovedAction(int type, int value, int delta)
+int AbstractTableView::sliderMovedAction(int type, int value, int delta)
 {
-    qDebug() << "AbstractTableView: sliderMovedAction: value " << value << " delta " << delta;
+    return value + delta;
 }
 
-
-QScrollBar* AbstractTableView::getScrollbar()
-{
-    return this->verticalScrollBar();
-}
-
-
-
-
-/************************************************************************************
-                                Selection Management
-************************************************************************************/
-/**
- * @brief       Expand the multilines selection up to the index to.
- *
- * @param[in]   to      End of the multilines selection
- *
- * @return      Nothing.
- */
-void AbstractTableView::expandSelectionUpTo(int to)
-{
-    if(to < mSelection.firstSelectedIndex)
-    {
-        mSelection.fromIndex = to;
-        mSelection.toIndex = mSelection.firstSelectedIndex;
-    }
-    else if(to > mSelection.firstSelectedIndex)
-    {
-        mSelection.fromIndex = mSelection.firstSelectedIndex;
-        mSelection.toIndex = to;
-    }
-}
-
-
-/**
- * @brief       Selects the line at the index index.
- *
- * @param[in]   index      Index of the single line selection
- *
- * @return      Nothing.
- */
-void AbstractTableView::setSingleSelection(int index)
-{
-    mSelection.firstSelectedIndex = index;
-    mSelection.fromIndex = index;
-    mSelection.toIndex = index;
-}
-
-
-/**
- * @brief       Returns the index of the selection in case of single line selection or the first selected line in case of
- *              multilines selection.
- *
- * @return      Initial selection index.
- */
-int AbstractTableView::getInitialSelection()
-{
-    return mSelection.firstSelectedIndex;
-}
-
-
-/**
- * @brief       Checks if the row at index index is selected.
- *
- * @param[in]   index      Row index
- *
- * @return      True if the line is selected. False if the line is not selected.
- */
-bool AbstractTableView::isSelected(int index)
-{
-    if(index >= mSelection.fromIndex && index <= mSelection.toIndex)
-        return true;
-    else
-        return false;
-}
-
-
-void AbstractTableView::selectNext()
-{
-    int wInit = mSelection.firstSelectedIndex + 1;
-
-    if(wInit > getRowCount() - 1)
-        wInit = getRowCount() - 1;
-
-    mSelection.firstSelectedIndex = wInit;
-    mSelection.fromIndex = wInit;
-    mSelection.toIndex = wInit;
-}
-
-
-void AbstractTableView::selectPrevious()
-{
-    int wInit = mSelection.firstSelectedIndex - 1;
-
-    if(wInit < 0)
-        wInit = 0;
-
-    mSelection.firstSelectedIndex = wInit;
-    mSelection.fromIndex = wInit;
-    mSelection.toIndex = wInit;
-}
 
 
 /************************************************************************************
@@ -940,30 +758,9 @@ int AbstractTableView::getTableOffset()
     return mTableOffset;
 }
 
-
-int AbstractTableView::setTableOffset(int value)
+int AbstractTableView::getGuiState()
 {
-    mTableOffset = value;
+    return mGuiState;
 }
 
-
-/**
- * @brief       Return the index of the count-th row after the top displayed row.
- *
- * @param[in]   count      Row count
- *
- * @return      Index of count-th row after the top displayed row.
- */
-int AbstractTableView::getIndexFromCount(int index, int count)
-{
-    int wIndex = index + count;
-
-    if(wIndex < 0)
-        wIndex = 0;
-
-    if(wIndex > getRowCount())
-        wIndex = getRowCount() - 1;
-
-    return wIndex;
-}
 

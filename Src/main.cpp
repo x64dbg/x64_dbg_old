@@ -8,7 +8,7 @@
 #include "MapViewOfMem.h"
 #include "QBeaEngine.h"
 #include "Disassembly.h"
-#include "StdTable.h"
+//#include "StdTable.h"
 #include "HexDump.h"
 
 int main(int argc, char *argv[])
@@ -39,17 +39,16 @@ int main(int argc, char *argv[])
     hexDump.resize(QSize(600,600));
     hexDump.show();
 
-/*
+
     Disassembly d(0);
     d.callVirtual();
     d.resize(QSize(600,600));
     d.show();
-
+/*
     StdTable table(0);
     table.resize(QSize(600,600));
     table.show();
 */
-
 /*
     MapViewOfMem mem("AsmCode.bin");
     DisassemblyView dis(mem,0);

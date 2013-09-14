@@ -10,15 +10,17 @@ class AbstractTableView : public QAbstractScrollArea
 {
     Q_OBJECT
 public:
+        enum GuiState_t {NoState, ReadyToResize, ResizeColumnState, HeaderButtonPressed};
+
     explicit AbstractTableView(QWidget *parent = 0);
 
-    virtual void AbstractMemberFunction(void) = 0;
+    //virtual void AbstractMemberFunction(void) = 0;
     void callVirtual();
 
-    enum GuiState_t {NoState, ResizeColumnState, MultiRowsSelectionState, HeaderButtonPressed};
 
-    virtual bool paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
-    virtual void paintSelection(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+
+    virtual QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+   // virtual void paintSelection(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
 
     // Reimplemented Methods
     void paintEvent(QPaintEvent* event);
@@ -31,16 +33,8 @@ public:
     // ScrollBar Management
     void setScrollBarValue(int value);
     void setRowCount(int count);
-    virtual void sliderMovedAction(int type, int value, int delta); // Virtual
-    QScrollBar* getScrollbar();
-
-    // Selection Management
-    virtual void expandSelectionUpTo(int to);
-    virtual void setSingleSelection(int index);
-    virtual int getInitialSelection();
-    virtual bool isSelected(int index); // Virtual
-    virtual void selectNext();
-    virtual void selectPrevious();
+    virtual int sliderMovedAction(int type, int value, int delta); // Virtual
+    //QScrollBar* getScrollbar();
 
     // Coordinate analysis
     int getRowIndexFromY(int y);
@@ -66,12 +60,12 @@ public:
     int getTableHeigth();
 
     // Table Data
-    virtual QString getStringToPrint(int rowBase, int rowOffset, int col) = 0;
+    //virtual QString getStringToPrint(int rowBase, int rowOffset, int col) = 0;
     int getTableOffset();
     int setTableOffset(int value);
 
-    virtual int getIndexFromCount(int index, int count);
-
+    virtual void upDownKeyPressed(int key);
+int getGuiState();
 
 signals:
     void headerButtonPressed(int col);
@@ -80,9 +74,6 @@ signals:
 public slots:
     // ScrollBar Management
     void vertSliderActionSlot(int action);
-
-    // Selection Management
-    void multiSelTimerSlot();
 
 private:
     typedef struct _ColumnResizingData_t
@@ -119,8 +110,6 @@ private:
         int fromIndex;
         int toIndex;
     } SelectionData_t;
-
-    QTimer* mMultiSelTimer;
 
     GuiState_t mGuiState;
 
