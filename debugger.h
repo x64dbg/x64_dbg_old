@@ -16,7 +16,8 @@ struct INIT_STRUCT
 void dbgdisablebpx();
 void dbgenablebpx();
 bool dbgisrunning();
-void DebugUpdateGui(uint disasm_addr);
+void DebugUpdateMemoryMap();
+void DebugUpdateDisasm(uint disasm_addr);
 //callbacks
 bool cbDebugInit(const char* cmd);
 bool cbStopDebug(const char* cmd);

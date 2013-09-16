@@ -128,6 +128,10 @@ static bool isregister(const char* string)
         return true;
     if(scmp(string, "spl"))
         return true;
+    if(scmp(string, "iph"))
+        return true;
+    if(scmp(string, "ipl"))
+        return true;
 
     if(scmp(string, "dr0"))
         return true;
@@ -844,6 +848,10 @@ static bool setregister(const char* string, uint value)
         return SetContextData(UE_ESP, ((value&0xFF)<<8)|(GetContextData(UE_ESP)&0xFFFF00FF));
     if(scmp(string, "spl"))
         return SetContextData(UE_ESP, (value&0xFF)|(GetContextData(UE_ESP)&0xFFFFFF00));
+    if(scmp(string, "iph"))
+        return SetContextData(UE_EIP, ((value&0xFF)<<8)|(GetContextData(UE_EIP)&0xFFFF00FF));
+    if(scmp(string, "ipl"))
+        return SetContextData(UE_EIP, (value&0xFF)|(GetContextData(UE_EIP)&0xFFFFFF00));
 
     if(scmp(string, "dr0"))
         return SetContextData(UE_DR0, value);
@@ -1215,7 +1223,7 @@ bool valtostring(const char* string, uint* value, bool silent)
         }
         bool ok=setregister(string, *value);
         if(strstr(string, "ip"))
-            DebugUpdateGui(GetContextData(UE_CIP));
+            DebugUpdateDisasm(GetContextData(UE_CIP));
         return ok;
     }
     else if(*string=='!' and isflag(string+1)) //flag

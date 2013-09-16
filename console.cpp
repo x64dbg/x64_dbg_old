@@ -108,7 +108,7 @@ int cprintf(const char* format, ...)
     return ret;
 }
 
-HWND GetConsoleHwnd(void)
+/*HWND GetConsoleHwnd(void)
 {
 #define MY_BUFSIZE 1024 // Buffer size for console window titles.
     static HWND hwndFound=0;         // This is what is returned to the caller.
@@ -124,7 +124,7 @@ HWND GetConsoleHwnd(void)
     SetConsoleTitle(pszOldWindowTitle);
     Sleep(100);
     return hwndFound;
-}
+}*/
 
 void SetConsoleIcon(HICON hIcon)
 {

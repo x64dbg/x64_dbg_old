@@ -7,6 +7,7 @@
 #include "data.h"
 #include "resource.h"
 #include "console.h"
+#include "gui\disasm.h"
 
 static bool cbStrLen(const char* cmd)
 {
@@ -63,10 +64,34 @@ static void registercommands()
     cmdnew(cmd, "Fill\1memset", cbDebugMemset, true); //memset
 }
 
+static DWORD WINAPI focusThread(void* lpParam)
+{
+    unsigned int lastpress=0;
+    HWND console=GetConsoleHwnd();
+    HWND lastwindow=console;
+    while(1)
+    {
+        if(GetAsyncKeyState(VK_RMENU))
+        {
+            if(GetTickCount()-lastpress<300)
+                continue;
+            if(GetForegroundWindow()==console)
+                SetForegroundWindow(lastwindow);
+            else
+            {
+                lastwindow=GetForegroundWindow();
+                SetForegroundWindow(console);
+            }
+            lastpress=GetTickCount();
+        }
+        Sleep(100);
+    }
+    return 0;
+}
+
 int main()
 {
     SetConsoleIcon(LoadIconA(0, MAKEINTRESOURCEA(IDI_ICON1)));
-    SetForegroundWindow(GetConsoleHwnd());
 #ifndef _WIN64
     SetConsoleTitleA("x32_dbg");
 #else
@@ -80,9 +105,12 @@ int main()
         len--;
     dir[len]=0;
     SetCurrentDirectoryA(dir);
+    CreateThread(0, 0, focusThread, 0, 0, 0);
 
     varinit();
     registercommands();
+    Sleep(200);
+    SetForegroundWindow(GetConsoleHwnd());
     cmdloop(command_list, cbBadCmd);
     DeleteFileA("DLLLoader.exe");
     return 0;

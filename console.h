@@ -9,7 +9,7 @@ int consolegetlasty();
 int consolesetlasty();
 int cputs(const char* text);
 int cprintf(const char* format, ...);
-HWND GetConsoleHwnd(void);
+//HWND GetConsoleHwnd(void);
 void SetConsoleIcon(HICON hIcon);
 
 #endif // _CONSOLE_H

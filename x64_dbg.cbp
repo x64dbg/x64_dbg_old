@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="TitanEngine_x64_console" />
+		<Option title="x64_dbg" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>

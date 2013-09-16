@@ -18,6 +18,7 @@ extern "C"
 {
 #endif
 
+DLL_EXPORT HWND GetConsoleHwnd(void);
 void DLL_EXPORT DisasmInit(DISASM_INIT* initstruct);
 uint* DLL_EXPORT DisasmDo(char* mem, uint mem_va, uint codebase, uint code_size, uint ip, uint real_eip);
 
