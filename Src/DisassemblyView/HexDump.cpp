@@ -21,7 +21,6 @@ HexDump::HexDump(QWidget *parent) :AbstractTableView(parent)
 }
 
 
-
 void HexDump::mouseMoveEvent(QMouseEvent* event)
 {
     qDebug() << "HexDump::mouseMoveEvent";
@@ -34,7 +33,7 @@ void HexDump::mouseMoveEvent(QMouseEvent* event)
 
         if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {
-            int wRowIndex = getTableOffset() +getRowOffsetFromY(transY(event->y()));
+            int wRowIndex = getTableOffset() +getIndexOffsetFromY(transY(event->y()));
 
             if(wRowIndex < getRowCount())
             {
@@ -65,7 +64,7 @@ void HexDump::mousePressEvent(QMouseEvent* event)
         {
             if(event->y() > getHeaderHeigth())
             {
-                int wRowIndex = getTableOffset()+ getRowOffsetFromY(transY(event->y()));
+                int wRowIndex = getTableOffset()+ getIndexOffsetFromY(transY(event->y()));
                 int wColIndex = getColumnIndexFromX(event->x());
                 int wByteIndex;
 

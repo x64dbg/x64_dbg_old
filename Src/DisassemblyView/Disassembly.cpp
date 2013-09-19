@@ -30,7 +30,7 @@ void Disassembly::mouseMoveEvent(QMouseEvent* event)
 
         if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {
-            int wRowIndex = getIndexFromCount(getTableOffset(), getRowOffsetFromY(transY(event->y())));
+            int wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
 
             if(wRowIndex < getRowCount())
             {
@@ -61,7 +61,7 @@ void Disassembly::mousePressEvent(QMouseEvent* event)
         {
             if(event->y() > getHeaderHeigth())
             {
-                int wRowIndex = getIndexFromCount(getTableOffset(), getRowOffsetFromY(transY(event->y())));
+                int wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
 
                 if(wRowIndex < getRowCount())
                 {
@@ -106,10 +106,10 @@ void Disassembly::mouseReleaseEvent(QMouseEvent* event)
 
 int Disassembly::sliderMovedAction(int type, int value, int delta)
 {
+    int newValue;
+
     if(type == QAbstractSlider::SliderMove)
     {
-        int newValue;
-
         if(value + delta > 0)
         {
             newValue = getIndexFromCount(value + delta, -1);
@@ -117,12 +117,47 @@ int Disassembly::sliderMovedAction(int type, int value, int delta)
         }
         else
             newValue = 0;
-
-        return newValue;
     }
     else
     {
-        return getIndexFromCount(value, delta);
+        newValue = getIndexFromCount(value, delta);
+    }
+
+    return newValue;
+}
+
+void Disassembly::keyPressEvent(QKeyEvent* event)
+{
+    int key = event->key();
+    qDebug() << "keyPressEvent " << getLineToPrintcount();
+
+    if(key == Qt::Key_Up || key == Qt::Key_Down)
+    {
+        int botRVA = getTableOffset();
+        int topRVA = getIndexFromCount(getTableOffset(), getLineToPrintcount() - 1);
+
+        if(key == Qt::Key_Up)
+            selectPrevious();
+        else
+            selectNext();
+
+
+        if(getInitialSelection() < botRVA)
+        {
+            verticalScrollBar()->setValue(getInitialSelection());
+            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
+        }
+        else if(getInitialSelection() >= topRVA)
+        {
+            verticalScrollBar()->setValue(getIndexFromCount(getInitialSelection(),-getLineToPrintcount() + 2));
+            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
+        }
+
+        viewport()->repaint();
+    }
+    else
+    {
+        AbstractTableView::keyPressEvent(event);
     }
 }
 
@@ -351,6 +386,20 @@ int Disassembly::getInitialSelection()
     return mSelection.firstSelectedIndex;
 }
 
+void Disassembly::selectNext()
+{
+    int wAddr = getIndexFromCount(getInitialSelection(), 1);
+
+    setSingleSelection(wAddr);
+}
+
+void Disassembly::selectPrevious()
+{
+    int wAddr = getIndexFromCount(getInitialSelection(), -1);
+
+    setSingleSelection(wAddr);
+}
+
 
 bool Disassembly::isSelected(int base, int offset)
 {
@@ -389,4 +438,27 @@ int Disassembly::getIndexFromCount(int index, int count)
 }
 
 
+int Disassembly::getLineToPrintcount()
+{
+    int wViewableRowsCount = getViewableRowsCount();
 
+    int wAddrPrev = getTableOffset();
+    int wAddr = wAddrPrev;
+
+    int wCount = 0;
+
+    for(int wI = 0; wI < wViewableRowsCount; wI++)
+    {
+        wAddrPrev = wAddr;
+        wAddr = getNextInstructionRVA(wAddr, 1);
+
+        if(wAddr == wAddrPrev)
+        {
+            break;
+        }
+
+        wCount++;
+    }
+
+    return wCount;
+}

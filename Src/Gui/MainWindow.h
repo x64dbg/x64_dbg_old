@@ -3,8 +3,8 @@
 
 #include <QMainWindow>
 #include <QtGui>
-#include "CPUSubWindow.h"
-
+#include "CPUWidget.h"
+#include "Disassembly.h"
 
 
 namespace Ui {

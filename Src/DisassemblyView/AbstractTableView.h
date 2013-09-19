@@ -10,17 +10,18 @@ class AbstractTableView : public QAbstractScrollArea
 {
     Q_OBJECT
 public:
-        enum GuiState_t {NoState, ReadyToResize, ResizeColumnState, HeaderButtonPressed};
+    enum GuiState_t {NoState, ReadyToResize, ResizeColumnState, HeaderButtonPressed};
 
+    // Constructor
     explicit AbstractTableView(QWidget *parent = 0);
 
-    //virtual void AbstractMemberFunction(void) = 0;
-    void callVirtual();
+    // Pure Virtual Methods
+    virtual QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h) = 0;
 
-
-
-    virtual QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
-   // virtual void paintSelection(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+    // Virtual Methods
+    virtual int sliderMovedAction(int type, int value, int delta);
+    virtual int getLineToPrintcount();
+    virtual void upDownKeyPressed(int key);
 
     // Reimplemented Methods
     void paintEvent(QPaintEvent* event);
@@ -33,12 +34,9 @@ public:
     // ScrollBar Management
     void setScrollBarValue(int value);
     void setRowCount(int count);
-    virtual int sliderMovedAction(int type, int value, int delta); // Virtual
-    //QScrollBar* getScrollbar();
 
     // Coordinate analysis
-    int getRowIndexFromY(int y);
-    int getRowOffsetFromY(int y);
+    int getIndexOffsetFromY(int y);
     int getColumnIndexFromX(int x);
     int getColumnPosition(int index);
     int transY(int y);
@@ -60,12 +58,10 @@ public:
     int getTableHeigth();
 
     // Table Data
-    //virtual QString getStringToPrint(int rowBase, int rowOffset, int col) = 0;
     int getTableOffset();
     int setTableOffset(int value);
 
-    virtual void upDownKeyPressed(int key);
-int getGuiState();
+    int getGuiState();
 
 signals:
     void headerButtonPressed(int col);
@@ -116,7 +112,6 @@ private:
     ColumnResizingData_t mColResizeData;
 
     QPushButton mHeaderButtonSytle;
-
 
     QList<Column_t> mColumnList;
 

@@ -36,19 +36,11 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 }
 
 
-void AbstractTableView::callVirtual()
-{
-    //AbstractMemberFunction();
-}
-
-
-
-
 /************************************************************************************
                             Reimplemented Functions
 ************************************************************************************/
 /**
- * @brief       The reimplementation of the paintEvent acts in the GUI management.
+ * @brief       This method has been reimplemented. It paints the whole table.
  *
  * @param[in]   event       Paint event
  *
@@ -58,7 +50,6 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
 {
     QPainter wPainter(this->viewport());
 
-    int wViewableRowsCount = getViewableRowsCount();
     int x = 0;
     int y = 0;
 
@@ -90,10 +81,10 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
     // Iterate over all columns and cells
     for(int j = 0; j < getColumnCount(); j++)
     {
-        for(int i = 0; i < wViewableRowsCount; i++)
+        for(int i = 0; i < getViewableRowsCount(); i++)
         {
-            //  Draw cell content
-            if((mTableOffset + i) < getRowCount())
+            //  Draw cells content
+            if(i < getLineToPrintcount())
             {
                QString wStr = paintContent(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
                wPainter.drawText(QRect(x + 4, y, getColumnWidth(j) - 4, getRowHeight()), Qt::AlignVCenter | Qt::AlignLeft, wStr);
@@ -114,14 +105,11 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
     }
 }
 
-QString AbstractTableView::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
-{
-    return QString("Col:") + QString::number(col) + "Row:" + QString::number(rowBase + rowOffset);
-}
-
 
 /**
- * @brief       The reimplementation of the mouseMoveEvent acts in the GUI management.
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Column resizing
+ *               - Hedare button
  *
  * @param[in]   event       Mouse event
  *
@@ -551,30 +539,23 @@ int AbstractTableView::sliderMovedAction(int type, int value, int delta)
 
 
 /************************************************************************************
-                            GUI Utils
+                            Coordinates Utils
 ************************************************************************************/
 /**
- * @brief       Returns the absolute row index from the given y coordinate. The header heigth needs to be substract from
- *              y before calling this method.
+ * @brief       Returns the index offset corresponding to the given y coordinate.
  *
- * @param[in]   y      Pixel offset starting from the top of the table (Without the header)
+ * @param[in]   y      Pixel offset starting from the top of the table (without the header)
  *
- * @return      Absolute row index.
+ * @return      row index offset.
  */
-int AbstractTableView::getRowIndexFromY(int y)
-{
-    return (y / getRowHeight() + mTableOffset);
-}
-
-
-int AbstractTableView::getRowOffsetFromY(int y)
+int AbstractTableView::getIndexOffsetFromY(int y)
 {
     return (y / getRowHeight());
 }
 
 
 /**
- * @brief       Returns the index of the column according to the given x coordinate.
+ * @brief       Returns the index of the column corresponding to the given x coordinate.
  *
  * @param[in]   x      Pixel offset starting from the left of the table
  *
@@ -603,7 +584,7 @@ int AbstractTableView::getColumnIndexFromX(int x)
 
 
 /**
- * @brief       Returns the x coordinate of the begining of the column at index index.
+ * @brief       Returns the x coordinate of the beginning of the column at index index.
  *
  * @param[in]   index      Column index.
  *
@@ -658,6 +639,23 @@ int AbstractTableView::getViewableRowsCount()
 }
 
 
+/************************************************************************************
+                            Data Accessor
+************************************************************************************/
+/**
+ * @brief       Substract the header heigth from the given y.
+ *
+ * @param[in]   y      y coordinate
+ *
+ * @return      y - getHeaderHeigth().
+ */
+int AbstractTableView::getLineToPrintcount()
+{
+    int wViewableRowsCount = getViewableRowsCount();
+    int wRemainingRowsCount = getRowCount() - getTableOffset();
+    int wCount = wRemainingRowsCount > wViewableRowsCount ? wViewableRowsCount : wRemainingRowsCount;
+    return wCount;
+}
 
 
 /************************************************************************************
@@ -683,8 +681,6 @@ void AbstractTableView::addColumnAt(int at, int width, bool isClickable)
 
     mColumnList.insert(at, wColumn);
 }
-
-
 
 
 /************************************************************************************
@@ -758,9 +754,9 @@ int AbstractTableView::getTableOffset()
     return mTableOffset;
 }
 
+
 int AbstractTableView::getGuiState()
 {
     return mGuiState;
 }
-
 

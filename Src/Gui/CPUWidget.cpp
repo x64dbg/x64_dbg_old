@@ -43,3 +43,24 @@ void CPUWidget::setDefaultDisposition(void)
 
     ui->mBotHSplitter->setSizes(sizesList);
 }
+
+
+QVBoxLayout* CPUWidget::getTopLeftWidget(void)
+{
+    return ui->mTopLeftFrameLayout;
+}
+
+QVBoxLayout* CPUWidget::getTopRightWidget(void)
+{
+    return ui->mTopRightFrameLayout;
+}
+
+QVBoxLayout* CPUWidget::getBotLeftWidget(void)
+{
+    return ui->mBotLeftFrameLayout;
+}
+
+QVBoxLayout* CPUWidget::getBotRightWidget(void)
+{
+    return ui->mBotRightFrameLayout;
+}

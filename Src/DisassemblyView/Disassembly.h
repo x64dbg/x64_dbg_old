@@ -20,6 +20,7 @@ public:
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
+    void keyPressEvent(QKeyEvent* event);
 
     int getPreviousInstructionRVA(int address, int count);
     int getNextInstructionRVA(int address, int count);
@@ -34,9 +35,12 @@ public:
     void setSingleSelection(int index);
     int getInitialSelection();
     bool isSelected(int base, int offset);
+    void selectNext();
+    void selectPrevious();
 
 
     int getIndexFromCount(int index, int count);
+    int getLineToPrintcount();
 
 signals:
     

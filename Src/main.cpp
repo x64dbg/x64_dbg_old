@@ -2,9 +2,7 @@
 #include <QApplication>
 #include <QtGui>
 #include "CPUWidget.h"
-#include "ColumnWidget.h"
-#include "CustomTableView.h"
-#include "DisassemblyView.h"
+
 #include "MapViewOfMem.h"
 #include "QBeaEngine.h"
 #include "Disassembly.h"
@@ -14,8 +12,10 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    //MainWindow w;
-    //w.show();
+/*
+    MainWindow w;
+    w.show();
+*/
 
     //CPUSubWindow cpuWin;
     //cpuWin.show();
@@ -23,27 +23,23 @@ int main(int argc, char *argv[])
     //CPUWidget cpuWin;
     //cpuWin.show();
 
-    /*
-    ColumnWidget cw(5);
-    cw.show();
-
-    QWidget w;
-    CustomTableView cust(&w);
-    w.show();
-    */
 
     //QBeaEngine disasm;
 
+/*
     HexDump hexDump(0);
     hexDump.callVirtual();
     hexDump.resize(QSize(600,600));
     hexDump.show();
-
+*/
 
     Disassembly d(0);
-    d.callVirtual();
     d.resize(QSize(600,600));
     d.show();
+
+
+
+
 /*
     StdTable table(0);
     table.resize(QSize(600,600));
