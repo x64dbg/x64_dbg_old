@@ -228,7 +228,7 @@ static void cbException(void* ExceptionData)
 
 static void cbLoadDll(void* ExceptionData)
 {
-    puts("dll loaded!");
+    cputs("dll loaded!");
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
     //lock
@@ -711,7 +711,6 @@ bool cbDebugDeleteBPX(const char* cmd)
 bool cbDebugBplist(const char* cmd)
 {
     BREAKPOINT* cur=bplist;
-    dbg("cbDebugBplist");
     if(!cur or !cur->addr)
     {
         cputs("no breakpoints!");
@@ -875,7 +874,7 @@ bool cbDebugSetHardwareBreakpoint(const char* cmd)
         case 'x':
             break;
         default:
-            puts("invlalid type, assuming 'x'");
+            cputs("invlalid type, assuming 'x'");
             break;
         }
     }
@@ -899,7 +898,7 @@ bool cbDebugSetHardwareBreakpoint(const char* cmd)
             break;
 #endif // _WIN64
         default:
-            puts("invalid size, using 1");
+            cputs("invalid size, using 1");
             break;
         }
         if(addr%size)
@@ -911,7 +910,7 @@ bool cbDebugSetHardwareBreakpoint(const char* cmd)
     DWORD drx=0;
     if(!GetUnusedHardwareBreakPointRegister(&drx))
     {
-        puts("no free debug register");
+        cputs("no free debug register");
         return true;
     }
     BREAKPOINT* found=bpfind(bplist, 0, addr, 0, BPHARDWARE);
@@ -936,7 +935,7 @@ bool cbDebugAlloc(const char* cmd)
             return true;
     uint mem=(uint)memalloc(fdProcessInfo->hProcess, 0, size, PAGE_EXECUTE_READWRITE);
     if(!mem)
-        puts("VirtualAllocEx failed");
+        cputs("VirtualAllocEx failed");
     else
         cprintf(fhex"\n", mem);
     if(mem)
@@ -957,12 +956,12 @@ bool cbDebugFree(const char* cmd)
             return true;
     }
     else if(!lastalloc)
-        puts("lastalloc is zero, provide a page address");
+        cputs("lastalloc is zero, provide a page address");
     if(addr==lastalloc)
         varset("$lastalloc", 0, true);
     bool ok=VirtualFreeEx(fdProcessInfo->hProcess, (void*)addr, 0, MEM_RELEASE);
     if(!ok)
-        puts("VirtualFreeEx failed");
+        cputs("VirtualFreeEx failed");
     varset("$res", ok, false);
     return true;
 }
@@ -998,7 +997,7 @@ bool cbDebugMemset(const char* cmd)
     }
     BYTE fi=value&0xFF;
     if(!Fill((void*)addr, size&0xFFFFFFFF, &fi))
-        puts("memset failed");
+        cputs("memset failed");
     else
         cprintf("memory "fhex" (size: %.8X) set to %.2X\n", addr, size&0xFFFFFFFF, value&0xFF);
     return true;

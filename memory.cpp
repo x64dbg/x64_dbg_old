@@ -2,16 +2,12 @@
 
 uint memfindbaseaddr(HANDLE hProcess, uint addr, uint* size)
 {
-#ifndef _WIN64
     MEMORY_BASIC_INFORMATION mbi;
-#else
-    MEMORY_BASIC_INFORMATION64 mbi;
-#endif // _WIN64
     DWORD numBytes;
     uint MyAddress=0, newAddress=0;
     do
     {
-        numBytes=VirtualQueryEx(hProcess, (LPCVOID)MyAddress, (MEMORY_BASIC_INFORMATION*)&mbi, sizeof(mbi));
+        numBytes=VirtualQueryEx(hProcess, (LPCVOID)MyAddress, &mbi, sizeof(mbi));
         newAddress=(uint)mbi.BaseAddress+mbi.RegionSize;
         if(mbi.State==MEM_COMMIT and addr<newAddress and addr>=MyAddress)
         {

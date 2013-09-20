@@ -18,6 +18,8 @@ extern "C"
 {
 #endif
 
+DLL_EXPORT void SaveWindowPos(const char* window_name, HWND hwndDlg);
+DLL_EXPORT void LoadWindowPos(const char* window_name, HWND hwndDlg);
 DLL_EXPORT HWND GetConsoleHwnd(void);
 void DLL_EXPORT DisasmInit(DISASM_INIT* initstruct);
 uint* DLL_EXPORT DisasmDo(char* mem, uint mem_va, uint codebase, uint code_size, uint ip, uint real_eip);

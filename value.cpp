@@ -967,7 +967,6 @@ static bool setregister(const char* string, uint value)
 
 bool valapifromstring(const char* name, uint* value, int* value_size, bool printall, bool* hexonly)
 {
-    dbg("apifromstring");
     if(!value or !IsFileBeingDebugged())
         return false;
     DWORD cbNeeded=1;
@@ -1027,6 +1026,38 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
     return true;
 }
 
+/*
+check whether a string is a valid dec number
+*/
+static bool isdecnumber(const char* string)
+{
+    if(*string!='.' or !string[1]) //dec indicator/no number
+        return false;
+    int len=strlen(string+1);
+    for(int i=0; i<len; i++)
+        if(!isdigit(string[i+1]))
+            return false;
+    return true;
+}
+
+/*
+check whether a string is a valid hex number
+*/
+static bool ishexnumber(const char* string)
+{
+    dbg("ishexnumber");
+    int add=0;
+    if(*string=='x') //hex indicator
+        add=1;
+    if(!string[add]) //only an indicator, no number
+        return false;
+    int len=strlen(string+add);
+    for(int i=0; i<len; i++)
+        if(!isxdigit(string[i+add])) //all must be hex digits
+            return false;
+    return true;
+}
+
 bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar, bool silent, bool* hexonly)
 {
     if(!value)
@@ -1068,7 +1099,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         }
         int read_size=sizeof(uint);
         int add=1;
-        if(string[2]==':' and isdigit((string[1])))
+        if(string[2]==':' and isdigit((string[1]))) //@n: (number of bytes to read)
         {
             add+=2;
             int new_size=string[1]-0x30;
@@ -1139,40 +1170,37 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             *isvar=true;
         return true;
     }
-    else if(varget(string, value, value_size, 0)) //variable?
+    else if(isdecnumber(string)) //decimal numbers come 'first'
+    {
+        if(value_size)
+            *value_size=0;
+        if(isvar)
+            *isvar=false;
+        sscanf(string+1, "%"fext"u", value);
+        return true;
+    }
+    else if(ishexnumber(string)) //then hex numbers
+    {
+        if(value_size)
+            *value_size=0;
+        if(isvar)
+            *isvar=false;
+        //hexadecimal value
+        int inc=0;
+        if(*string=='x')
+            inc=1;
+        sscanf(string+inc, "%"fext"x", value);
+        return true;
+    }
+    else if(valapifromstring(string, value, value_size, true, hexonly)) //then come APIs
+        return true;
+    else if(varget(string, value, value_size, 0)) //finally variables
     {
         if(isvar)
             *isvar=true;
         return true;
     }
-
-    if(value_size)
-        *value_size=0;
-    if(isvar)
-        *isvar=false;
-    if(*string=='.') //decimal value
-    {
-        int len=strlen(string+1);
-        if(!string[1])
-            return valapifromstring(string, value, value_size, true, hexonly);
-        for(int i=0; i<len; i++)
-            if(!isdigit(string[i+1]))
-                return valapifromstring(string, value, value_size, true, hexonly);
-        sscanf(string+1, "%"fext"u", value);
-        return true;
-    }
-    //hexadecimal value
-    int inc=0;
-    if(*string=='x')
-        inc=1;
-    int len=strlen(string+inc);
-    if(!string[inc])
-        return valapifromstring(string, value, value_size, true, hexonly);
-    for(int i=0; i<len; i++)
-        if(!isxdigit(string[i+inc]))
-            return valapifromstring(string, value, value_size, true, hexonly);
-    sscanf(string+inc, "%"fext"x", value);
-    return true;
+    return false; //nothing was OK
 }
 
 bool valtostring(const char* string, uint* value, bool silent)

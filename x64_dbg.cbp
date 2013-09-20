@@ -77,6 +77,8 @@
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="simplescript.cpp" />
+		<Unit filename="simplescript.h" />
 		<Unit filename="threading.cpp" />
 		<Unit filename="threading.h" />
 		<Unit filename="value.cpp" />

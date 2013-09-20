@@ -174,17 +174,17 @@ bool cbInstrVarList(const char* cmd)
                 if(cur->type==filter)
                 {
                     if(value>15)
-                        printf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
+                        cprintf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
                     else
-                        printf("%s=%"fext"X\n", name, value);
+                        cprintf("%s=%"fext"X\n", name, value);
                 }
             }
             else
             {
                 if(value>15)
-                    printf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
+                    cprintf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
                 else
-                    printf("%s=%"fext"X\n", name, value);
+                    cprintf("%s=%"fext"X\n", name, value);
             }
         }
         cur=cur->next;

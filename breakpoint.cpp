@@ -26,7 +26,6 @@ BREAKPOINT* bpinit(BREAKPOINT* breakpoint_list)
 
 BREAKPOINT* bpfind(BREAKPOINT* breakpoint_list, const char* name, uint addr, BREAKPOINT** link, BP_TYPE type)
 {
-    dbg("bpfind");
     BREAKPOINT* cur=breakpoint_list;
     if(!cur or !cur->addr)
         return 0;

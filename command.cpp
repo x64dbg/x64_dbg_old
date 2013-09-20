@@ -4,7 +4,7 @@
 #include "debugger.h"
 #include "math.h"
 
-static COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
+COMMAND* cmdfind(COMMAND* command_list, const char* name, COMMAND** link)
 {
     COMMAND* cur=command_list;
     if(!cur->name)
@@ -29,6 +29,18 @@ COMMAND* cmdinit()
     COMMAND* cmd=(COMMAND*)emalloc(sizeof(COMMAND));
     memset(cmd, 0, sizeof(COMMAND));
     return cmd;
+}
+
+void cmdfree(COMMAND* cmd_list)
+{
+    COMMAND* cur=cmd_list;
+    while(cur)
+    {
+        efree(cur->name);
+        COMMAND* next=cur->next;
+        efree(cur);
+        cur=next;
+    }
 }
 
 bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool debugonly)
@@ -114,9 +126,47 @@ bool cmddel(COMMAND* command_list, const char* name)
     return true;
 }
 
+void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPROVIDER cbCommandProvider, CBCOMMANDFINDER cbCommandFinder)
+{
+    if(!cbUnknownCommand or !cbCommandProvider)
+        return;
+    char* command=(char*)emalloc(deflen);
+    memset(command, 0, deflen);
+    bool bLoop=true;
+    while(bLoop)
+    {
+        printf(">");
+        consolesetlasty();
+        if(!cbCommandProvider(command, deflen))
+            break;
+        if(strlen(command))
+        {
+            argformat(command); //default formatting
+            COMMAND* cmd;
+            if(!cbCommandFinder) //'clean' command processing
+                cmd=cmdget(command_list, command);
+            else //'dirty' command processing
+                cmd=cbCommandFinder(command_list, command);
+
+            if(!cmd or !cmd->cbCommand) //unknown command
+                bLoop=cbUnknownCommand(command);
+            else
+            {
+                if(cmd->debugonly and !IsFileBeingDebugged())
+                    cputs("this command is debug-only");
+                else
+                    bLoop=cmd->cbCommand(command);
+            }
+        }
+    }
+    efree(command);
+}
+
+/*
+- custom command formatting rules
+*/
 static void specialformat(char* string)
 {
-    dbg("specialformat");
     int len=strlen(string);
     char* found=strstr(string, "=");
     char* str=(char*)emalloc(len*2);
@@ -136,6 +186,14 @@ static void specialformat(char* string)
             *found='=';
             efree(str);
             return;
+        }
+        int flen=strlen(found); //n(+)=n++
+        if((found[flen-1]=='+' and found[flen-2]=='+') or (found[flen-1]=='-' and found[flen-2]=='-')) //eax++/eax--
+        {
+            found[flen-2]=0;
+            char op=found[flen-1];
+            sprintf(str, "%s%c1", found, op);
+            strcpy(found, str);
         }
         if(mathisoperator(*a)>2) //x*=3 -> x=x*3
         {
@@ -157,50 +215,18 @@ static void specialformat(char* string)
     efree(str);
 }
 
-void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand)
+/*
+- 'default' command finder, with some custom rules
+*/
+COMMAND* cmdfindmain(COMMAND* cmd_list, char* command)
 {
-    //char command[deflen]="";
-    char* command=(char*)emalloc(deflen);
-    memset(command, 0, deflen);
-    bool bLoop=true;
-    while(bLoop)
+    COMMAND* cmd=cmdfind(cmd_list, command, 0);
+    if(!cmd)
     {
-        printf(">");
-        consolesetlasty();
-        fgets(command, deflen, stdin);
-        command[strlen(command)-1]=0;
-        int len=strlen(command);
-        if(len)
-        {
-            argformat(command);
-            COMMAND* cmd=cmdget(command_list, command);
-            if(!cmd)
-            {
-                specialformat(command);
-                cmd=cmdget(command_list, command);
-            }
-            if(!cmd)
-            {
-                mathformat(command);
-                bLoop=cbUnknownCommand(command);
-            }
-            else
-            {
-                CBCOMMAND cbCommand=cmd->cbCommand;
-                if(cmd->debugonly and !IsFileBeingDebugged())
-                    cputs("this command is debug-only");
-                else
-                {
-                    if(!cbCommand)
-                    {
-                        mathformat(command);
-                        bLoop=cbUnknownCommand(command);
-                    }
-                    else
-                        bLoop=cbCommand(command);
-                }
-            }
-        }
+        specialformat(command);
+        cmd=cmdget(cmd_list, command);
     }
-    efree(command);
+    if(!cmd or !cmd->cbCommand)
+        mathformat(command);
+    return cmd;
 }

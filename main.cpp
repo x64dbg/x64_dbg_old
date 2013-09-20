@@ -5,15 +5,17 @@
 #include "instruction.h"
 #include "debugger.h"
 #include "data.h"
+#include "simplescript.h"
 #include "resource.h"
 #include "console.h"
+#include "math.h"
 #include "gui\disasm.h"
 
 static bool cbStrLen(const char* cmd)
 {
     char arg1[deflen]="";
     if(argget(cmd, arg1, 0, false))
-        printf("\"%s\"[%d]\n", arg1, strlen(arg1));
+        cprintf("\"%s\"[%d]\n", arg1, strlen(arg1));
     return true;
 }
 
@@ -62,6 +64,7 @@ static void registercommands()
     cmdnew(cmd, "alloc", cbDebugAlloc, true); //allocate memory
     cmdnew(cmd, "free", cbDebugFree, true); //free memory
     cmdnew(cmd, "Fill\1memset", cbDebugMemset, true); //memset
+    cmdnew(cmd, "scr\1script", cbScript, false); //script testing
 }
 
 static DWORD WINAPI focusThread(void* lpParam)
@@ -89,8 +92,35 @@ static DWORD WINAPI focusThread(void* lpParam)
     return 0;
 }
 
+static DWORD WINAPI consolePosThread(void* lpParam)
+{
+    HWND console=GetConsoleHwnd();
+    RECT rc;
+    int window_pos[2]= {0,0};
+    while(1)
+    {
+        GetWindowRect(console, &rc);
+        if(window_pos[0]!=rc.left and window_pos[1]!=rc.top)
+        {
+            window_pos[0]=rc.left;
+            window_pos[1]=rc.top;
+            SaveWindowPos("console", console);
+        }
+        Sleep(200);
+    }
+    return 0;
+}
+
+static bool cbCommandProvider(char* cmd, int maxlen)
+{
+    fgets(cmd, maxlen, stdin);
+    cmd[strlen(cmd)-1]=0;
+    return true;
+}
+
 int main()
 {
+    CreateThread(0, 0, consolePosThread, 0, 0, 0);
     SetConsoleIcon(LoadIconA(0, MAKEINTRESOURCEA(IDI_ICON1)));
 #ifndef _WIN64
     SetConsoleTitleA("x32_dbg");
@@ -106,12 +136,12 @@ int main()
     dir[len]=0;
     SetCurrentDirectoryA(dir);
     CreateThread(0, 0, focusThread, 0, 0, 0);
-
     varinit();
     registercommands();
     Sleep(200);
     SetForegroundWindow(GetConsoleHwnd());
-    cmdloop(command_list, cbBadCmd);
+    scriptSetList(command_list);
+    cmdloop(command_list, cbBadCmd, cbCommandProvider, cmdfindmain);
     DeleteFileA("DLLLoader.exe");
     return 0;
 }

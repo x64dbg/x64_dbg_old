@@ -10,3 +10,4 @@ CppCheckResults.xml
 bin/x32/test2.exe
 bin/x32/unpackme.exe
 *.bmarks
+suggestions.txt
