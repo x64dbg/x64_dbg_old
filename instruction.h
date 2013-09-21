@@ -2,13 +2,14 @@
 #define _INSTRUCTIONS_H
 
 #include "_global.h"
+#include "command.h"
 
 //functions
-bool cbBadCmd(const char* cmd);
-bool cbInstrVar(const char* cmd);
-bool cbInstrVarDel(const char* cmd);
-bool cbInstrMov(const char* cmd);
-bool cbInstrVarList(const char* cmd);
-bool cbInstrChd(const char* cmd);
+CMDRESULT cbBadCmd(const char* cmd);
+CMDRESULT cbInstrVar(const char* cmd);
+CMDRESULT cbInstrVarDel(const char* cmd);
+CMDRESULT cbInstrMov(const char* cmd);
+CMDRESULT cbInstrVarList(const char* cmd);
+CMDRESULT cbInstrChd(const char* cmd);
 
 #endif // _INSTRUCTIONS_H

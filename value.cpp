@@ -533,6 +533,16 @@ static uint getregister(int* size, const char* string)
         uint val=GetContextData(UE_ESP);
         return val&0xFF;
     }
+    if(scmp(string, "iph"))
+    {
+        uint val=GetContextData(UE_EIP);
+        return (val>>8)&0xFF;
+    }
+    if(scmp(string, "ipl"))
+    {
+        uint val=GetContextData(UE_EIP);
+        return val&0xFF;
+    }
 
     if(size)
         *size=sizeof(uint);

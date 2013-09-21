@@ -7,9 +7,9 @@ static int total=0;
 static char found[1024][1024];
 static COMMAND* command_list=0;
 
-static bool cbRet(const char* cmd)
+static CMDRESULT cbRet(const char* cmd)
 {
-    return false;
+    return STATUS_EXIT;
 }
 
 static bool cbCommandProvider(char* cmd, int maxlen)
@@ -19,13 +19,13 @@ static bool cbCommandProvider(char* cmd, int maxlen)
     return true;
 }
 
-static bool cbCollect(const char* cmd)
+static CMDRESULT cbCollect(const char* cmd)
 {
     strcpy(found[total], cmd);
     total++;
     if(total>=1024)
-        return false;
-    return true;
+        return STATUS_EXIT;
+    return STATUS_CONTINUE;
 }
 
 void scriptSetList(COMMAND* cmd_list)
@@ -45,14 +45,14 @@ static bool provider(char* cmd, int size)
     printf("b");
 }
 
-bool cbScript(const char* cmd)
+CMDRESULT cbScript(const char* cmd)
 {
     total=0;
     i=0;
     COMMAND* cmd_list=cmdinit();
     cmdnew(cmd_list, "ret", cbRet, false);
-    cmdloop(cmd_list, cbCollect, cbCommandProvider, 0);
+    cmdloop(cmd_list, cbCollect, cbCommandProvider, 0, false);
     cmdfree(cmd_list);
-    cmdloop(command_list, cbBadCmd, provider, cmdfindmain);
-    return true;
+    cmdloop(command_list, cbBadCmd, provider, cmdfindmain, true);
+    return STATUS_CONTINUE;
 }

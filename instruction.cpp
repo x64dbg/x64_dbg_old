@@ -3,8 +3,9 @@
 #include "variable.h"
 #include "console.h"
 #include "value.h"
+#include "command.h"
 
-bool cbBadCmd(const char* cmd)
+CMDRESULT cbBadCmd(const char* cmd)
 {
     uint value=0;
     int valsize=0;
@@ -47,28 +48,18 @@ bool cbBadCmd(const char* cmd)
     }
     else //unknown command
     {
-        char cmd_[deflen]="";
-        strcpy(cmd_, cmd);
-        /*int len=strlen(cmd_);
-        for(int i=0; i<len; i++)
-        {
-            if(cmd_[i]==' ')
-            {
-                cmd_[i]=0;
-                break;
-            }
-        }*/
-        printf("unknown command/expression: \"%s\"\n", cmd_);
+        printf("unknown command/expression: \"%s\"\n", cmd);
+        return STATUS_ERROR;
     }
-    return true;
+    return STATUS_CONTINUE;
 }
 
-bool cbInstrVar(const char* cmd)
+CMDRESULT cbInstrVar(const char* cmd)
 {
     char arg1[deflen]="";
     char arg2[deflen]="";
     if(!argget(cmd, arg1, 0, false)) //var name
-        return true;
+        return STATUS_ERROR;
     argget(cmd, arg2, 1, true); //var value (optional)
     uint value=0;
     int add=0;
@@ -77,15 +68,18 @@ bool cbInstrVar(const char* cmd)
     if(valfromstring(arg1+add, &value, 0, 0, true, 0))
     {
         printf("invalid variable name \"%s\"\n", arg1);
-        return true;
+        return STATUS_ERROR;
     }
     if(!valfromstring(arg2, &value, 0, 0, false, 0))
     {
         printf("invalid value \"%s\"\n", arg2);
-        return true;
+        return STATUS_ERROR;
     }
     if(!varnew(arg1, value, VAR_USER))
+    {
         printf("error creating variable \"%s\"\n", arg1);
+        return STATUS_ERROR;
+    }
     else
     {
         if(value>15)
@@ -93,34 +87,34 @@ bool cbInstrVar(const char* cmd)
         else
             printf("%s=%"fext"X\n", arg1, value);
     }
-    return true;
+    return STATUS_CONTINUE;
 }
 
-bool cbInstrVarDel(const char* cmd)
+CMDRESULT cbInstrVarDel(const char* cmd)
 {
     char arg1[deflen]="";
     if(!argget(cmd, arg1, 0, false)) //var name
-        return true;
+        return STATUS_ERROR;
     if(!vardel(arg1, false))
         printf("could not delete variable \"%s\"\n", arg1);
     else
         printf("deleted variable \"%s\"\n", arg1);
-    return true;
+    return STATUS_CONTINUE;
 }
 
-bool cbInstrMov(const char* cmd)
+CMDRESULT cbInstrMov(const char* cmd)
 {
     char arg1[deflen]="";
     char arg2[deflen]="";
     if(!argget(cmd, arg1, 0, false)) //dest name
-        return true;
+        return STATUS_ERROR;
     if(!argget(cmd, arg2, 1, false)) //src name
-        return true;
+        return STATUS_ERROR;
     uint set_value=0;
     if(!valfromstring(arg2, &set_value, 0, 0, false, 0))
     {
         printf("invalid src \"%s\"\n", arg2);
-        return true;
+        return STATUS_ERROR;
     }
     bool isvar=false;
     uint temp;
@@ -131,15 +125,15 @@ bool cbInstrMov(const char* cmd)
         if(valfromstring(arg1, &value, 0, 0, true, 0))
         {
             printf("invalid dest \"%s\"\n", arg1);
-            return true;
+            return STATUS_ERROR;
         }
         varnew(arg1, set_value, VAR_USER);
     }
     cbBadCmd(arg1);
-    return true;
+    return STATUS_CONTINUE;
 }
 
-bool cbInstrVarList(const char* cmd)
+CMDRESULT cbInstrVarList(const char* cmd)
 {
     char arg1[deflen]="";
     argget(cmd, arg1, 0, true);
@@ -154,7 +148,7 @@ bool cbInstrVarList(const char* cmd)
     if(!cur or !cur->name)
     {
         cputs("no variables");
-        return true;
+        return STATUS_CONTINUE;
     }
 
     bool bNext=true;
@@ -191,20 +185,20 @@ bool cbInstrVarList(const char* cmd)
         if(!cur)
             bNext=false;
     }
-    return true;
+    return STATUS_CONTINUE;
 }
 
-bool cbInstrChd(const char* cmd)
+CMDRESULT cbInstrChd(const char* cmd)
 {
     char arg1[deflen]="";
     if(!argget(cmd, arg1, 0, false))
-        return true;
+        return STATUS_ERROR;
     if(!DirExists(arg1))
     {
         cputs("directory doesn't exist");
-        return true;
+        return STATUS_ERROR;
     }
     SetCurrentDirectoryA(arg1);
     cputs("current directory changed!");
-    return true;
+    return STATUS_CONTINUE;
 }

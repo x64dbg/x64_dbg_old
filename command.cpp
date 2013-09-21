@@ -126,10 +126,10 @@ bool cmddel(COMMAND* command_list, const char* name)
     return true;
 }
 
-void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPROVIDER cbCommandProvider, CBCOMMANDFINDER cbCommandFinder)
+CMDRESULT cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPROVIDER cbCommandProvider, CBCOMMANDFINDER cbCommandFinder, bool error_is_fatal)
 {
     if(!cbUnknownCommand or !cbCommandProvider)
-        return;
+        return STATUS_ERROR;
     char* command=(char*)emalloc(deflen);
     memset(command, 0, deflen);
     bool bLoop=true;
@@ -149,17 +149,30 @@ void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPROVIDE
                 cmd=cbCommandFinder(command_list, command);
 
             if(!cmd or !cmd->cbCommand) //unknown command
-                bLoop=cbUnknownCommand(command);
+            {
+                CMDRESULT res=cbUnknownCommand(command);
+                if((error_is_fatal and res==STATUS_ERROR) or res==STATUS_EXIT)
+                    bLoop=false;
+            }
             else
             {
                 if(cmd->debugonly and !IsFileBeingDebugged())
+                {
                     cputs("this command is debug-only");
+                    if(error_is_fatal)
+                        bLoop=false;
+                }
                 else
-                    bLoop=cmd->cbCommand(command);
+                {
+                    CMDRESULT res=cmd->cbCommand(command);
+                    if((error_is_fatal and res==STATUS_ERROR) or res==STATUS_EXIT)
+                        bLoop=false;
+                }
             }
         }
     }
     efree(command);
+    return STATUS_EXIT;
 }
 
 /*

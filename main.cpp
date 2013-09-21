@@ -11,23 +11,23 @@
 #include "math.h"
 #include "gui\disasm.h"
 
-static bool cbStrLen(const char* cmd)
+static CMDRESULT cbStrLen(const char* cmd)
 {
     char arg1[deflen]="";
     if(argget(cmd, arg1, 0, false))
         cprintf("\"%s\"[%d]\n", arg1, strlen(arg1));
-    return true;
+    return STATUS_CONTINUE;
 }
 
-static bool cbExit(const char* cmd)
+static CMDRESULT cbExit(const char* cmd)
 {
-    return false;
+    return STATUS_EXIT;
 }
 
-static bool cbCls(const char* cmd)
+static CMDRESULT cbCls(const char* cmd)
 {
     system("cls");
-    return true;
+    return STATUS_CONTINUE;
 }
 
 static COMMAND* command_list=0;
@@ -141,7 +141,7 @@ int main()
     Sleep(200);
     SetForegroundWindow(GetConsoleHwnd());
     scriptSetList(command_list);
-    cmdloop(command_list, cbBadCmd, cbCommandProvider, cmdfindmain);
+    cmdloop(command_list, cbBadCmd, cbCommandProvider, cmdfindmain, false);
     DeleteFileA("DLLLoader.exe");
     return 0;
 }

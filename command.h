@@ -14,7 +14,7 @@ enum CMDRESULT
     STATUS_ERROR=2
 };
 
-typedef bool (*CBCOMMAND)(const char*);
+typedef CMDRESULT (*CBCOMMAND)(const char*);
 typedef bool (*CBCOMMANDPROVIDER)(char*, int);
 typedef COMMAND* (*CBCOMMANDFINDER)(COMMAND*, char*);
 
@@ -34,7 +34,7 @@ bool cmdnew(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool d
 COMMAND* cmdget(COMMAND* command_list, const char* cmd);
 CBCOMMAND cmdset(COMMAND* command_list, const char* name, CBCOMMAND cbCommand, bool debugonly);
 bool cmddel(COMMAND* command_list, const char* name);
-void cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPROVIDER cbCommandProvider, CBCOMMANDFINDER cbCommandFinder);
+CMDRESULT cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPROVIDER cbCommandProvider, CBCOMMANDFINDER cbCommandFinder, bool error_is_fatal);
 COMMAND* cmdfindmain(COMMAND* cmd_list, char* command);
 
 #endif // _COMMAND_H
