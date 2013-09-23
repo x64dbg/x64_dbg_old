@@ -1,13 +1,11 @@
+/*  Header for BeaEngine 4.x    */
 #ifndef _BEA_ENGINE_
 #define _BEA_ENGINE_
-#if  defined(__cplusplus) && defined(__BORLANDC__)
-namespace BeaEngine
-{
-#endif
 
-#include "macros.h"
-#include "export.h"
-#include "basic_types.h"
+#define BEA_ENGINE_STATIC //remove this for dll use...
+
+#include "Includes/export.h"
+#include "Includes/basic_types.h"
 
 #if !defined(BEA_ENGINE_STATIC)
 #if defined(BUILD_BEA_ENGINE_DLL)
@@ -52,7 +50,6 @@ typedef struct
     UInt8 BranchTaken;
     UInt8 BranchNotTaken;
     REX_Struct REX;
-    char alignment[2];
 } PREFIXINFO  ;
 #pragma pack()
 
@@ -112,50 +109,8 @@ typedef struct
 } ARGTYPE;
 #pragma pack()
 
-/* reserved structure used for thread-safety */
-/* unusable by customer */
-#pragma pack(1)
-typedef struct
-{
-    UIntPtr EIP_;
-    UInt64 EIP_VA;
-    UIntPtr EIP_REAL;
-    Int32 OriginalOperandSize;
-    Int32 OperandSize;
-    Int32 MemDecoration;
-    Int32 AddressSize;
-    Int32 MOD_;
-    Int32 RM_;
-    Int32 INDEX_;
-    Int32 SCALE_;
-    Int32 BASE_;
-    Int32 MMX_;
-    Int32 SSE_;
-    Int32 CR_;
-    Int32 DR_;
-    Int32 SEG_;
-    Int32 REGOPCODE;
-    UInt32 DECALAGE_EIP;
-    Int32 FORMATNUMBER;
-    Int32 SYNTAX_;
-    UInt64 EndOfBlock;
-    Int32 RelativeAddress;
-    UInt32 Architecture;
-    Int32 ImmediatSize;
-    Int32 NB_PREFIX;
-    Int32 PrefRepe;
-    Int32 PrefRepne;
-    UInt32 SEGMENTREGS;
-    UInt32 SEGMENTFS;
-    Int32 third_arg;
-    Int32 TAB_;
-    Int32 ERROR_OPCODE;
-    REX_Struct REX;
-    Int32 OutOfBlock;
-} InternalDatas;
-#pragma pack()
 
-/* ************** main structure ************ */
+
 #pragma pack(1)
 typedef struct _Disasm
 {
@@ -170,7 +125,7 @@ typedef struct _Disasm
     ARGTYPE Argument2;
     ARGTYPE Argument3;
     PREFIXINFO Prefix;
-    InternalDatas Reserved_;
+    UInt32 Reserved_[40];
 } DISASM, *PDISASM, *LPDISASM;
 #pragma pack()
 
@@ -253,6 +208,7 @@ enum INSTRUCTION_TYPE
     SAD_INSTRUCTION,
     ACCELERATOR_INSTRUCTION,    /* crc32, popcnt (sse4.2) */
     ROUND_INSTRUCTION
+
 };
 
 enum EFLAGS_STATES
@@ -267,49 +223,28 @@ enum EFLAGS_STATES
 
 enum BRANCH_TYPE
 {
-    //JO vs JNO
     JO = 1,
-    JNO = -1,
-    //JC=JB=JNAE vs JNC=JNB=JAE
     JC = 2,
-    JB = 2,
-    JNAE = 2,
-    JNC = -2,
-    JNB = -2,
-    JAE = -2,
-    //JE=JZ vs JNE=JNZ
     JE = 3,
-    JZ = 3,
-    JNE = -3,
-    JNZ = -3,
-    //JA=JNBE vs JNA=JBE
     JA = 4,
-    JNBE = 4,
-    JNA = -4,
-    JBE = -4,
-    //JS vs JNS
     JS = 5,
-    JNS = -5,
-    //JP=JPE vs JNP=JPO
     JP = 6,
-    JPE = 6,
-    JNP = -6,
-    JPO = -6,
-    //JL=JNGE vs JNL=JGE
     JL = 7,
-    JNGE = 7,
-    JNL = -7,
-    JGE = -7,
-    //JG=JNLE vs JNG=JLE
     JG = 8,
-    JNLE = 8,
+    JB = 2,       // JC == JB
+    JECXZ = 10,
+    JmpType = 11,
+    CallType = 12,
+    RetType = 13,
+    JNO = -1,
+    JNC = -2,
+    JNE = -3,
+    JNA = -4,
+    JNS = -5,
+    JNP = -6,
+    JNL = -7,
     JNG = -8,
-    JLE = -8,
-    //others
-    JECXZ = 9,
-    JmpType = 10,
-    CallType = 11,
-    RetType = 12,
+    JNB = -2      // JNC == JNB
 };
 
 enum ARGUMENTS_TYPE
@@ -336,13 +271,21 @@ enum ARGUMENTS_TYPE
     WRITE = 0x2,
 
     REG0 = 0x1,
+    REG_EAX = REG0,
     REG1 = 0x2,
+    REG_ECX = REG1,
     REG2 = 0x4,
+    REG_EDX = REG2,
     REG3 = 0x8,
+    REG_EBX = REG3,
     REG4 = 0x10,
+    REG_ESP = REG4,
     REG5 = 0x20,
+    REG_EBP = REG5,
     REG6 = 0x40,
+    REG_ESI = REG6,
     REG7 = 0x80,
+    REG_EDI = REG7,
     REG8 = 0x100,
     REG9 = 0x200,
     REG10 = 0x400,
@@ -370,9 +313,7 @@ enum SPECIAL_INFO
 
     /* === mask = 0xff0000 */
     PrefixedNumeral   = 0x00010000,
-    SuffixedNumeral   = 0x00020000,
-    NoformatNumeral   = 0x00030000,
-    CleanNumeral      = 0x00000000,
+    SuffixedNumeral   = 0x00000000,
 
     /* === mask = 0xff000000 */
     ShowSegmentRegs   = 0x01000000
@@ -383,11 +324,7 @@ enum SPECIAL_INFO
 extern "C"
 #endif
 
-BEA_API int __bea_callspec__ Disasm (LPDISASM pDisAsm);
-BEA_API const__ char* __bea_callspec__ BeaEngineVersion (void);
-BEA_API const__ char* __bea_callspec__ BeaEngineRevision (void);
-#if  defined(__cplusplus) && defined(__BORLANDC__)
-};
-using namespace BeaEngine;
-#endif
+BEA_API int __bea_callspec__ Disasm(LPDISASM pDisAsm);
+BEA_API const__ char* __bea_callspec__ BeaEngineVersion(void);
+BEA_API const__ char* __bea_callspec__ BeaEngineRevision(void);
 #endif

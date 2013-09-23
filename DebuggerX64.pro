@@ -8,6 +8,8 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+#CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+
 TARGET = DebuggerX64
 TEMPLATE = app
 
@@ -46,6 +48,6 @@ FORMS    += \
     Src/Gui/CPUWidget.ui
 
 
-LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s
+LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s_64
 
-INCLUDEPATH += $$PWD/Src/BeaEngine_s
+INCLUDEPATH += $$PWD/Src/BeaEngine_s_64

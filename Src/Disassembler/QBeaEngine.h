@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QDebug>
 
+#define BEA_ENGINE_STATIC
 #include "BeaEngine.h"
 
 

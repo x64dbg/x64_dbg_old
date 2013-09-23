@@ -329,16 +329,22 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
 
 int Disassembly::getPreviousInstructionRVA(int address, int count)
 {
-    ulong addr = mDisasm->DisassembleBack((char*)mMemoryView->data(), (ulong)mMemoryView->data(), (ulong)mMemoryView->size(), (ulong)(mMemoryView->data() + address), count);
-    return addr - (ulong)mMemoryView->data();
+    unsigned char* wBase = mMemoryView->data();
+    unsigned char* wIp = mMemoryView->data() + address;
+
+    ulong addr = mDisasm->DisassembleBack((char*)mMemoryView->data(), *((ulong*)(&wBase)), (ulong)mMemoryView->size(), *((ulong*)(&wIp)), count);
+    return addr - *((ulong*)(&wBase));
 
     //return (count > address ? 0 : address - count);
 }
 
 int Disassembly::getNextInstructionRVA(int address, int count)
 {
-    ulong addr = mDisasm->DisassembleNext((char*)mMemoryView->data(),(ulong)mMemoryView->data(), (ulong)mMemoryView->size(), (ulong)(mMemoryView->data() + address), count);
-    return addr - (ulong)mMemoryView->data();
+    unsigned char* wBase = mMemoryView->data();
+    unsigned char* wIp = mMemoryView->data() + address;
+
+    ulong addr = mDisasm->DisassembleNext((char*)mMemoryView->data(), *((ulong*)(&wBase)), (ulong)mMemoryView->size(), *((ulong*)(&wIp)), count);
+    return addr - *((ulong*)(&wBase));
 
     //return address + count;
 }

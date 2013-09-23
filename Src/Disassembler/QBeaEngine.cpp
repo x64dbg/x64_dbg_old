@@ -206,7 +206,7 @@ Instruction_t QBeaEngine::DisassembleAt(char* data, ulong base, ulong size, ulon
     Instruction_t wInst;
     int len;
 
-    mDisasmStruct.EIP = (UIntPtr)((long)data + (long)wInstRVA);
+    mDisasmStruct.EIP = (UIntPtr)(*((long*)(&data)) + (long)wInstRVA);
     mDisasmStruct.VirtualAddr = ip;
     mDisasmStruct.SecurityBlock = (UIntPtr)(size - wInstRVA);
 
