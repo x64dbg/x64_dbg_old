@@ -63,6 +63,9 @@ public:
 
     int getGuiState();
 
+    void forceScrollBarValue(int val);
+    void moveScrollBar(int delta);
+
 signals:
     void headerButtonPressed(int col);
     void headerButtonReleased(int col);

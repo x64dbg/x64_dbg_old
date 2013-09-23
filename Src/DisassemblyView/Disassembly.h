@@ -65,6 +65,7 @@ private:
     bool mIsLastInstDisplayed;
 
     GuiState_t mGuiState;
+
     
 };
 

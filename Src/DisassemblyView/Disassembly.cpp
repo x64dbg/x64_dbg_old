@@ -141,16 +141,13 @@ void Disassembly::keyPressEvent(QKeyEvent* event)
         else
             selectNext();
 
-
         if(getInitialSelection() < botRVA)
         {
-            verticalScrollBar()->setValue(getInitialSelection());
-            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
+            forceScrollBarValue(getInitialSelection());
         }
         else if(getInitialSelection() >= topRVA)
         {
-            verticalScrollBar()->setValue(getIndexFromCount(getInitialSelection(),-getLineToPrintcount() + 2));
-            verticalScrollBar()->triggerAction(QAbstractSlider::SliderMove);
+            forceScrollBarValue(getIndexFromCount(getInitialSelection(),-getLineToPrintcount() + 2));
         }
 
         viewport()->repaint();
@@ -179,7 +176,21 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
         {
             //ulong wAddr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
             //wStr = QString("%1").arg(wAddr, 8, 16, QChar('0')).toUpper();
-            wStr += QString::number(wInst.rva);
+            // QString::number(wInst.rva)
+
+
+
+            if(wInst.rva == getInitialSelection())
+            {
+                painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
+                painter->save();
+                painter->setPen(QPen(QColor("#ffffff")));
+                painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(wInst.rva, 8, 16, QChar('0')).toUpper());
+                painter->restore();
+            }
+            else
+                wStr += QString("%1").arg(wInst.rva, 8, 16, QChar('0')).toUpper();
+
             break;
         }
 

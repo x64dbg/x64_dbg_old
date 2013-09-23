@@ -12,10 +12,10 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-/*
+
     MainWindow w;
     w.show();
-*/
+
 
     //CPUSubWindow cpuWin;
     //cpuWin.show();
@@ -32,11 +32,11 @@ int main(int argc, char *argv[])
     hexDump.resize(QSize(600,600));
     hexDump.show();
 */
-
+/*
     Disassembly d(0);
     d.resize(QSize(600,600));
     d.show();
-
+*/
 
 
 

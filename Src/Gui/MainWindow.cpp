@@ -14,24 +14,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Create QMdiSubWindow
     QMdiSubWindow* subWindow = new QMdiSubWindow();
     subWindow->setWindowTitle("Disassembly");
-    //subWindow->resize(200,100);
     subWindow->showMaximized();
 
+    mCpuWin = new CPUWidget();
 
 
-    CPUWidget *cpuWin = new CPUWidget();
-    Disassembly *dias = new Disassembly(0);
-
-    cpuWin->getTopLeftWidget()->addWidget(dias);
-
-
-    subWindow->setWidget(cpuWin);
+    subWindow->setWidget(mCpuWin);
 
     //Add subWindow to Main QMdiArea here
     mdiArea->addSubWindow(subWindow);
 
 
     setCentralWidget(mdiArea);
+
+
+    // Setup Signals/Slots
+    connect(ui->actionStepOver, SIGNAL(triggered()), mCpuWin, SLOT(stepOverSlot()));
+
 }
 
 MainWindow::~MainWindow()

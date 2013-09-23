@@ -2,6 +2,8 @@
 #define CPUWIDGET_H
 
 #include <QtGui>
+#include "Disassembly.h"
+#include "HexDump.h"
 
 
 namespace Ui {
@@ -21,8 +23,14 @@ public:
     QVBoxLayout* getBotLeftWidget(void);
     QVBoxLayout* getBotRightWidget(void);
 
+signals:
+
+public slots:
+    void stepOverSlot();
+
 private:
     Ui::CPUWidget *ui;
+    Disassembly* mDisas;
 
 };
 

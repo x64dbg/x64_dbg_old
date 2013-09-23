@@ -7,9 +7,11 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
     mTableOffset = 0;
     mHeader = (Header_t){true, 20, -1};
 
-    QFont font("Monospace", 9);
-    font.setStyleHint(QFont::TypeWriter);
-    setFont(font);
+    QFont font("Monospace", 8);
+    font.setFixedPitch(true);
+    //font.setStyleHint(QFont::Monospace);
+    this->setFont(font);
+
 
     int wRowsHeight = QFontMetrics(this->font()).height();
     wRowsHeight = (wRowsHeight * 105) / 100;
@@ -49,6 +51,8 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 void AbstractTableView::paintEvent(QPaintEvent* event)
 {
     QPainter wPainter(this->viewport());
+    QTextDocument wRichTextDoc;
+    wRichTextDoc.setDocumentMargin(0);
 
     int x = 0;
     int y = 0;
@@ -88,6 +92,16 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
             {
                QString wStr = paintContent(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
                wPainter.drawText(QRect(x + 4, y, getColumnWidth(j) - 4, getRowHeight()), Qt::AlignVCenter | Qt::AlignLeft, wStr);
+
+               /*
+               QRect wTextRect(0, 0, getColumnWidth(j) - 4, getRowHeight());
+               wRichTextDoc.setTextWidth(wTextRect.width());
+               wRichTextDoc.setHtml("<font face=\"" + this->font().family() + "\" size=\"" + this->font().pointSize() + "\">" + wStr + "</font>");
+               wPainter.save();
+               wPainter.translate(x + 4, y);
+               wRichTextDoc.drawContents(&wPainter, wTextRect);
+               wPainter.restore();
+               */
             }
 
             // Draw cell right border
@@ -348,19 +362,10 @@ void AbstractTableView::wheelEvent(QWheelEvent* event)
 
     //QAbstractScrollArea::wheelEvent(event);
 
-    int value = verticalScrollBar()->value();
-
     if(event->delta() > 0)
-    {
-        value -=3;
-    }
+        moveScrollBar(-3);
     else
-    {
-        value +=3;
-    }
-
-    verticalScrollBar()->setValue(value);
-    verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
+        moveScrollBar(3);
 }
 
 
@@ -455,7 +460,7 @@ void AbstractTableView::vertSliderActionSlot(int action)
         case QAbstractSlider::SliderNoAction:
         {
             qDebug() << "SliderNoAction";
-            mTableOffset+= wDelta;// = getIndexFromCount(mTableOffset, wDelta);
+            mTableOffset = wSliderPosition;// = getIndexFromCount(mTableOffset, wDelta);
 
             break;
         }
@@ -464,7 +469,8 @@ void AbstractTableView::vertSliderActionSlot(int action)
             break;
     }
 
-    mTableOffset = sliderMovedAction(action, wOldValue, wDelta);
+    if(action != QAbstractSlider::SliderNoAction)
+        mTableOffset = sliderMovedAction(action, wOldValue, wDelta);
 
     verticalScrollBar()->setValue(mTableOffset);
 
@@ -474,19 +480,29 @@ void AbstractTableView::vertSliderActionSlot(int action)
 }
 
 
-void AbstractTableView::upDownKeyPressed(int key)
+void AbstractTableView::forceScrollBarValue(int val)
+{
+    verticalScrollBar()->setValue(val);
+    verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
+}
+
+void AbstractTableView::moveScrollBar(int delta)
 {
     int wSliderPosition = verticalScrollBar()->sliderPosition();
 
+    verticalScrollBar()->setValue(wSliderPosition + delta);
+    verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepSub);
+}
+
+void AbstractTableView::upDownKeyPressed(int key)
+{
     if(key == Qt::Key_Up)
     {
-        verticalScrollBar()->setValue(wSliderPosition - 1);
-        verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
+        moveScrollBar(-1);
     }
     else if(key == Qt::Key_Down)
     {
-        verticalScrollBar()->setValue(wSliderPosition + 1);
-        verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
+        moveScrollBar(1);
     }
 }
 

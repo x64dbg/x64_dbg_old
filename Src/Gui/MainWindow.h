@@ -21,7 +21,8 @@ public:
     
 private:
     Ui::MainWindow *ui;
-    QMdiArea *mdiArea;
+    QMdiArea* mdiArea;
+    CPUWidget* mCpuWin;
 };
 
 #endif // MAINWINDOW_H
