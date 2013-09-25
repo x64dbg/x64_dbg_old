@@ -18,12 +18,7 @@ public:
     // Pure Virtual Methods
     virtual QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h) = 0;
 
-    // Virtual Methods
-    virtual int sliderMovedAction(int type, int value, int delta);
-    virtual int getLineToPrintcount();
-    virtual void upDownKeyPressed(int key);
-
-    // Reimplemented Methods
+    // Reimplemented Functions
     void paintEvent(QPaintEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
@@ -32,39 +27,32 @@ public:
     void wheelEvent(QWheelEvent* event);
 
     // ScrollBar Management
-    void setScrollBarValue(int value);
-    void setRowCount(int count);
+    virtual int sliderMovedAction(int type, int value, int delta);
+    void forceScrollBarValue(int val);
+    void moveScrollBar(int delta);
 
-    // Coordinate analysis
+    // Coordinates Utils
     int getIndexOffsetFromY(int y);
     int getColumnIndexFromX(int x);
     int getColumnPosition(int index);
     int transY(int y);
     int getViewableRowsCount();
+    virtual int getLineToPrintcount();
 
-    // Add / Remove row and columns
+    // New Columns
     void addColumnAt(int at, int width, bool isClickable);
 
-    // Getters and Setters
+    // Getter & Setter
+    void setRowCount(int count);
     int getRowCount();
     int getColumnCount();
-
     int getRowHeight();
     int getColumnWidth(int index);
-
     void setColumnWidth(int index, int width);
-
     int getHeaderHeigth();
     int getTableHeigth();
-
-    // Table Data
     int getTableOffset();
-    int setTableOffset(int value);
-
     int getGuiState();
-
-    void forceScrollBarValue(int val);
-    void moveScrollBar(int delta);
 
 signals:
     void headerButtonPressed(int col);
@@ -103,13 +91,6 @@ private:
         int activeButtonIndex;
     } Header_t;
 
-    typedef struct _SelectionData_t
-    {
-        int firstSelectedIndex;
-        int fromIndex;
-        int toIndex;
-    } SelectionData_t;
-
     GuiState_t mGuiState;
 
     ColumnResizingData_t mColResizeData;
@@ -121,7 +102,7 @@ private:
     int mRowHeight;
     int mRowCount;
 
-    SelectionData_t mSelection;
+
     int mTableOffset;
     Header_t mHeader;
 };

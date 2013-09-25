@@ -1,6 +1,8 @@
 #include "Disassembly.h"
 
-Disassembly::Disassembly(QWidget *parent) :AbstractTableView(parent)
+
+
+Disassembly::Disassembly(QWidget *parent) : AbstractTableView(parent)
 {
     mSelection = (SelectionData_t){0, 0, 0};
 
@@ -14,151 +16,32 @@ Disassembly::Disassembly(QWidget *parent) :AbstractTableView(parent)
     setRowCount(mMemoryView->size());
 
     qDebug() << "size" << mMemoryView->size();
+
+    addColumnAt(getColumnCount(), 100, false);
+    addColumnAt(getColumnCount(), 100, false);
+    addColumnAt(getColumnCount(), 100, false);
+
 }
 
 
-
-void Disassembly::mouseMoveEvent(QMouseEvent* event)
-{
-    qDebug() << "Disassembly::mouseMoveEvent";
-
-    bool wAccept = true;
-
-    if(mGuiState == Disassembly::MultiRowsSelectionState)
-    {
-        qDebug() << "State = MultiRowsSelectionState";
-
-        if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
-        {
-            int wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
-
-            if(wRowIndex < getRowCount())
-            {
-                expandSelectionUpTo(wRowIndex);
-
-                this->viewport()->repaint();
-
-                wAccept = false;
-            }
-        }
-    }
-
-    if(wAccept == true)
-        AbstractTableView::mouseMoveEvent(event);
-}
-
-
-
-void Disassembly::mousePressEvent(QMouseEvent* event)
-{
-    qDebug() << "Disassembly::mousePressEvent";
-
-    bool wAccept = false;
-
-    if(((event->buttons() & Qt::LeftButton) != 0) && ((event->buttons() & Qt::RightButton) == 0))
-    {
-        if(getGuiState() == AbstractTableView::NoState)
-        {
-            if(event->y() > getHeaderHeigth())
-            {
-                int wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
-
-                if(wRowIndex < getRowCount())
-                {
-                    setSingleSelection(wRowIndex);
-
-                    mGuiState = Disassembly::MultiRowsSelectionState;
-
-                    viewport()->repaint();
-
-                    wAccept = true;
-                }
-            }
-        }
-    }
-
-    if(wAccept == false)
-        AbstractTableView::mousePressEvent(event);
-}
-
-
-
-void Disassembly::mouseReleaseEvent(QMouseEvent* event)
-{
-    bool wAccept = true;
-
-    if((event->buttons() & Qt::LeftButton) == 0)
-    {
-        if(mGuiState == Disassembly::MultiRowsSelectionState)
-        {
-            mGuiState = Disassembly::NoState;
-
-            this->viewport()->repaint();
-
-            wAccept = false;
-        }
-    }
-
-    if(wAccept == true)
-        AbstractTableView::mouseReleaseEvent(event);
-}
-
-
-int Disassembly::sliderMovedAction(int type, int value, int delta)
-{
-    int newValue;
-
-    if(type == QAbstractSlider::SliderMove)
-    {
-        if(value + delta > 0)
-        {
-            newValue = getIndexFromCount(value + delta, -1);
-            newValue = getIndexFromCount(newValue, 1);
-        }
-        else
-            newValue = 0;
-    }
-    else
-    {
-        newValue = getIndexFromCount(value, delta);
-    }
-
-    return newValue;
-}
-
-void Disassembly::keyPressEvent(QKeyEvent* event)
-{
-    int key = event->key();
-    qDebug() << "keyPressEvent " << getLineToPrintcount();
-
-    if(key == Qt::Key_Up || key == Qt::Key_Down)
-    {
-        int botRVA = getTableOffset();
-        int topRVA = getIndexFromCount(getTableOffset(), getLineToPrintcount() - 1);
-
-        if(key == Qt::Key_Up)
-            selectPrevious();
-        else
-            selectNext();
-
-        if(getInitialSelection() < botRVA)
-        {
-            forceScrollBarValue(getInitialSelection());
-        }
-        else if(getInitialSelection() >= topRVA)
-        {
-            forceScrollBarValue(getIndexFromCount(getInitialSelection(),-getLineToPrintcount() + 2));
-        }
-
-        viewport()->repaint();
-    }
-    else
-    {
-        AbstractTableView::keyPressEvent(event);
-    }
-}
-
-
+/************************************************************************************
+                            Reimplemented Functions
+************************************************************************************/
+/**
+ * @brief       This method has been reimplemented. It returns the string to paint or paints it
+ *              by its own.
+ *
+ * @param[in]   painter     Pointer to the painter that allows painting by its own
+ * @param[in]   rowBase     Index of the top item (Table offset)
+ * @param[in]   rowOffset   Index offset starting from rowBase
+ * @param[in]   col         Column index
+ * @param[in]   x           Rectangle x
+ * @param[in]   y           Rectangle y
+ * @param[in]   w           Rectangle width
+ * @param[in]   h           Rectangle heigth
+ *
+ * @return      Nothing.
+ */
 QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
 {
     //return QString("Disassembly: Col:") + QString::number(col) + "Row:" + QString::number(rowBase + rowOffset);
@@ -220,6 +103,206 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
     return wStr;
 }
 
+
+/**
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Multi-rows selection
+ *
+ * @param[in]   event       Mouse event
+ *
+ * @return      Nothing.
+ */
+void Disassembly::mouseMoveEvent(QMouseEvent* event)
+{
+    qDebug() << "Disassembly::mouseMoveEvent";
+
+    bool wAccept = true;
+
+    if(mGuiState == Disassembly::MultiRowsSelectionState)
+    {
+        qDebug() << "State = MultiRowsSelectionState";
+
+        if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
+        {
+            int wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
+
+            if(wRowIndex < getRowCount())
+            {
+                expandSelectionUpTo(wRowIndex);
+
+                this->viewport()->repaint();
+
+                wAccept = false;
+            }
+        }
+    }
+
+    if(wAccept == true)
+        AbstractTableView::mouseMoveEvent(event);
+}
+
+
+/**
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Multi-rows selection
+ *
+ * @param[in]   event       Mouse event
+ *
+ * @return      Nothing.
+ */
+void Disassembly::mousePressEvent(QMouseEvent* event)
+{
+    qDebug() << "Disassembly::mousePressEvent";
+
+    bool wAccept = false;
+
+    if(((event->buttons() & Qt::LeftButton) != 0) && ((event->buttons() & Qt::RightButton) == 0))
+    {
+        if(getGuiState() == AbstractTableView::NoState)
+        {
+            if(event->y() > getHeaderHeigth())
+            {
+                int wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
+
+                if(wRowIndex < getRowCount())
+                {
+                    setSingleSelection(wRowIndex);
+
+                    mGuiState = Disassembly::MultiRowsSelectionState;
+
+                    viewport()->repaint();
+
+                    wAccept = true;
+                }
+            }
+        }
+    }
+
+    if(wAccept == false)
+        AbstractTableView::mousePressEvent(event);
+}
+
+
+/**
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Multi-rows selection
+ *
+ * @param[in]   event       Mouse event
+ *
+ * @return      Nothing.
+ */
+void Disassembly::mouseReleaseEvent(QMouseEvent* event)
+{
+    bool wAccept = true;
+
+    if((event->buttons() & Qt::LeftButton) == 0)
+    {
+        if(mGuiState == Disassembly::MultiRowsSelectionState)
+        {
+            mGuiState = Disassembly::NoState;
+
+            this->viewport()->repaint();
+
+            wAccept = false;
+        }
+    }
+
+    if(wAccept == true)
+        AbstractTableView::mouseReleaseEvent(event);
+}
+
+
+/**
+ * @brief       This method has been reimplemented. It realigns the slider on real instructions except
+ *              when the type is QAbstractSlider::SliderNoAction. This type (QAbstractSlider::SliderNoAction)
+ *              is used to force the disassembling at a specific address.
+ *
+ * @param[in]   event       Mouse event
+ *
+ * @return      Nothing.
+ */
+int Disassembly::sliderMovedAction(int type, int value, int delta)
+{
+    int newValue;
+
+    if(type != QAbstractSlider::SliderNoAction) // QAbstractSlider::SliderNoAction is used print the disassembly at a specifi address
+    {
+        if(type == QAbstractSlider::SliderMove) // If it's a slider action, disassemble one instruction back and one instruction next in order to be aligned on a real instruction
+        {
+            if(value + delta > 0)
+            {
+                newValue = getIndexFromCount(value + delta, -1);
+                newValue = getIndexFromCount(newValue, 1);
+            }
+            else
+                newValue = 0;
+        }
+        else    // For other action, disassebmle according to the delta
+        {
+            newValue = getIndexFromCount(value, delta);
+        }
+    }
+    else
+    {
+        newValue = value + delta;
+    }
+    return newValue;
+}
+
+
+/**
+ * @brief       This method has been reimplemented. It processes the Up/Down key events.
+ *
+ * @param[in]   event       Mouse event
+ *
+ * @return      Nothing.
+ */
+void Disassembly::keyPressEvent(QKeyEvent* event)
+{
+    int key = event->key();
+    qDebug() << "keyPressEvent " << getLineToPrintcount();
+
+    if(key == Qt::Key_Up || key == Qt::Key_Down)
+    {
+        int botRVA = getTableOffset();
+        int topRVA = getIndexFromCount(getTableOffset(), getLineToPrintcount() - 1);
+
+        if(key == Qt::Key_Up)
+            selectPrevious();
+        else
+            selectNext();
+
+        if(getInitialSelection() < botRVA)
+        {
+            forceScrollBarValue(getInitialSelection());
+        }
+        else if(getInitialSelection() >= topRVA)
+        {
+            forceScrollBarValue(getIndexFromCount(getInitialSelection(),-getLineToPrintcount() + 2));
+        }
+
+        viewport()->repaint();
+    }
+    else
+    {
+        AbstractTableView::keyPressEvent(event);
+    }
+}
+
+
+/************************************************************************************
+                            Graphic Dump
+************************************************************************************/
+/**
+ * @brief       This method processes the Up/Down key events.
+ *
+ * @param[in]   painter     Pointer to the painter that allows painting by its own
+ * @param[in]   x           Rectangle x
+ * @param[in]   y           Rectangle y
+ * @param[in]   addr        RVA of address to process
+ *
+ * @return      Nothing.
+ */
 void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
 {
     ulong selHeadRVA = mSelection.fromIndex;
@@ -326,11 +409,18 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
 /************************************************************************************
                             Instructions Management
  ***********************************************************************************/
-
-int Disassembly::getPreviousInstructionRVA(int address, int count)
+/**
+ * @brief       Returns the RVA of count-th instructions before the given instruction RVA.
+ *
+ * @param[in]   address     Instruction RVA
+ * @param[in]   count       Instruction count
+ *
+ * @return      RVA of count-th instructions before the given instruction RVA.
+ */
+int Disassembly::getPreviousInstructionRVA(int rva, int count)
 {
     unsigned char* wBase = mMemoryView->data();
-    unsigned char* wIp = mMemoryView->data() + address;
+    unsigned char* wIp = mMemoryView->data() + rva;
 
     ulong addr = mDisasm->DisassembleBack((char*)mMemoryView->data(), *((ulong*)(&wBase)), (ulong)mMemoryView->size(), *((ulong*)(&wIp)), count);
     return addr - *((ulong*)(&wBase));
@@ -338,10 +428,19 @@ int Disassembly::getPreviousInstructionRVA(int address, int count)
     //return (count > address ? 0 : address - count);
 }
 
-int Disassembly::getNextInstructionRVA(int address, int count)
+
+/**
+ * @brief       Returns the RVA of count-th instructions after the given instruction RVA.
+ *
+ * @param[in]   address     Instruction RVA
+ * @param[in]   count       Instruction count
+ *
+ * @return      RVA of count-th instructions after the given instruction RVA.
+ */
+int Disassembly::getNextInstructionRVA(int rva, int count)
 {
     unsigned char* wBase = mMemoryView->data();
-    unsigned char* wIp = mMemoryView->data() + address;
+    unsigned char* wIp = mMemoryView->data() + rva;
 
     ulong addr = mDisasm->DisassembleNext((char*)mMemoryView->data(), *((ulong*)(&wBase)), (ulong)mMemoryView->size(), *((ulong*)(&wIp)), count);
     return addr - *((ulong*)(&wBase));
@@ -349,6 +448,14 @@ int Disassembly::getNextInstructionRVA(int address, int count)
     //return address + count;
 }
 
+
+/**
+ * @brief       Disassembles the instruction at the given RVA.
+ *
+ * @param[in]   rva     RVA of instruction to disassemble
+ *
+ * @return      Return the disassembled instruction.
+ */
 Instruction_t Disassembly::DisassembleAt(ulong rva)
 {
     char* data = (char*)mMemoryView->data();
@@ -359,6 +466,16 @@ Instruction_t Disassembly::DisassembleAt(ulong rva)
     return mDisasm->DisassembleAt(data, base, size, ip);
 }
 
+
+/**
+ * @brief       Disassembles the instruction count instruction afterc the instruction at the given RVA.
+ *              Count can be positive or negative.
+ *
+ * @param[in]   rva     RVA of reference instruction
+ * @param[in]   count   Number of instruction
+ *
+ * @return      Return the disassembled instruction.
+ */
 Instruction_t Disassembly::DisassembleAt(ulong rva, ulong count)
 {
     rva = getNextInstructionRVA(rva, count);
@@ -403,12 +520,14 @@ int Disassembly::getInitialSelection()
     return mSelection.firstSelectedIndex;
 }
 
+
 void Disassembly::selectNext()
 {
     int wAddr = getIndexFromCount(getInitialSelection(), 1);
 
     setSingleSelection(wAddr);
 }
+
 
 void Disassembly::selectPrevious()
 {
@@ -434,6 +553,9 @@ bool Disassembly::isSelected(int base, int offset)
 }
 
 
+/************************************************************************************
+                        Index Management
+************************************************************************************/
 int Disassembly::getIndexFromCount(int index, int count)
 {
     int wAddr;

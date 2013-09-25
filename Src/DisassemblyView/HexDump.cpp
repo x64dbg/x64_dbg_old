@@ -1,6 +1,6 @@
 #include "HexDump.h"
 
-#include "HexDump.h"
+
 
 HexDump::HexDump(QWidget *parent) :AbstractTableView(parent)
 {
@@ -18,6 +18,12 @@ HexDump::HexDump(QWidget *parent) :AbstractTableView(parent)
     setRowCount(mMemoryView->size() / 16);
 
     qDebug() << "size" << getRowCount();
+
+
+
+    addColumnAt(getColumnCount(), 100, false);
+    addColumnAt(getColumnCount(), 100, false);
+    addColumnAt(getColumnCount(), 100, false);
 }
 
 

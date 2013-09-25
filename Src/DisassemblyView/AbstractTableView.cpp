@@ -3,7 +3,6 @@
 AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(parent)
 {
     // Class variable initialization
-    mSelection = (SelectionData_t){0, 0, 0};
     mTableOffset = 0;
     mHeader = (Header_t){true, 20, -1};
 
@@ -26,10 +25,6 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 
     mGuiState = AbstractTableView::NoState;
 
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
-
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
     setMouseTracking(true);
@@ -51,8 +46,6 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 void AbstractTableView::paintEvent(QPaintEvent* event)
 {
     QPainter wPainter(this->viewport());
-    QTextDocument wRichTextDoc;
-    wRichTextDoc.setDocumentMargin(0);
 
     int x = 0;
     int y = 0;
@@ -92,16 +85,6 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
             {
                QString wStr = paintContent(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
                wPainter.drawText(QRect(x + 4, y, getColumnWidth(j) - 4, getRowHeight()), Qt::AlignVCenter | Qt::AlignLeft, wStr);
-
-               /*
-               QRect wTextRect(0, 0, getColumnWidth(j) - 4, getRowHeight());
-               wRichTextDoc.setTextWidth(wTextRect.width());
-               wRichTextDoc.setHtml("<font face=\"" + this->font().family() + "\" size=\"" + this->font().pointSize() + "\">" + wStr + "</font>");
-               wPainter.save();
-               wPainter.translate(x + 4, y);
-               wRichTextDoc.drawContents(&wPainter, wTextRect);
-               wPainter.restore();
-               */
             }
 
             // Draw cell right border
@@ -123,7 +106,7 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
 /**
  * @brief       This method has been reimplemented. It manages the following actions:
  *               - Column resizing
- *               - Hedare button
+ *               - Header button
  *
  * @param[in]   event       Mouse event
  *
@@ -248,7 +231,9 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
 
 
 /**
- * @brief       The reimplementation of the mousePressEvent handles several GUI actions as column resizing, selection and header.
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Column resizing
+ *               - Header button
  *
  * @param[in]   event       Mouse event
  *
@@ -300,7 +285,9 @@ void AbstractTableView::mousePressEvent(QMouseEvent* event)
 
 
 /**
- * @brief       The reimplementation of the mouseReleaseEvent handles several GUI actions as column resizing, selection and header.
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Column resizing
+ *               - Header button
  *
  * @param[in]   event       Mouse event
  *
@@ -340,7 +327,8 @@ void AbstractTableView::mouseReleaseEvent(QMouseEvent* event)
 
 
 /**
- * @brief       The reimplementation of the mouseReleaseEvent handles key events.
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Pressed keys
  *
  * @param[in]   event       Key event
  *
@@ -350,12 +338,25 @@ void AbstractTableView::keyPressEvent(QKeyEvent* event)
 {
     int key = event->key();
 
-    if(key == Qt::Key_Up || key == Qt::Key_Down)
-        upDownKeyPressed(key);
-
+    if(key == Qt::Key_Up)
+    {
+        moveScrollBar(-1);
+    }
+    else if(key == Qt::Key_Down)
+    {
+        moveScrollBar(1);
+    }
 }
 
 
+/**
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Mouse wheel
+ *
+ * @param[in]   event       Wheel event
+ *
+ * @return      Nothing.
+ */
 void AbstractTableView::wheelEvent(QWheelEvent* event)
 {
     qDebug() << "wheelEvent";
@@ -373,7 +374,7 @@ void AbstractTableView::wheelEvent(QWheelEvent* event)
                             ScrollBar Management
  ***********************************************************************************/
 /**
- * @brief       vertSliderActionSlot is the slot connected to the actionTriggered signal from the vertical scrollbar.
+ * @brief       This method is the slot connected to the actionTriggered signal of the vertical scrollbar.
  *
  * @param[in]   action      Slider action type
  *
@@ -386,153 +387,21 @@ void AbstractTableView::vertSliderActionSlot(int action)
     int wDelta;
 
     // Saturate slider postion value
-    if(wSliderPosition < 0)
-        wSliderPosition = 0;
-    else if(wSliderPosition > getRowCount() - 1)
-        wSliderPosition = getRowCount() - 1;
-    else
-        wSliderPosition = wSliderPosition;
+    qBound((int)0, wSliderPosition, getRowCount() - 1);
 
     // Compute Delta
     wDelta = wSliderPosition - wOldValue;
 
     qDebug() << "Scroll Action Slot : wSliderPosition: " << wSliderPosition << " mTableOffset: " << mTableOffset << " wDelta: " << wDelta;
 
-    switch(action)
-    {
-        case QAbstractSlider::SliderSingleStepSub:
-        {
-            qDebug() << "SliderSingleStepSub";
-            mTableOffset += wDelta;//= getIndexFromCount(mTableOffset, wDelta);
-
-            break;
-        }
-
-        case QAbstractSlider::SliderPageStepSub:
-        {
-            qDebug() << "SliderPageStepSub";
-            mTableOffset += wDelta;//= getIndexFromCount(mTableOffset, wDelta);
-
-            break;
-        }
-
-        case QAbstractSlider::SliderSingleStepAdd:
-        {
-            qDebug() << "SliderSingleStepAdd";
-            mTableOffset += wDelta;//= getIndexFromCount(mTableOffset, wDelta);
-
-            break;
-        }
-
-        case QAbstractSlider::SliderPageStepAdd:
-        {
-            qDebug() << "SliderPageStepAdd";
-            mTableOffset += wDelta;//= getIndexFromCount(mTableOffset, wDelta);
-            break;
-        }
-
-        case QAbstractSlider::SliderToMinimum:
-            break;
-
-        case QAbstractSlider::SliderToMaximum:
-            break;
-
-        case QAbstractSlider::SliderMove:
-        {
-            qDebug() << "SliderMove";
-            int value = wSliderPosition;
-            /*
-            if(value > 0)
-            {
-                mTableOffset = getIndexFromCount(value, -1);
-                mTableOffset = getIndexFromCount(mTableOffset, 1);
-            }
-            else
-            {
-                mTableOffset = 0;
-            }
-            */
-            mTableOffset = value;
-
-            break;
-        }
-
-        case QAbstractSlider::SliderNoAction:
-        {
-            qDebug() << "SliderNoAction";
-            mTableOffset = wSliderPosition;// = getIndexFromCount(mTableOffset, wDelta);
-
-            break;
-        }
-
-        default:
-            break;
-    }
-
-    if(action != QAbstractSlider::SliderNoAction)
-        mTableOffset = sliderMovedAction(action, wOldValue, wDelta);
+    // Compute the new table offset
+    mTableOffset = sliderMovedAction(action, wOldValue, wDelta);
 
     verticalScrollBar()->setValue(mTableOffset);
 
     qDebug() << "New mTableOffset: " << mTableOffset;
 
-    viewport()->repaint();
-}
-
-
-void AbstractTableView::forceScrollBarValue(int val)
-{
-    verticalScrollBar()->setValue(val);
-    verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
-}
-
-void AbstractTableView::moveScrollBar(int delta)
-{
-    int wSliderPosition = verticalScrollBar()->sliderPosition();
-
-    verticalScrollBar()->setValue(wSliderPosition + delta);
-    verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepSub);
-}
-
-void AbstractTableView::upDownKeyPressed(int key)
-{
-    if(key == Qt::Key_Up)
-    {
-        moveScrollBar(-1);
-    }
-    else if(key == Qt::Key_Down)
-    {
-        moveScrollBar(1);
-    }
-}
-
-
-
-/**
- * @brief       Set the number of rows.
- *
- * @param[in]   count      Row count
- *
- * @return      Nothing.
- */
-void AbstractTableView::setRowCount(int count)
-{
-    mRowCount = count > 0 ? count : 0;
-    verticalScrollBar()->setRange(0, count > 0 ? count - 1 : 0);
-}
-
-
-/**
- * @brief       Move slider to value without trigger the actionTriggered signal of the vertical scrollbar.
- *
- * @param[in]   value      Set the number of rows
- *
- * @return      Nothing.
- */
-void AbstractTableView::setScrollBarValue(int value)
-{
-    verticalScrollBar()->setSliderPosition(value);
-    mTableOffset = value;
+    //viewport()->repaint();
 }
 
 
@@ -552,6 +421,37 @@ int AbstractTableView::sliderMovedAction(int type, int value, int delta)
     return value + delta;
 }
 
+
+/**
+ * @brief       This method set the verticall scrollbar to the given value and triggers the slider action slot with
+ *              the QAbstractSlider::SliderNoAction type.
+ *
+ * @param[in]   val      New slider value
+ *
+ * @return      Nothing.
+ */
+void AbstractTableView::forceScrollBarValue(int val)
+{
+    verticalScrollBar()->setValue(val);
+    verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
+}
+
+
+/**
+ * @brief       This method set the verticall scrollbar to the given value and triggers the slider action slot with
+ *              the QAbstractSlider::SliderSingleStepSub type.
+ *
+ * @param[in]   val      New slider value
+ *
+ * @return      Nothing.
+ */
+void AbstractTableView::moveScrollBar(int delta)
+{
+    int wSliderPosition = verticalScrollBar()->sliderPosition();
+
+    verticalScrollBar()->setValue(wSliderPosition + delta);
+    verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepSub);
+}
 
 
 /************************************************************************************
@@ -640,7 +540,7 @@ int AbstractTableView::transY(int y)
 
 
 /**
- * @brief       Returns the number of viewable rows (Partially viewable rows are aslo counted).
+ * @brief       Returns the number of viewable rows in the current window (Partially viewable rows are aslo counted).
  *
  * @return      Number of viewable rows.
  */
@@ -655,9 +555,6 @@ int AbstractTableView::getViewableRowsCount()
 }
 
 
-/************************************************************************************
-                            Data Accessor
-************************************************************************************/
 /**
  * @brief       Substract the header heigth from the given y.
  *
@@ -668,7 +565,7 @@ int AbstractTableView::getViewableRowsCount()
 int AbstractTableView::getLineToPrintcount()
 {
     int wViewableRowsCount = getViewableRowsCount();
-    int wRemainingRowsCount = getRowCount() - getTableOffset();
+    int wRemainingRowsCount = getRowCount() - mTableOffset;
     int wCount = wRemainingRowsCount > wViewableRowsCount ? wViewableRowsCount : wRemainingRowsCount;
     return wCount;
 }
@@ -677,6 +574,13 @@ int AbstractTableView::getLineToPrintcount()
 /************************************************************************************
                                 New Columns
 ************************************************************************************/
+/**
+ * @brief       Substract the header heigth from the given y.
+ *
+ * @param[in]   y      y coordinate
+ *
+ * @return      y - getHeaderHeigth().
+ */
 void AbstractTableView::addColumnAt(int at, int width, bool isClickable)
 {
     HeaderButton_t wHeaderButton;
@@ -702,6 +606,13 @@ void AbstractTableView::addColumnAt(int at, int width, bool isClickable)
 /************************************************************************************
                                 Getter & Setter
 ************************************************************************************/
+void AbstractTableView::setRowCount(int count)
+{
+    mRowCount = count > 0 ? count : 0;
+    verticalScrollBar()->setRange(0, count > 0 ? count - 1 : 0);
+}
+
+
 int AbstractTableView::getRowCount()
 {
     return mRowCount;
@@ -712,6 +623,7 @@ int AbstractTableView::getColumnCount()
 {
     return mColumnList.size();
 }
+
 
 int AbstractTableView::getRowHeight()
 {
