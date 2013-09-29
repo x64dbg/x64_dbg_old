@@ -22,13 +22,13 @@
 #ifdef _WIN64 //defined by default
 #define fhex "%.16llX"
 #define fext "ll"
-#define uint unsigned long long
-#define sint long long
+typedef unsigned long long uint;
+typedef long long sint;
 #else
 #define fhex "%.8X"
 #define fext ""
-#define uint unsigned long
-#define sint long
+typedef unsigned long uint;
+typedef long sint;
 #endif // _WIN64
 
 enum BITMASK
