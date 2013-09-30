@@ -9,6 +9,7 @@ MapViewOfMem::MapViewOfMem()
 
 MapViewOfMem::MapViewOfMem(QString file)
 {
+    mGuiMemDataCache = (MemDataCacheStruct_t){new QVector<byte_t>(0), 0, 0, false};
 
     mSelectedData.fromIndex = -1;
     mSelectedData.toIndex = -1;
@@ -45,9 +46,9 @@ MapViewOfMem::~MapViewOfMem()
 
 }
 
-QString MapViewOfMem::readByte(unsigned long long address)
+byte_t MapViewOfMem::readByte(uint64 rva)
 {
-    return QString::number(address);
+    return mData.data()[(uint32)rva];
 }
 
 unsigned long long MapViewOfMem::size()
@@ -75,3 +76,52 @@ ulong MapViewOfMem::getBase()
 {
     return mBase;
 }
+
+
+byte_t* MapViewOfMem::getDataPtrForGui(uint64 rva, uint32 maxNbrOfBytesToRead, uint32 newCacheSize)
+{
+    byte_t* wBytePtr = 0;
+
+    if(maxNbrOfBytesToRead > 0)
+    {
+        // Bound maxNbrOfBytesToRead to the max value it can take
+        if(maxNbrOfBytesToRead > (this->size() - rva))
+            maxNbrOfBytesToRead = this->size() - rva;
+
+        if((mGuiMemDataCache.isInit == true) && (rva >= mGuiMemDataCache.rva) && ((rva + (uint64)maxNbrOfBytesToRead) <= (mGuiMemDataCache.rva + (uint64)mGuiMemDataCache.memDataCacheSize)))
+        {
+            // Cache Success
+            wBytePtr = mGuiMemDataCache.memDataCachePtr->data() + (rva - mGuiMemDataCache.rva);
+        }
+        else
+        {
+            // Cache Miss
+            mGuiMemDataCache.memDataCacheSize = newCacheSize;
+            mGuiMemDataCache.memDataCachePtr->resize(newCacheSize);
+            mGuiMemDataCache.rva = rva;
+            wBytePtr = mGuiMemDataCache.memDataCachePtr->data();
+            // TODO: Fill cache
+            for(int wI = 0; wI < newCacheSize; wI++)
+            {
+                wBytePtr[wI] = readByte(rva + (uint64)wI);
+            }
+            mGuiMemDataCache.isInit = true;
+        }
+    }
+
+    return wBytePtr;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

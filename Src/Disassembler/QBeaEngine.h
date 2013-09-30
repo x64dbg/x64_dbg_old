@@ -6,6 +6,7 @@
 
 #define BEA_ENGINE_STATIC
 #include "BeaEngine.h"
+#include "NewTypes.h"
 
 
 
@@ -28,8 +29,7 @@ public:
 
     ulong DisassembleBack(char *data, ulong base, ulong size, ulong ip, int n);
     ulong DisassembleNext(char* data, ulong base, ulong size, ulong ip, int n);
-    
-    Instruction_t DisassembleAt(char* data, ulong base, ulong size, ulong ip);
+    Instruction_t DisassembleAt(unsigned char* data, int64 size, uint64 instIndex, uint64 origBase, uint64 origInstRVA);
 signals:
     
 public slots:

@@ -84,10 +84,10 @@ QBeaEngine::QBeaEngine()
  * @brief       Return the address of the nth instruction before the instruction pointed by ip.                 @n
  *              This function has been grab from OllyDbg ("Disassembleback" in asmserv.c)
  *
- * @param[in]   data    Pointer to the code data (Can be a buffer that is a copy of the original code)
- * @param[in]   base    RVA of the base (Same as data when data[] is a pointer to the original process memory)
- * @param[in]   size    Size of the memory page
- * @param[in]   ip      RVA of the current instruction (Original process memory)
+ * @param[in]   data    Base address of the memory (Can be a buffer that is a copy of the process memory)
+ * @param[in]   base    Original base address of the memory page (Required to disassemble destination addresses)
+ * @param[in]   size    Size of the memory page (Or the cache buffer)
+ * @param[in]   ip      RVA of the current instruction
  * @param[in]   n       Number of instruction back
  *
  * @return      Return the address of the nth instruction before the instruction pointed by ip
@@ -101,48 +101,48 @@ ulong QBeaEngine::DisassembleBack(char* data, ulong base, ulong size, ulong ip, 
 
     // Check if the pointer is not null
     if (data == NULL)
-    return 0;
+        return 0;
 
     // Round the number of back instructions to 127
     if(n < 0)
-    n = 0;
+        n = 0;
     else if (n > 127)
-    n = 127;
+        n = 127;
 
     // Check if the instruction pointer ip is not outside the memory range
-    if(ip > (base + size))
-    ip = base + size;
+    if(ip >= size)
+        ip = size - 1;
 
     // Obvious answer
     if(n == 0)
-    return ip;
+        return ip;
 
-    if(ip <= (base + n))
-    return base;
+    if(ip < n)
+        return base;
 
     back = 16 * (n + 3); // Instruction length limited to 16
 
-    if (ip < (base + back))
-    back = ip - base;
+    if(ip < back)
+        back = ip;
 
     addr = ip - back;
 
-    pdata = data + (addr - base);
+    pdata = data + addr;
 
-    for (i=0; addr<ip; i++)
+    for(i = 0; addr < ip; i++)
     {
-        abuf[i%128]=addr;
+        abuf[i%128] = addr;
 
         mDisasmStruct.EIP = (UIntPtr)pdata;
         len = Disasm(&mDisasmStruct);
         cmdsize = (len < 1) ? 1 : len ;
 
-        pdata+=cmdsize;
-        addr+=cmdsize;
-        back-=cmdsize;
+        pdata += cmdsize;
+        addr += cmdsize;
+        back -= cmdsize;
     }
 
-    if (i < n)
+    if(i < n)
         return abuf[0];
     else
         return abuf[(i - n + 128) % 128];
@@ -155,11 +155,11 @@ ulong QBeaEngine::DisassembleBack(char* data, ulong base, ulong size, ulong ip, 
  * @brief       Return the address of the nth instruction after the instruction pointed by ip.                 @n
  *              This function has been grab from OllyDbg ("Disassembleforward" in asmserv.c)
  *
- * @param[in]   data    Pointer to the code data (Can be a buffer that is a copy of the original code)
- * @param[in]   base    RVA of the base (Same as data when data[] is a pointer to the original process memory)
- * @param[in]   size    Size of the memory page
- * @param[in]   ip      RVA of the current instruction (Original process memory)
- * @param[in]   n       Number of instruction back
+ * @param[in]   data    Base address of the memory (Can be a buffer that is a copy of the process memory)
+ * @param[in]   base    Original base address of the memory page (Required to disassemble destination addresses)
+ * @param[in]   size    Size of the memory page (Or the cache buffer)
+ * @param[in]   ip      RVA of the current instruction
+ * @param[in]   n       Number of instruction next
  *
  * @return      Return the address of the nth instruction after the instruction pointed by ip
  */
@@ -173,17 +173,14 @@ ulong QBeaEngine::DisassembleNext(char* data, ulong base, ulong size, ulong ip, 
     if(data == NULL)
         return 0;
 
-    if(ip < base)
-        ip = base;
-
-    if (ip > (base + size))
-        ip = base + size;
+    if (ip >= size)
+        ip = size - 1;
 
     if(n <= 0)
         return ip;
 
-    pdata = data + (ip - base);
-    size -= (ip - base);
+    pdata = data + ip;
+    size -= ip;
 
     for(i = 0; i < n && size > 0; i++)
     {
@@ -200,15 +197,26 @@ ulong QBeaEngine::DisassembleNext(char* data, ulong base, ulong size, ulong ip, 
     return ip;
 }
 
-Instruction_t QBeaEngine::DisassembleAt(char* data, ulong base, ulong size, ulong ip)
+
+/**
+ * @brief       Disassemble the instruction at the given ip RVA.
+ *
+ * @param[in]   data            Pointer to memory data (Can be either a buffer or the original data memory)
+ * @param[in]   size            Size of the memory pointed by data (Can be the memory page size if data points to the original memory page base address)
+ * @param[in]   instIndex       Offset to reach the instruction data from the data pointer
+ * @param[in]   origBase        Original base address of the memory page (Required to disassemble destination addresses)
+ * @param[in]   origInstRVA     Original Instruction RVA of the instruction to disassemble
+ *
+ * @return      Return the disassembled instruction
+ */
+Instruction_t QBeaEngine::DisassembleAt(unsigned char* data, int64 size, uint64 instIndex, uint64 origBase, uint64 origInstRVA)
 {
-    long wInstRVA = (long)ip - (long)base;
     Instruction_t wInst;
     int len;
 
-    mDisasmStruct.EIP = (UIntPtr)(*((long*)(&data)) + (long)wInstRVA);
-    mDisasmStruct.VirtualAddr = ip;
-    mDisasmStruct.SecurityBlock = (UIntPtr)(size - wInstRVA);
+    mDisasmStruct.EIP = (UIntPtr)((uint64)data + (uint64)instIndex);
+    mDisasmStruct.VirtualAddr = origBase + origInstRVA;
+    mDisasmStruct.SecurityBlock = (UIntPtr)((uint64)size - instIndex);
 
     len = Disasm(&mDisasmStruct);
     len = (len < 1) ? 1 : len ;
@@ -217,7 +225,7 @@ Instruction_t QBeaEngine::DisassembleAt(char* data, ulong base, ulong size, ulon
 
     wInst.instStr = QString(mDisasmStruct.CompleteInstr);
     wInst.dump = QByteArray((char*)mDisasmStruct.EIP, len);
-    wInst.rva = wInstRVA;
+    wInst.rva = origInstRVA;
     wInst.lentgh = len;
     wInst.disasm = mDisasmStruct;
 

@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QDebug>
+#include "NewTypes.h"
 
 
 typedef struct _Selection_t
@@ -22,7 +23,7 @@ class MapViewOfMem
         explicit MapViewOfMem(QString file);
         explicit MapViewOfMem(unsigned long long startAddress , unsigned long long size);
         ~MapViewOfMem();
-        QString readByte(unsigned long long address);
+        byte_t readByte(uint64 rva);
         unsigned long long size();
         unsigned char *data();
 
@@ -30,8 +31,18 @@ class MapViewOfMem
         void setSelection(Selection_t sel);
 
         ulong getBase();
+        byte_t* getDataPtrForGui(uint64 rva, uint32 maxNbrOfBytesToRead, uint32 newCacheSize);
 
     private:
+        typedef struct _MemDataCacheStruct_t
+        {
+            QVector<byte_t>* memDataCachePtr;
+            uint32 memDataCacheSize;
+            uint64 rva;
+            bool isInit;
+        } MemDataCacheStruct_t;
+
+
         ulong mBase;
         unsigned long mStartAddress;
         unsigned long mEndAddress;
@@ -40,6 +51,8 @@ class MapViewOfMem
         QByteArray mData;
 
         Selection_t mSelectedData;
+
+        MemDataCacheStruct_t mGuiMemDataCache;
 };
 
 #endif // MAPVIEWOFMEM_H

@@ -46,6 +46,8 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 void AbstractTableView::paintEvent(QPaintEvent* event)
 {
     QPainter wPainter(this->viewport());
+    int wViewableRowsCount = getViewableRowsCount();
+    int wLineToPrintcount = getLineToPrintcount();
 
     int x = 0;
     int y = 0;
@@ -78,10 +80,10 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
     // Iterate over all columns and cells
     for(int j = 0; j < getColumnCount(); j++)
     {
-        for(int i = 0; i < getViewableRowsCount(); i++)
+        for(int i = 0; i < wViewableRowsCount; i++)
         {
             //  Draw cells content
-            if(i < getLineToPrintcount())
+            if(i < wLineToPrintcount)
             {
                QString wStr = paintContent(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
                wPainter.drawText(QRect(x + 4, y, getColumnWidth(j) - 4, getRowHeight()), Qt::AlignVCenter | Qt::AlignLeft, wStr);

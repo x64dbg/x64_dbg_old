@@ -8,6 +8,7 @@
 #include "Disassembly.h"
 //#include "StdTable.h"
 #include "HexDump.h"
+#include "ProcessMemoryMap.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,8 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
+
+    //ProcessMemoryMap m("");
 
 
     //CPUSubWindow cpuWin;

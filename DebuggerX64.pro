@@ -10,6 +10,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 #CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
+#QMAKE_CXXFLAGS += -fpermissive
+
 TARGET = DebuggerX64
 TEMPLATE = app
 
@@ -22,7 +24,9 @@ SOURCES += \
     Src/Disassembler/QBeaEngine.cpp \
     Src/DisassemblyView/AbstractTableView.cpp \
     Src/DisassemblyView/Disassembly.cpp \
-    Src/DisassemblyView/HexDump.cpp
+    Src/DisassemblyView/HexDump.cpp \
+    Src/Memory/ProcessMemoryMap.cpp \
+    Src/Memory/ProcessMemoryCache.cpp
 
 HEADERS  += \
     Src/Gui/MainWindow.h \
@@ -32,7 +36,9 @@ HEADERS  += \
     Src/DisassemblyView/AbstractTableView.h \
     Src/DisassemblyView/Disassembly.h \
     Src/Global/NewTypes.h \
-    Src/DisassemblyView/HexDump.h
+    Src/DisassemblyView/HexDump.h \
+    Src/Memory/ProcessMemoryMap.h \
+    Src/Memory/ProcessMemoryCache.h
 
 INCLUDEPATH += \
     Src/Gui \
@@ -40,7 +46,8 @@ INCLUDEPATH += \
     Src/Memory \
     Src/BeaEngine/headers \
     Src/Disassembler \
-    Src/BeaEngine
+    Src/BeaEngine \
+    Src/Global
 
 FORMS    += \
     Src/Gui/MainWindow.ui \

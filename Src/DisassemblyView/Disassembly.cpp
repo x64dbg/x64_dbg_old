@@ -20,7 +20,6 @@ Disassembly::Disassembly(QWidget *parent) : AbstractTableView(parent)
     addColumnAt(getColumnCount(), 100, false);
     addColumnAt(getColumnCount(), 100, false);
     addColumnAt(getColumnCount(), 100, false);
-
 }
 
 
@@ -419,13 +418,24 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
  */
 int Disassembly::getPreviousInstructionRVA(int rva, int count)
 {
-    unsigned char* wBase = mMemoryView->data();
-    unsigned char* wIp = mMemoryView->data() + rva;
+    int64 wBottomByteRealRVA = (int64)rva - 16 * (count + 3);
+    wBottomByteRealRVA = wBottomByteRealRVA < 0 ? 0 : wBottomByteRealRVA;
 
-    ulong addr = mDisasm->DisassembleBack((char*)mMemoryView->data(), *((ulong*)(&wBase)), (ulong)mMemoryView->size(), *((ulong*)(&wIp)), count);
-    return addr - *((ulong*)(&wBase));
+    int64 wVirtualRVA = (int64)rva - wBottomByteRealRVA;
 
-    //return (count > address ? 0 : address - count);
+    int64 wMaxByteCountToRead = wVirtualRVA + 1 + 16;
+
+    uint32 wNewCacheSize = wMaxByteCountToRead > 16 * (getViewableRowsCount() + 20) ? wMaxByteCountToRead : 16 * (getViewableRowsCount() + 20);
+
+    unsigned char* wVirtualBaseAddr = mMemoryView->getDataPtrForGui(wBottomByteRealRVA, wMaxByteCountToRead,  wNewCacheSize);
+
+
+    ulong addr = mDisasm->DisassembleBack((char*)wVirtualBaseAddr, 0,  wMaxByteCountToRead, wVirtualRVA, count);
+
+    addr += rva - wVirtualRVA;
+
+    return addr;
+
 }
 
 
@@ -439,13 +449,19 @@ int Disassembly::getPreviousInstructionRVA(int rva, int count)
  */
 int Disassembly::getNextInstructionRVA(int rva, int count)
 {
-    unsigned char* wBase = mMemoryView->data();
-    unsigned char* wIp = mMemoryView->data() + rva;
+    int64 wVirtualRVA = 0;
+    int64 wRemainingBytes = mMemoryView->size() - rva;
+    int64 wMaxByteCountToRead = 16 * (count + 1);
+    wMaxByteCountToRead = wRemainingBytes > wMaxByteCountToRead ? wMaxByteCountToRead : wRemainingBytes;
 
-    ulong addr = mDisasm->DisassembleNext((char*)mMemoryView->data(), *((ulong*)(&wBase)), (ulong)mMemoryView->size(), *((ulong*)(&wIp)), count);
-    return addr - *((ulong*)(&wBase));
+    uint32 wNewCacheSize = wMaxByteCountToRead > 16 * (getViewableRowsCount() + 20) ? wMaxByteCountToRead : 16 * (getViewableRowsCount() + 20);
 
-    //return address + count;
+    unsigned char* wVirtualBaseAddr = mMemoryView->getDataPtrForGui(rva, wMaxByteCountToRead,  wNewCacheSize);
+
+    ulong addr = mDisasm->DisassembleNext((char*)wVirtualBaseAddr, 0,  wMaxByteCountToRead, wVirtualRVA, count);
+    addr += rva;
+
+    return addr;
 }
 
 
@@ -458,12 +474,13 @@ int Disassembly::getNextInstructionRVA(int rva, int count)
  */
 Instruction_t Disassembly::DisassembleAt(ulong rva)
 {
-    char* data = (char*)mMemoryView->data();
     ulong base = mMemoryView->getBase();
-    ulong size = mMemoryView->size();
-    ulong ip = base + rva;
+    int64 wMaxByteCountToRead = 16 * 2;
+    uint32 wNewCacheSize = wMaxByteCountToRead > 16 * (getViewableRowsCount() + 20) ? wMaxByteCountToRead : 16 * (getViewableRowsCount() + 20);
 
-    return mDisasm->DisassembleAt(data, base, size, ip);
+    unsigned char* wVirtualBaseAddr = mMemoryView->getDataPtrForGui(rva, wMaxByteCountToRead,  wNewCacheSize);
+
+    return mDisasm->DisassembleAt(wVirtualBaseAddr, wMaxByteCountToRead, 0, base, rva);
 }
 
 
@@ -479,13 +496,7 @@ Instruction_t Disassembly::DisassembleAt(ulong rva)
 Instruction_t Disassembly::DisassembleAt(ulong rva, ulong count)
 {
     rva = getNextInstructionRVA(rva, count);
-
-    char* data = (char*)mMemoryView->data();
-    ulong base = mMemoryView->getBase();
-    ulong size = mMemoryView->size();
-    ulong ip = base + rva;
-
-    return mDisasm->DisassembleAt(data, base, size, ip);
+    return DisassembleAt(rva);
 }
 
 
