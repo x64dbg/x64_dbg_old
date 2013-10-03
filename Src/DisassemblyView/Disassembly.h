@@ -3,15 +3,21 @@
 
 #include <QtGui>
 #include <qdebug.h>
+#include "NewTypes.h"
 #include "AbstractTableView.h"
 #include "MapViewOfMem.h"
 #include "QBeaEngine.h"
+#include "MemoryPage.h"
 
 class Disassembly : public AbstractTableView
 {
     Q_OBJECT
 public:
-    explicit Disassembly(QWidget *parent = 0);
+    explicit Disassembly(MemoryPage *parMemPage, QWidget *parent = 0);
+
+    // Memory page
+    void setMemoryPage(MemoryPage* parMemPage);
+    void disassambleAt(uint64 parRVA);
 
     // Reimplemented Functions
     QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
@@ -65,6 +71,10 @@ private:
     bool mIsLastInstDisplayed;
 
     GuiState_t mGuiState;
+
+    MemoryPage* mMemPage;
+
+    uint64 mEIP;
 };
 
 #endif // DISASSEMBLY_H

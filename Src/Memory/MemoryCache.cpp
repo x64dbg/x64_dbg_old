@@ -1,18 +1,18 @@
-#include "ProcessMemoryCache.h"
+#include "MemoryCache.h"
 
-ProcessMemoryCache::ProcessMemoryCache(QObject *parent) : QObject(parent)
+MemoryCache::MemoryCache(QObject *parent) : QObject(parent)
 {
     mMemDataCache = (MemDataCacheStruct_t){new QByteArray(), 0, 0, false};
 }
 
-void ProcessMemoryCache::setMemoryToCache(uint64 parBase, uint64 parSize)
+void MemoryCache::setMemoryToCache(uint64 parBase, uint64 parSize)
 {
     mBase = parBase;
     mSize = parSize;
 }
 
 
-byte_t* ProcessMemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize)
+byte_t* MemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize)
 {
     byte_t* wBytePtr = 0;
 
@@ -38,10 +38,8 @@ byte_t* ProcessMemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint6
             mMemDataCache.rva = parRVA;
             wBytePtr = reinterpret_cast<byte_t*>(mMemDataCache.memDataCachePtr->data());
             // TODO: Fill cache
-            for(int wI = 0; wI < parCacheNewSize; wI++)
-            {
-                //wBytePtr[wI] = readByte(parRVA + (uint64)wI);
-            }
+            getBridge()->readProcessMemory(wBytePtr, parRVA, parCacheNewSize);
+
             mMemDataCache.isInit = true;
         }
     }

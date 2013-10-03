@@ -5,13 +5,15 @@
 #include <QDebug>
 #include <QtGui>
 #include "NewTypes.h"
+#include "Bridge.h"
 #include "windows.h"
+#include "main.h"
 
-class ProcessMemoryCache : public QObject
+class MemoryCache : public QObject
 {
     Q_OBJECT
 public:
-    explicit ProcessMemoryCache(QObject *parent = 0);
+    explicit MemoryCache(QObject *parent = 0);
 
     void setMemoryToCache(uint64 parBase, uint64 parSize);
     byte_t* readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize);
@@ -35,7 +37,6 @@ private:
 
     uint64 mBase;
     uint64 mSize;
-    
 };
 
 #endif // PROCESSMEMORYCACHE_H

@@ -14,7 +14,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = DebuggerX64
 TEMPLATE = app
+#TEMPLATE = lib
 
+#DEFINES += BUILD_LIB
 
 SOURCES += \
     Src/Gui/MainWindow.cpp \
@@ -26,7 +28,11 @@ SOURCES += \
     Src/DisassemblyView/Disassembly.cpp \
     Src/DisassemblyView/HexDump.cpp \
     Src/Memory/ProcessMemoryMap.cpp \
-    Src/Memory/ProcessMemoryCache.cpp
+    Src/Memory/MemoryPage.cpp \
+    Src/Memory/MemoryCache.cpp \
+    Src/Bridge/Bridge.cpp \
+    Src/Imports.cpp \
+    Src/Exports.cpp
 
 HEADERS  += \
     Src/Gui/MainWindow.h \
@@ -38,16 +44,23 @@ HEADERS  += \
     Src/Global/NewTypes.h \
     Src/DisassemblyView/HexDump.h \
     Src/Memory/ProcessMemoryMap.h \
-    Src/Memory/ProcessMemoryCache.h
+    Src/Memory/MemoryPage.h \
+    Src/Memory/MemoryCache.h \
+    Src/Bridge/Bridge.h \
+    Src/Exports.h \
+    Src/Imports.h \
+    Src/main.h
 
 INCLUDEPATH += \
+    Src \
     Src/Gui \
     Src/DisassemblyView \
     Src/Memory \
     Src/BeaEngine/headers \
     Src/Disassembler \
     Src/BeaEngine \
-    Src/Global
+    Src/Global \
+    Src/Bridge
 
 FORMS    += \
     Src/Gui/MainWindow.ui \

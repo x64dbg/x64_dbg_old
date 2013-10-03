@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include <QtGui>
 #include "CPUWidget.h"
-#include "Disassembly.h"
-
 
 namespace Ui {
 class MainWindow;

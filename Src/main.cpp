@@ -10,12 +10,28 @@
 #include "HexDump.h"
 #include "ProcessMemoryMap.h"
 
+#include "Imports.h"
+#include "main.h"
+
+
+Bridge* mBridge;
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    iInitDbg();
+
+    mBridge = new Bridge();
+
+
+
+
     MainWindow w;
     w.show();
+
+
+
 
     //ProcessMemoryMap m("");
 
@@ -71,4 +87,11 @@ int main(int argc, char *argv[])
 */
 
     return a.exec();
+}
+
+
+
+Bridge* getBridge()
+{
+    return mBridge;
 }
