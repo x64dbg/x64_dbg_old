@@ -21,6 +21,7 @@ signals:
 public slots:
 
 private:
+    QByteArray* mData;
 
 };
 

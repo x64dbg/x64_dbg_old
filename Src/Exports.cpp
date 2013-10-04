@@ -3,18 +3,15 @@
 
 #ifdef BUILD_LIB
 
-__declspec(dllexport) int launchGUI(int argc, char *argv[])
+#include "main.h"
+
+
+__declspec(dllexport) int _gui_guiinit(int argc, char *argv[])
 {
-    QApplication wApp(argc, argv);
-    Bridge wBridge;
-
-    MainWindow wMainWin;
-    wMainWin.show();
-
-    return wApp.exec();
+    return main(argc, argv);
 }
 
-__declspec(dllexport) int GuiChangeEIP(unsigned long long eip)
+__declspec(dllexport) int _gui_guichangeeip(unsigned long long eip)
 {
 
 }

@@ -13,10 +13,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 #QMAKE_CXXFLAGS += -fpermissive
 
 TARGET = DebuggerX64
-TEMPLATE = app
-#TEMPLATE = lib
+#TEMPLATE = app
+TEMPLATE = lib
 
-#DEFINES += BUILD_LIB
+DEFINES += BUILD_LIB
 
 SOURCES += \
     Src/Gui/MainWindow.cpp \
@@ -69,5 +69,19 @@ FORMS    += \
 
 
 LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s_64
+LIBS += -L"$$PWD/Src/Bridge/" -lbridge.dll
 
 INCLUDEPATH += $$PWD/Src/BeaEngine_s_64
+INCLUDEPATH += $$PWD/Src/Bridge
+
+
+
+
+
+
+
+
+
+
+
+
