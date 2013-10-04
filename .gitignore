@@ -1,13 +1,23 @@
-obj/
+#ignore object files
+*/obj/
+#global filetypes to ignore
 *.depend
 *.layout
-ODbgScript.chm
-ODbgScript.chw
-CppCheckResults.xml
 *.cscope_file_list
-.cccc/
-/bin/*/gui.ini
+*.bmarks
+*.chw
+#binary files to ignore
+bin/*/gui.ini
 bin/x32/test2.exe
 bin/x32/unpackme.exe
-*.bmarks
-suggestions.txt
+#debugger files to ignore
+x64_dbg_dbg/ODbgScript.chm
+x64_dbg_dbg/ODbgScript.chw
+x64_dbg_dbg/CppCheckResults.xml
+x64_dbg_dbg/.cccc/
+x64_dbg_dbg/suggestions.txt
+
+
+
+
+todo_bridge.txt
