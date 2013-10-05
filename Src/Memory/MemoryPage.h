@@ -16,6 +16,8 @@ public:
     explicit MemoryPage(MEMORY_BASIC_INFORMATION parMemInfo, QObject *parent = 0);
 
     byte_t* readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize);
+    uint64 getSize();
+    uint64 getBase();
     
 signals:
     

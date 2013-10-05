@@ -38,7 +38,7 @@ byte_t* MemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCa
             mMemDataCache.rva = parRVA;
             wBytePtr = reinterpret_cast<byte_t*>(mMemDataCache.memDataCachePtr->data());
             // TODO: Fill cache
-            getBridge()->readProcessMemory(wBytePtr, parRVA, parCacheNewSize);
+            Bridge::getBridge()->readProcessMemory(wBytePtr, parRVA, parCacheNewSize);
 
             mMemDataCache.isInit = true;
         }

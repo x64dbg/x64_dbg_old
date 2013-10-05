@@ -13,16 +13,17 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 #QMAKE_CXXFLAGS += -fpermissive
 
 TARGET = DebuggerX64
-#TEMPLATE = app
-TEMPLATE = lib
 
 DEFINES += BUILD_LIB
+TEMPLATE = lib
+#TEMPLATE = app
+
+
 
 SOURCES += \
     Src/Gui/MainWindow.cpp \
     Src/main.cpp \
     Src/Gui/CPUWidget.cpp \
-    Src/Memory/MapViewOfMem.cpp \
     Src/Disassembler/QBeaEngine.cpp \
     Src/DisassemblyView/AbstractTableView.cpp \
     Src/DisassemblyView/Disassembly.cpp \
@@ -31,13 +32,11 @@ SOURCES += \
     Src/Memory/MemoryPage.cpp \
     Src/Memory/MemoryCache.cpp \
     Src/Bridge/Bridge.cpp \
-    Src/Imports.cpp \
-    Src/Exports.cpp
+    Src/Memory/MapViewOfMem.cpp
 
 HEADERS  += \
     Src/Gui/MainWindow.h \
     Src/Gui/CPUWidget.h \
-    Src/Memory/MapViewOfMem.h \
     Src/Disassembler/QBeaEngine.h \
     Src/DisassemblyView/AbstractTableView.h \
     Src/DisassemblyView/Disassembly.h \
@@ -49,7 +48,8 @@ HEADERS  += \
     Src/Bridge/Bridge.h \
     Src/Exports.h \
     Src/Imports.h \
-    Src/main.h
+    Src/main.h \
+    Src/Memory/MapViewOfMem.h
 
 INCLUDEPATH += \
     Src \

@@ -5,7 +5,6 @@
 #include <qdebug.h>
 #include "NewTypes.h"
 #include "AbstractTableView.h"
-#include "MapViewOfMem.h"
 #include "QBeaEngine.h"
 #include "MemoryPage.h"
 
@@ -17,7 +16,6 @@ public:
 
     // Memory page
     void setMemoryPage(MemoryPage* parMemPage);
-    void disassambleAt(uint64 parRVA);
 
     // Reimplemented Functions
     QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
@@ -51,6 +49,7 @@ public:
 signals:
     
 public slots:
+    void disassambleAt(uint64 parRVA);
 
 private:
     enum GuiState_t {NoState, MultiRowsSelectionState};
@@ -63,7 +62,6 @@ private:
         int toIndex;
     } SelectionData_t;
 
-    MapViewOfMem* mMemoryView;
     QBeaEngine* mDisasm;
 
     SelectionData_t mSelection;

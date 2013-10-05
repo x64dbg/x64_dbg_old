@@ -1,97 +1,29 @@
-#include "MainWindow.h"
 #include <QApplication>
 #include <QtGui>
-#include "CPUWidget.h"
+#include "MainWindow.h"
+#include "NewTypes.h"
 
-#include "MapViewOfMem.h"
-#include "QBeaEngine.h"
-#include "Disassembly.h"
-//#include "StdTable.h"
-#include "HexDump.h"
-#include "ProcessMemoryMap.h"
-
-#include "Imports.h"
-#include "main.h"
-
-
-Bridge* mBridge;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    qRegisterMetaType<int32>("int32");
+    qRegisterMetaType<uint32>("uint32");
+
+    qRegisterMetaType<int64>("int64");
+    qRegisterMetaType<uint64>("uint64");
+
+    qRegisterMetaType<byte_t>("byte_t");
+
     //iInitDbg();
 
-    mBridge = new Bridge();
-
-
-
+    Bridge::initBridge();
 
     MainWindow w;
     w.show();
-
-
-
-
-    //ProcessMemoryMap m("");
-
-
-    //CPUSubWindow cpuWin;
-    //cpuWin.show();
-
-    //CPUWidget cpuWin;
-    //cpuWin.show();
-
-
-    //QBeaEngine disasm;
-
-/*
-    HexDump hexDump(0);
-    hexDump.callVirtual();
-    hexDump.resize(QSize(600,600));
-    hexDump.show();
-*/
-/*
-    Disassembly d(0);
-    d.resize(QSize(600,600));
-    d.show();
-*/
-
-
-
-/*
-    StdTable table(0);
-    table.resize(QSize(600,600));
-    table.show();
-*/
-/*
-    MapViewOfMem mem("AsmCode.bin");
-    DisassemblyView dis(mem,0);
-    dis.resize(QSize(600,600));
-    dis.show();
-    */
-
-/*
-    QWidget fenetre;
-    fenetre.setFixedSize(300, 150);
-
-    // Création du bouton, ayant pour parent la "fenêtre"
-    QPushButton bouton("Pimp mon bouton !", &fenetre);
-    // Personnalisation du bouton
-    bouton.setFont(QFont("Comic Sans MS", 14));
-    bouton.setCursor(Qt::PointingHandCursor);
-    bouton.setIcon(QIcon("smile.png"));
-
-    // Affichage de la fenêtre
-    fenetre.show();
-*/
 
     return a.exec();
 }
 
 
-
-Bridge* getBridge()
-{
-    return mBridge;
-}

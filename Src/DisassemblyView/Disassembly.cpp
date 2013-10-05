@@ -10,20 +10,21 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
 
     mEIP = 0;
 
-    mMemoryView = new MapViewOfMem("AsmCode.bin");
     mDisasm = new QBeaEngine();
 
     mIsLastInstDisplayed = false;
 
     mGuiState = Disassembly::NoState;
 
-    setRowCount(mMemoryView->size());
+    setRowCount(parMemPage->getSize());
 
-    qDebug() << "size" << mMemoryView->size();
+    qDebug() << "size" << parMemPage->getSize();
 
     addColumnAt(getColumnCount(), 100, false);
     addColumnAt(getColumnCount(), 100, false);
     addColumnAt(getColumnCount(), 100, false);
+
+    connect(Bridge::getBridge(), SIGNAL(emitEIPChangedSignal(uint64)), this, SLOT(disassambleAt(uint64)));
 }
 
 
@@ -338,9 +339,9 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
     {
         ulong destRVA = (ulong)instruction.disasm.Instruction.AddrValue;
 
-        if(destRVA > (ulong)mMemoryView->getBase())
+        if(destRVA > (ulong)mMemPage->getBase())
         {
-            destRVA -= (ulong)mMemoryView->getBase();
+            destRVA -= (ulong)mMemPage->getBase();
 
             if(destRVA < selHeadRVA)
             {
@@ -454,7 +455,7 @@ int Disassembly::getPreviousInstructionRVA(int rva, int count)
 int Disassembly::getNextInstructionRVA(int rva, int count)
 {
     int64 wVirtualRVA = 0;
-    int64 wRemainingBytes = mMemoryView->size() - rva;
+    int64 wRemainingBytes = mMemPage->getSize() - rva;
     int64 wMaxByteCountToRead = 16 * (count + 1);
     wMaxByteCountToRead = wRemainingBytes > wMaxByteCountToRead ? wMaxByteCountToRead : wRemainingBytes;
 
@@ -479,7 +480,7 @@ int Disassembly::getNextInstructionRVA(int rva, int count)
  */
 Instruction_t Disassembly::DisassembleAt(ulong rva)
 {
-    ulong base = mMemoryView->getBase();
+    ulong base = mMemPage->getBase();
     int64 wMaxByteCountToRead = 16 * 2;
     uint32 wNewCacheSize = wMaxByteCountToRead > 16 * (getViewableRowsCount() + 20) ? wMaxByteCountToRead : 16 * (getViewableRowsCount() + 20);
 
@@ -632,4 +633,6 @@ void Disassembly::disassambleAt(uint64 parRVA)
 {
     forceScrollBarValue(parRVA);
     mEIP = parRVA;
+
+    QMessageBox::information(this, "EIP Changed", "EIP Changed");
 }

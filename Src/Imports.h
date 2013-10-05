@@ -8,9 +8,7 @@
 #else
     #include "NewTypes.h"
 
-    void iInitDbg();
-    void iReadProcessMemory(byte_t* dest, uint64 rva, uint64 size);
-    unsigned long long iGetMemSize();
+    void stubReadProcessMemory(byte_t* dest, uint64 rva, uint64 size);
 #endif
 
 
