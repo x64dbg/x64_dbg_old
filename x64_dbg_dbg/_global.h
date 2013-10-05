@@ -74,6 +74,9 @@ enum BITMASK
     BIT32=0x80000000
 };
 
+//superglobal variables
+extern HINSTANCE hInst;
+
 //functions
 void* emalloc(size_t size);
 void efree(void* ptr);

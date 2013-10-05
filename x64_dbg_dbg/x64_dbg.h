@@ -1,5 +1,5 @@
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef _X64_DBG_H
+#define _X64_DBG_H
 
 #include <windows.h>
 #include "_global.h"
@@ -15,4 +15,4 @@ const char* DLL_EXPORT _dbg_dbginit();
 }
 #endif
 
-#endif // __MAIN_H__
+#endif // _X64_DBG_H

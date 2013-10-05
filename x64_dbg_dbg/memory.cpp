@@ -24,7 +24,7 @@ uint memfindbaseaddr(HANDLE hProcess, uint addr, uint* size)
     return 0;
 }
 
-bool memread(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, DWORD nSize, SIZE_T* lpNumberOfBytesRead)
+bool memread(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead)
 {
     uint size;
     uint base=memfindbaseaddr(hProcess, (uint)lpBaseAddress, &size);

@@ -9,8 +9,10 @@
 #include "gui\disasm.h"
 #include "gui\memmap.h"
 #include "memory.h"
+#include "..\x64_dbg_bridge\bridgemain.h"
 
-PROCESS_INFORMATION* fdProcessInfo;
+static PROCESS_INFORMATION g_pi={0,0,0,0};
+PROCESS_INFORMATION* fdProcessInfo=&g_pi;
 static char szFileName[deflen]="";
 bool bFileIsDll;
 BREAKPOINT* bplist=0;
@@ -88,9 +90,11 @@ void DebugUpdateDisasm(uint disasm_addr)
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
-    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, GetContextData(UE_CIP));
+    uint cip=GetContextData(UE_CIP);
+    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, cip);
     efree(mem);
-    //TODO: call QT Gui
+    //call 'real' GUI
+    GuiChangeCIP(cip);
 }
 
 static void cbUserBreakpoint()
@@ -322,6 +326,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
         fdProcessInfo=(PROCESS_INFORMATION*)InitDebugEx(init->exe, init->commandline, init->currentfolder, (void*)cbEntryBreakpoint);
     if(!fdProcessInfo)
     {
+        fdProcessInfo=&g_pi;
         cputs("error starting process (invalid pe?)!");
         unlock(WAITID_SYSBREAK);
         return 0;

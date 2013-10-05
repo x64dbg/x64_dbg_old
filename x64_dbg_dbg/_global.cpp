@@ -1,5 +1,7 @@
 #include "_global.h"
 
+HINSTANCE hInst;
+
 void* emalloc(size_t size)
 {
     unsigned char* a=new unsigned char[size];

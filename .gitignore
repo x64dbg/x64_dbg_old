@@ -7,7 +7,7 @@
 *.bmarks
 *.chw
 #binary files to ignore
-bin/*/gui.ini
+gui.ini
 bin/x32/test2.exe
 bin/x32/unpackme.exe
 #debugger files to ignore
