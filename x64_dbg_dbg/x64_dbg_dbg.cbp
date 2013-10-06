@@ -23,7 +23,7 @@
 					<Add library=".\TitanEngine\TitanEngine_x86.a" />
 					<Add library=".\libdbg_x32.a" />
 					<Add library=".\gui\libgui_x32.a" />
-					<Add library="..\bin\x32\libbridge.a" />
+					<Add library="..\bin\x32\libx32_bridge.a" />
 				</Linker>
 			</Target>
 			<Target title="x64">
@@ -43,7 +43,7 @@
 					<Add library=".\TitanEngine\TitanEngine_x64.a" />
 					<Add library=".\libdbg_x64.a" />
 					<Add library=".\gui\libgui_x64.a" />
-					<Add library="..\bin\x64\libbridge.a" />
+					<Add library="..\bin\x64\libx64_bridge.a" />
 				</Linker>
 			</Target>
 		</Build>
