@@ -33,7 +33,7 @@ Bridge::Bridge(QObject *parent) : QObject(parent)
 void Bridge::readProcessMemory(byte_t* dest, uint64 rva, uint64 size)
 {
 #ifdef BUILD_LIB
-    DbgMemRead(dest, 0x00401000 + rva, size);
+    DbgMemRead(dest, rva, size);
 #else
     stubReadProcessMemory(dest, rva, size);
 #endif
@@ -41,15 +41,26 @@ void Bridge::readProcessMemory(byte_t* dest, uint64 rva, uint64 size)
 
 void Bridge::emitEIPChangedSignal(uint64 eip)
 {
+#ifdef BUILD_LIB
     emit eipChanged(eip);
+#endif
 }
 
-uint64 Bridge::getSize()
+uint64 Bridge::getSize(uint64 va)
 {
 #ifdef BUILD_LIB
-    return DbgMemGetPageSize(0x00401000);
+    return DbgMemGetPageSize(va);
 #else
     return mData->size();
+#endif
+}
+
+uint64 Bridge::getBase(uint64 addr)
+{
+#ifdef BUILD_LIB
+    return DbgMemFindBaseAddr(addr,0);
+#else
+    return 0x00401000;
 #endif
 }
 
@@ -83,7 +94,7 @@ Bridge* Bridge::initBridge()
 
 
 
-    __declspec(dllexport) int _gui_guichangeeip(unsigned long long eip)
+    __declspec(dllexport) int _gui_changecip(unsigned long long eip)
     {
         Bridge::getBridge()->emitEIPChangedSignal(eip);
     }
@@ -94,19 +105,14 @@ Bridge* Bridge::initBridge()
                             Imported Functions (Stub)
 ************************************************************************************/
 #ifndef BUILD_LIB
-    void stubReadProcessMemory(byte_t* dest, uint64 rva, uint64 size)
+    void stubReadProcessMemory(byte_t* dest, uint64 va, uint64 size)
     {
         uint64 wI;
 
         for(wI = 0; wI < size; wI++)
         {
-            dest[wI] = Bridge::getBridge()->mData->data()[rva + wI];
+            dest[wI] = Bridge::getBridge()->mData->data()[(va - Bridge::getBridge()->getBase(0)) + wI];
         }
-    }
-
-    unsigned long long iGetMemSize()
-    {
-        return Bridge::getBridge()->mData->size();
     }
 #endif
 

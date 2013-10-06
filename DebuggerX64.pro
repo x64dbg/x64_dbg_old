@@ -69,7 +69,7 @@ FORMS    += \
 
 
 LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s_64
-LIBS += -L"$$PWD/Src/Bridge/" -lbridge.dll
+LIBS += -L"$$PWD/Src/Bridge/" -lbridge
 
 INCLUDEPATH += $$PWD/Src/BeaEngine_s_64
 INCLUDEPATH += $$PWD/Src/Bridge

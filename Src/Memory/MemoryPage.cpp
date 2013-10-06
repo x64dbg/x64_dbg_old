@@ -1,12 +1,11 @@
 #include "MemoryPage.h"
 
-MemoryPage::MemoryPage(MEMORY_BASIC_INFORMATION parMemInfo, QObject *parent) : QObject(parent)
+MemoryPage::MemoryPage(uint64 parBase, uint64 parSize, QObject *parent) : QObject(parent)
 {
-    mMBI = parMemInfo;
+    mBase = 0;
+    mSize = 0;
     mMemCache = new MemoryCache();
-    //mMemCache->setMemoryToCache(reinterpret_cast<uint64>(parMemInfo.BaseAddress), parMemInfo.RegionSize);
-
-    mMemCache->setMemoryToCache(0x00401000, Bridge::getBridge()->getSize());
+    mMemCache->setMemoryToCache(0, 0);
 }
 
 byte_t* MemoryPage::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize)
@@ -17,10 +16,25 @@ byte_t* MemoryPage::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCac
 
 uint64 MemoryPage::getSize()
 {
-    return Bridge::getBridge()->getSize();
+    return mSize;
 }
+
 
 uint64 MemoryPage::getBase()
 {
-    return 0x00401000;
+    return mBase;
+}
+
+
+void MemoryPage::setAttributes(uint64 base, uint64 size)
+{
+    mBase = base;
+    mSize = size;
+    mMemCache->setMemoryToCache(base, size);
+}
+
+
+void MemoryPage::resetCache()
+{
+    mMemCache->resetCache();
 }

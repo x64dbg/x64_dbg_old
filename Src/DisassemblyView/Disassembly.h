@@ -49,7 +49,7 @@ public:
 signals:
     
 public slots:
-    void disassambleAt(uint64 parRVA);
+    void disassambleAt(uint64 parVA);
 
 private:
     enum GuiState_t {NoState, MultiRowsSelectionState};

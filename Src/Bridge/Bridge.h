@@ -20,8 +20,9 @@ class Bridge : public QObject
 public:
     explicit Bridge(QObject *parent = 0);
     void readProcessMemory(byte_t* dest, uint64 rva, uint64 size);
-    uint64 getSize();
+    uint64 getSize(uint64 va);
     void emitEIPChangedSignal(uint64 eip);
+    uint64 getBase(uint64 addr);
     static Bridge* getBridge();
     static Bridge* initBridge();
     

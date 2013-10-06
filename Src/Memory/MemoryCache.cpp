@@ -11,6 +11,11 @@ void MemoryCache::setMemoryToCache(uint64 parBase, uint64 parSize)
     mSize = parSize;
 }
 
+void MemoryCache::resetCache()
+{
+    mMemDataCache.isInit = false;
+}
+
 
 byte_t* MemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize)
 {
@@ -28,17 +33,19 @@ byte_t* MemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCa
         if((mMemDataCache.isInit == true) && (parRVA >= mMemDataCache.rva) && ((parRVA + parLength) <= (mMemDataCache.rva + (uint64)mMemDataCache.memDataCacheSize)))
         {
             // Cache Success
+            //qDebug() << "Cache Success";
             wBytePtr = reinterpret_cast<byte_t*>(mMemDataCache.memDataCachePtr->data()) + (parRVA - mMemDataCache.rva);
         }
         else
         {
             // Cache Miss
+            //qDebug() << "Cache has been updated. Old Size:" << mMemDataCache.memDataCacheSize << " Old RVA:" << mMemDataCache.rva << " New Size:" << parCacheNewSize << " New RVA:" << parRVA;
             mMemDataCache.memDataCacheSize = parCacheNewSize;
             mMemDataCache.memDataCachePtr->resize(parCacheNewSize);
             mMemDataCache.rva = parRVA;
             wBytePtr = reinterpret_cast<byte_t*>(mMemDataCache.memDataCachePtr->data());
             // TODO: Fill cache
-            Bridge::getBridge()->readProcessMemory(wBytePtr, parRVA, parCacheNewSize);
+            Bridge::getBridge()->readProcessMemory(wBytePtr, mBase + parRVA, parCacheNewSize);
 
             mMemDataCache.isInit = true;
         }

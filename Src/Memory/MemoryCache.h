@@ -16,6 +16,7 @@ public:
     explicit MemoryCache(QObject *parent = 0);
 
     void setMemoryToCache(uint64 parBase, uint64 parSize);
+    void resetCache();
     byte_t* readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize);
     
 signals:

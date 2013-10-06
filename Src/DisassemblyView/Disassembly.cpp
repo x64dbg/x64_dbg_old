@@ -24,7 +24,7 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
     addColumnAt(getColumnCount(), 100, false);
     addColumnAt(getColumnCount(), 100, false);
 
-    connect(Bridge::getBridge(), SIGNAL(emitEIPChangedSignal(uint64)), this, SLOT(disassambleAt(uint64)));
+    connect(Bridge::getBridge(), SIGNAL(eipChanged(uint64)), this, SLOT(disassambleAt(uint64)));
 }
 
 
@@ -53,6 +53,7 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
     QString wStr = "";
     int wRva = getIndexFromCount(rowBase, rowOffset);
     Instruction_t wInst = DisassembleAt(wRva);
+
 
     if(isSelected(rowBase, rowOffset) == true)
         painter->fillRect(QRect(x, y, w, h), QBrush(QColor(192,192,192)));
@@ -629,10 +630,16 @@ void Disassembly::setMemoryPage(MemoryPage* parMemPage)
 }
 
 
-void Disassembly::disassambleAt(uint64 parRVA)
+void Disassembly::disassambleAt(uint64 parVA)
 {
-    forceScrollBarValue(parRVA);
-    mEIP = parRVA;
+    uint64 wBase = Bridge::getBridge()->getBase(parVA);
+    uint64 wSize = Bridge::getBridge()->getSize(wBase);
+    uint64 wRVA = parVA - wBase;
 
-    QMessageBox::information(this, "EIP Changed", "EIP Changed");
+    setSingleSelection(wRVA);
+    mMemPage->resetCache();
+    mMemPage->setAttributes(wBase, wSize);
+    forceScrollBarValue(wRVA);
+    mEIP = wRVA;
+    setRowCount(wSize);
 }

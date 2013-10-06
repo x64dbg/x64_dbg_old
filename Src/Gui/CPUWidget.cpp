@@ -6,9 +6,7 @@ CPUWidget::CPUWidget(QWidget *parent) :QWidget(parent), ui(new Ui::CPUWidget)
     ui->setupUi(this);
     setDefaultDisposition();
 
-    MEMORY_BASIC_INFORMATION wMBI;
-
-    mDisas = new Disassembly(new MemoryPage(wMBI), 0);
+    mDisas = new Disassembly(new MemoryPage(0, 0), 0);
     ui->mTopLeftFrameLayout->addWidget(mDisas);
 
     HexDump* hx = new HexDump(0);

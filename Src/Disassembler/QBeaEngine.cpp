@@ -134,6 +134,7 @@ ulong QBeaEngine::DisassembleBack(char* data, ulong base, ulong size, ulong ip, 
         abuf[i%128] = addr;
 
         mDisasmStruct.EIP = (UIntPtr)pdata;
+        mDisasmStruct.Archi=64;
         len = Disasm(&mDisasmStruct);
         cmdsize = (len < 1) ? 1 : len ;
 
@@ -184,6 +185,7 @@ ulong QBeaEngine::DisassembleNext(char* data, ulong base, ulong size, ulong ip, 
 
     for(i = 0; i < n && size > 0; i++)
     {
+        mDisasmStruct.Archi=64;
         mDisasmStruct.EIP = (UIntPtr)pdata;
         mDisasmStruct.SecurityBlock = (UIntPtr)size;
         len = Disasm(&mDisasmStruct);
@@ -214,6 +216,7 @@ Instruction_t QBeaEngine::DisassembleAt(unsigned char* data, int64 size, uint64 
     Instruction_t wInst;
     int len;
 
+    mDisasmStruct.Archi=64;
     mDisasmStruct.EIP = (UIntPtr)((uint64)data + (uint64)instIndex);
     mDisasmStruct.VirtualAddr = origBase + origInstRVA;
     mDisasmStruct.SecurityBlock = (UIntPtr)((uint64)size - instIndex);

@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    // Register custom data types
     qRegisterMetaType<int32>("int32");
     qRegisterMetaType<uint32>("uint32");
 
@@ -16,10 +17,10 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<byte_t>("byte_t");
 
-    //iInitDbg();
-
+    // Init communication with debugger
     Bridge::initBridge();
 
+    // Start GUI
     MainWindow w;
     w.show();
 
