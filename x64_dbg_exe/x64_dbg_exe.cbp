@@ -16,7 +16,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="..\bin\x32\libbridge.a" />
+					<Add library="..\bin\x32\libx32_bridge.a" />
 				</Linker>
 			</Target>
 			<Target title="x64">
@@ -29,7 +29,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="..\bin\x64\libbridge.a" />
+					<Add library="..\bin\x64\libx64_bridge.a" />
 				</Linker>
 			</Target>
 		</Build>
