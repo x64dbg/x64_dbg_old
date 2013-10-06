@@ -90,11 +90,11 @@ void DebugUpdateDisasm(uint disasm_addr)
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
-    uint cip=GetContextData(UE_CIP);
-    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, cip);
+    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, GetContextData(UE_CIP));
     efree(mem);
     //call 'real' GUI
-    GuiChangeCIP(cip);
+    //TODO: needs CIP+addr to disasm at
+    GuiChangeCIP(disasm_addr);
 }
 
 static void cbUserBreakpoint()
@@ -820,7 +820,7 @@ CMDRESULT cbDebugHide(const char* cmd)
 CMDRESULT cbDebugDisasm(const char* cmd)
 {
     char arg1[deflen]="";
-    uint addr=GetContextData(UE_EIP);
+    uint addr=GetContextData(UE_CIP);
     if(argget(cmd, arg1, 0, true))
         if(!valfromstring(arg1, &addr, 0, 0, true, 0))
             addr=GetContextData(UE_CIP);

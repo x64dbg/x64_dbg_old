@@ -12,7 +12,7 @@ static HINSTANCE hInst;
 #define gui_lib "x32_gui.dll"
 #endif // _WIN64
 
-#define NO_GUI
+//#define NO_GUI
 
 //Bridge
 const char* DLL_IMPEXP BridgeInit()
