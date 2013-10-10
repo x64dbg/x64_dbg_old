@@ -1,0 +1,5 @@
+LIBRARY "BeaEngine64.dll"
+EXPORTS
+BeaEngineRevision
+BeaEngineVersion
+Disasm
