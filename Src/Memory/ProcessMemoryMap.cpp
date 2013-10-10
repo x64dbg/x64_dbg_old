@@ -39,8 +39,8 @@ QList<MEMORY_BASIC_INFORMATION> ProcessMemoryMap::BruteForceProcessMemory()
 {
     QList<MEMORY_BASIC_INFORMATION> wMemoryRegionsList;
     MEMORY_BASIC_INFORMATION wMemInfo;
-    uint64 wVirtualAddress = 0;
-    uint64 wUpperLimit = 0x80000000;//0x000007FFFFFFFFFF;    // x64 User Space Limit
+    uint_t wVirtualAddress = 0;
+    uint_t wUpperLimit = 0x80000000;//0x000007FFFFFFFFFF;    // x64 User Space Limit
     SIZE_T wErr;
 
     // For each page in memory
@@ -107,12 +107,12 @@ void ProcessMemoryMap::printVirtualMemoryMap(QList<MEMORY_BASIC_INFORMATION> par
         wMemInfo = parList.at(wI);
 
         // Base address
-        wTmpStr = "0x" + QString("%1").arg((uint64)wMemInfo.BaseAddress, 16, 16, QChar('0')).toUpper();
+        wTmpStr = "0x" + QString("%1").arg((uint_t)wMemInfo.BaseAddress, 16, 16, QChar('0')).toUpper();
         wStr += wTmpStr + QString(" ").repeated(20 - wTmpStr.length());
         wStr += " | ";
 
         // Size
-        wTmpStr = "0x" + QString("%1").arg((uint64)wMemInfo.RegionSize, 16, 16, QChar('0')).toUpper();
+        wTmpStr = "0x" + QString("%1").arg((uint_t)wMemInfo.RegionSize, 16, 16, QChar('0')).toUpper();
         wStr += wTmpStr + QString(" ").repeated(20 - wTmpStr.length());
         wStr += " | ";
 

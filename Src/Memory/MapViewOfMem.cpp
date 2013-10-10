@@ -46,7 +46,7 @@ MapViewOfMem::~MapViewOfMem()
 
 }
 
-byte_t MapViewOfMem::readByte(uint64 rva)
+byte_t MapViewOfMem::readByte(uint_t rva)
 {
     return mData.data()[(uint32)rva];
 }
@@ -78,7 +78,7 @@ ulong MapViewOfMem::getBase()
 }
 
 
-byte_t* MapViewOfMem::getDataPtrForGui(uint64 rva, uint32 maxNbrOfBytesToRead, uint32 newCacheSize)
+byte_t* MapViewOfMem::getDataPtrForGui(uint_t rva, uint32 maxNbrOfBytesToRead, uint32 newCacheSize)
 {
     byte_t* wBytePtr = 0;
 
@@ -88,7 +88,7 @@ byte_t* MapViewOfMem::getDataPtrForGui(uint64 rva, uint32 maxNbrOfBytesToRead, u
         if(maxNbrOfBytesToRead > (this->size() - rva))
             maxNbrOfBytesToRead = this->size() - rva;
 
-        if((mGuiMemDataCache.isInit == true) && (rva >= mGuiMemDataCache.rva) && ((rva + (uint64)maxNbrOfBytesToRead) <= (mGuiMemDataCache.rva + (uint64)mGuiMemDataCache.memDataCacheSize)))
+        if((mGuiMemDataCache.isInit == true) && (rva >= mGuiMemDataCache.rva) && ((rva + (uint_t)maxNbrOfBytesToRead) <= (mGuiMemDataCache.rva + (uint_t)mGuiMemDataCache.memDataCacheSize)))
         {
             // Cache Success
             wBytePtr = mGuiMemDataCache.memDataCachePtr->data() + (rva - mGuiMemDataCache.rva);
@@ -103,7 +103,7 @@ byte_t* MapViewOfMem::getDataPtrForGui(uint64 rva, uint32 maxNbrOfBytesToRead, u
             // TODO: Fill cache
             for(int wI = 0; wI < newCacheSize; wI++)
             {
-                wBytePtr[wI] = readByte(rva + (uint64)wI);
+                wBytePtr[wI] = readByte(rva + (uint_t)wI);
             }
             mGuiMemDataCache.isInit = true;
         }

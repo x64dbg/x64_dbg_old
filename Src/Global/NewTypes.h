@@ -4,8 +4,8 @@
 typedef int int32;
 typedef unsigned int uint32;
 
-typedef unsigned long long uint64;
-typedef long long int64;
+typedef unsigned long long uint_t;
+typedef long long int_t;
 
 typedef unsigned char byte_t;
 

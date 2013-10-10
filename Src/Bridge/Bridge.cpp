@@ -30,23 +30,23 @@ Bridge::Bridge(QObject *parent) : QObject(parent)
 
 
 
-void Bridge::readProcessMemory(byte_t* dest, uint64 rva, uint64 size)
+void Bridge::readProcessMemory(byte_t* dest, uint_t va, uint_t size)
 {
 #ifdef BUILD_LIB
-    DbgMemRead(dest, rva, size);
+    DbgMemRead(va, dest, size);
 #else
-    stubReadProcessMemory(dest, rva, size);
+    stubReadProcessMemory(dest, va, size);
 #endif
 }
 
-void Bridge::emitEIPChangedSignal(uint64 eip)
+void Bridge::emitEIPChangedSignal(uint_t eip)
 {
 #ifdef BUILD_LIB
     emit eipChanged(eip);
 #endif
 }
 
-uint64 Bridge::getSize(uint64 va)
+uint_t Bridge::getSize(uint_t va)
 {
 #ifdef BUILD_LIB
     return DbgMemGetPageSize(va);
@@ -55,7 +55,7 @@ uint64 Bridge::getSize(uint64 va)
 #endif
 }
 
-uint64 Bridge::getBase(uint64 addr)
+uint_t Bridge::getBase(uint_t addr)
 {
 #ifdef BUILD_LIB
     return DbgMemFindBaseAddr(addr,0);
@@ -74,7 +74,7 @@ Bridge* Bridge::getBridge()
 }
 
 
-Bridge* Bridge::initBridge()
+void Bridge::initBridge()
 {
     mBridge = new Bridge();
 }

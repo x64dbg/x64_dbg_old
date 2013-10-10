@@ -3,101 +3,35 @@
 
 QBeaEngine::QBeaEngine()
 {
-    /*
-    QFile file("AsmCode.bin");
-
-    if(file.open(QIODevice::ReadOnly) == false)
-         qDebug() << "File has not been opened.";
-
-    QByteArray data = file.readAll();
-    qDebug() << "Size: " << data.size();
-
-    if(data.size() == 0)
-    {
-        qDebug() << "No Data";
-    }
-
-    DISASM MyDisasm;
-    int len, i = 0;
-    int Error = 0;
-
-    // Init the Disasm structure
-    (void) memset (&MyDisasm, 0, sizeof(DISASM));
-
-    // Init EIP
-    MyDisasm.EIP = (UIntPtr)data.data();
-
-    // Loop for Disasm
-    while ((!Error) && (i<data.size()))
-    {
-        len = Disasm(&MyDisasm);
-        if (len != UNKNOWN_OPCODE)
-        {
-            //(void) puts(MyDisasm.CompleteInstr);
-            qDebug() << "i= " << (int)MyDisasm.EIP-(int)data.data() << QString(MyDisasm.CompleteInstr);
-            MyDisasm.EIP = MyDisasm.EIP + (UIntPtr)len;
-            i += (int)len;
-        }
-        else {
-            MyDisasm.EIP = MyDisasm.EIP + (UIntPtr)1;
-            i += (int)len;
-        }
-    }
-    qDebug() << "End --------------------------------------------- i " << i;
-
-    */
-
-
-
-    /*
-
-    // Init the Disasm structure
-    DISASM MyDisasm;
-    memset(&MyDisasm, 0, sizeof(DISASM));
-
-
-
-
-//774F00C4   FF33                PUSH DWORD PTR DS:[EBX]
-//774F00C6   53                  PUSH EBX
-//774F00C7   68 D5004F90         PUSH ntdll.774F00D5                      ; ASCII "[Pj"
-//774F00CC   FF7424 18           PUSH DWORD PTR SS:[ESP+18]
-//774F00D0   E8 646C0300         CALL ntdll.RtlUnwind
-
-
-    char bytes[] = {0xFF, 0x33, 0x53, 0x68, 0xD5, 0x00, 0x4F, 0x90, 0xFF, 0x74, 0x24, 0x18, 0xE8, 0x64, 0x6C, 0x03, 0x00};
-
-    ulong prev = DisassembleBack(MyDisasm, bytes, (ulong)bytes, (ulong)17, (ulong)(bytes+8), 1);
-
-    qDebug() << "cur : " << (ulong)(bytes+8) << "prev : " << (ulong)(prev);
-    */
-
-
-    // Init the Disasm structure
+    // Reset the Disasm structure
     memset(&mDisasmStruct, 0, sizeof(DISASM));
 }
 
 
-
-
 /**
  * @brief       Return the address of the nth instruction before the instruction pointed by ip.                 @n
- *              This function has been grab from OllyDbg ("Disassembleback" in asmserv.c)
+ *              This function has been grabbed from OllyDbg ("Disassembleback" in asmserv.c)
  *
- * @param[in]   data    Base address of the memory (Can be a buffer that is a copy of the process memory)
+ * @param[in]   data    Address of the data to disassemble
  * @param[in]   base    Original base address of the memory page (Required to disassemble destination addresses)
- * @param[in]   size    Size of the memory page (Or the cache buffer)
- * @param[in]   ip      RVA of the current instruction
+ * @param[in]   size    Size of the data block pointed by data
+ * @param[in]   ip      RVA of the current instruction (Relative to data pointer)
  * @param[in]   n       Number of instruction back
  *
- * @return      Return the address of the nth instruction before the instruction pointed by ip
+ * @return      Return the RVA (Relative to the data pointer) of the nth instruction before the instruction pointed by ip
  */
-ulong QBeaEngine::DisassembleBack(char* data, ulong base, ulong size, ulong ip, int n)
+ulong QBeaEngine::DisassembleBack(byte_t* data, uint_t base, uint_t size, uint_t ip, int n)
 {
     int i;
-    ulong abuf[131],addr,back,cmdsize;
-    char* pdata;
+    uint_t abuf[131], addr, back, cmdsize;
+    byte_t* pdata;
     int len;
+
+    // Reset Disasm Structure
+    memset(&mDisasmStruct, 0, sizeof(DISASM));
+#ifdef _WIN64
+    mDisasmStruct.Archi = 64;
+#endif
 
     // Check if the pointer is not null
     if (data == NULL)
@@ -118,7 +52,7 @@ ulong QBeaEngine::DisassembleBack(char* data, ulong base, ulong size, ulong ip, 
         return ip;
 
     if(ip < n)
-        return base;
+        return ip;
 
     back = 16 * (n + 3); // Instruction length limited to 16
 
@@ -131,10 +65,9 @@ ulong QBeaEngine::DisassembleBack(char* data, ulong base, ulong size, ulong ip, 
 
     for(i = 0; addr < ip; i++)
     {
-        abuf[i%128] = addr;
+        abuf[i % 128] = addr;
 
         mDisasmStruct.EIP = (UIntPtr)pdata;
-        mDisasmStruct.Archi=64;
         len = Disasm(&mDisasmStruct);
         cmdsize = (len < 1) ? 1 : len ;
 
@@ -150,26 +83,30 @@ ulong QBeaEngine::DisassembleBack(char* data, ulong base, ulong size, ulong ip, 
 }
 
 
-
-
 /**
  * @brief       Return the address of the nth instruction after the instruction pointed by ip.                 @n
- *              This function has been grab from OllyDbg ("Disassembleforward" in asmserv.c)
+ *              This function has been grabbed from OllyDbg ("Disassembleforward" in asmserv.c)
  *
- * @param[in]   data    Base address of the memory (Can be a buffer that is a copy of the process memory)
+ * @param[in]   data    Address of the data to disassemble
  * @param[in]   base    Original base address of the memory page (Required to disassemble destination addresses)
- * @param[in]   size    Size of the memory page (Or the cache buffer)
- * @param[in]   ip      RVA of the current instruction
+ * @param[in]   size    Size of the data block pointed by data
+ * @param[in]   ip      RVA of the current instruction (Relative to data pointer)
  * @param[in]   n       Number of instruction next
  *
- * @return      Return the address of the nth instruction after the instruction pointed by ip
+ * @return      Return the RVA (Relative to the data pointer) of the nth instruction after the instruction pointed by ip
  */
-ulong QBeaEngine::DisassembleNext(char* data, ulong base, ulong size, ulong ip, int n)
+ulong QBeaEngine::DisassembleNext(byte_t* data, uint_t base, uint_t size, uint_t ip, int n)
 {
     int i;
-    ulong cmdsize;
-    char *pdata;
+    uint_t cmdsize;
+    byte_t* pdata;
     int len;
+
+    // Reset Disasm Structure
+    memset(&mDisasmStruct, 0, sizeof(DISASM));
+#ifdef _WIN64
+    mDisasmStruct.Archi = 64;
+#endif
 
     if(data == NULL)
         return 0;
@@ -185,11 +122,10 @@ ulong QBeaEngine::DisassembleNext(char* data, ulong base, ulong size, ulong ip, 
 
     for(i = 0; i < n && size > 0; i++)
     {
-        mDisasmStruct.Archi=64;
         mDisasmStruct.EIP = (UIntPtr)pdata;
         mDisasmStruct.SecurityBlock = (UIntPtr)size;
         len = Disasm(&mDisasmStruct);
-        cmdsize = (len < 1) ? 1 : len ;
+        cmdsize = (len < 1) ? 1 : len;
 
         pdata += cmdsize;
         ip += cmdsize;
@@ -211,20 +147,24 @@ ulong QBeaEngine::DisassembleNext(char* data, ulong base, ulong size, ulong ip, 
  *
  * @return      Return the disassembled instruction
  */
-Instruction_t QBeaEngine::DisassembleAt(unsigned char* data, int64 size, uint64 instIndex, uint64 origBase, uint64 origInstRVA)
+Instruction_t QBeaEngine::DisassembleAt(byte_t* data, uint_t size, uint_t instIndex, uint_t origBase, uint_t origInstRVA)
 {
     Instruction_t wInst;
     int len;
 
-    mDisasmStruct.Archi=64;
-    mDisasmStruct.EIP = (UIntPtr)((uint64)data + (uint64)instIndex);
+    // Reset Disasm Structure
+    memset(&mDisasmStruct, 0, sizeof(DISASM));
+
+#ifdef _WIN64
+    mDisasmStruct.Archi = 64;
+#endif
+
+    mDisasmStruct.EIP = (UIntPtr)((uint_t)data + (uint_t)instIndex);
     mDisasmStruct.VirtualAddr = origBase + origInstRVA;
-    mDisasmStruct.SecurityBlock = (UIntPtr)((uint64)size - instIndex);
+    mDisasmStruct.SecurityBlock = (UIntPtr)((uint_t)size - instIndex);
 
     len = Disasm(&mDisasmStruct);
     len = (len < 1) ? 1 : len ;
-
-    mDisasmStruct.SecurityBlock = 0;
 
     wInst.instStr = QString(mDisasmStruct.CompleteInstr);
     wInst.dump = QByteArray((char*)mDisasmStruct.EIP, len);

@@ -13,12 +13,12 @@ class MemoryPage : public QObject
 {
     Q_OBJECT
 public:
-    explicit MemoryPage(uint64 parBase, uint64 parSize, QObject *parent = 0);
+    explicit MemoryPage(uint_t parBase, uint_t parSize, QObject *parent = 0);
 
-    byte_t* readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize);
-    uint64 getSize();
-    uint64 getBase();
-    void setAttributes(uint64 base, uint64 size);
+    byte_t* readFromCache(uint_t parRVA, uint_t parLength, uint_t parCacheNewSize);
+    uint_t getSize();
+    uint_t getBase();
+    void setAttributes(uint_t base, uint_t size);
     void resetCache();
     
 signals:
@@ -27,8 +27,8 @@ public slots:
 
 private:
     MemoryCache* mMemCache;
-    uint64 mBase;
-    uint64 mSize;
+    uint_t mBase;
+    uint_t mSize;
 
     
 };

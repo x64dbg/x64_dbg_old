@@ -5,7 +5,7 @@ MemoryCache::MemoryCache(QObject *parent) : QObject(parent)
     mMemDataCache = (MemDataCacheStruct_t){new QByteArray(), 0, 0, false};
 }
 
-void MemoryCache::setMemoryToCache(uint64 parBase, uint64 parSize)
+void MemoryCache::setMemoryToCache(uint_t parBase, uint_t parSize)
 {
     mBase = parBase;
     mSize = parSize;
@@ -17,7 +17,7 @@ void MemoryCache::resetCache()
 }
 
 
-byte_t* MemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize)
+byte_t* MemoryCache::readFromCache(uint_t parRVA, uint_t parLength, uint_t parCacheNewSize)
 {
     byte_t* wBytePtr = 0;
 
@@ -30,7 +30,7 @@ byte_t* MemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCa
         if(parCacheNewSize > (mSize - parRVA))
             parCacheNewSize = mSize - parRVA;
 
-        if((mMemDataCache.isInit == true) && (parRVA >= mMemDataCache.rva) && ((parRVA + parLength) <= (mMemDataCache.rva + (uint64)mMemDataCache.memDataCacheSize)))
+        if((mMemDataCache.isInit == true) && (parRVA >= mMemDataCache.rva) && ((parRVA + parLength) <= (mMemDataCache.rva + (uint_t)mMemDataCache.memDataCacheSize)))
         {
             // Cache Success
             //qDebug() << "Cache Success";
@@ -39,7 +39,7 @@ byte_t* MemoryCache::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCa
         else
         {
             // Cache Miss
-            //qDebug() << "Cache has been updated. Old Size:" << mMemDataCache.memDataCacheSize << " Old RVA:" << mMemDataCache.rva << " New Size:" << parCacheNewSize << " New RVA:" << parRVA;
+            qDebug() << "Cache has been updated. Old Size:" << mMemDataCache.memDataCacheSize << " Old RVA:" << mMemDataCache.rva << " New Size:" << parCacheNewSize << " New RVA:" << parRVA;
             mMemDataCache.memDataCacheSize = parCacheNewSize;
             mMemDataCache.memDataCachePtr->resize(parCacheNewSize);
             mMemDataCache.rva = parRVA;

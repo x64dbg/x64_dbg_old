@@ -49,7 +49,7 @@ public:
 signals:
     
 public slots:
-    void disassambleAt(uint64 parVA);
+    void disassambleAt(uint_t parVA);
 
 private:
     enum GuiState_t {NoState, MultiRowsSelectionState};
@@ -72,7 +72,7 @@ private:
 
     MemoryPage* mMemPage;
 
-    uint64 mEIP;
+    uint_t mCipRva;
 };
 
 #endif // DISASSEMBLY_H

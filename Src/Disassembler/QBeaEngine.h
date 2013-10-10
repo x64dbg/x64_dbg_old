@@ -27,9 +27,9 @@ class QBeaEngine
 public:
     explicit QBeaEngine();
 
-    ulong DisassembleBack(char *data, ulong base, ulong size, ulong ip, int n);
-    ulong DisassembleNext(char* data, ulong base, ulong size, ulong ip, int n);
-    Instruction_t DisassembleAt(unsigned char* data, int64 size, uint64 instIndex, uint64 origBase, uint64 origInstRVA);
+    ulong DisassembleBack(byte_t *data, uint_t base, uint_t size, uint_t ip, int n);
+    ulong DisassembleNext(byte_t *data, uint_t base, uint_t size, uint_t ip, int n);
+    Instruction_t DisassembleAt(byte_t* data, uint_t size, uint_t instIndex, uint_t origBase, uint_t origInstRVA);
 signals:
     
 public slots:

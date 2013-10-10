@@ -1,6 +1,6 @@
 #include "MemoryPage.h"
 
-MemoryPage::MemoryPage(uint64 parBase, uint64 parSize, QObject *parent) : QObject(parent)
+MemoryPage::MemoryPage(uint_t parBase, uint_t parSize, QObject *parent) : QObject(parent)
 {
     mBase = 0;
     mSize = 0;
@@ -8,25 +8,25 @@ MemoryPage::MemoryPage(uint64 parBase, uint64 parSize, QObject *parent) : QObjec
     mMemCache->setMemoryToCache(0, 0);
 }
 
-byte_t* MemoryPage::readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize)
+byte_t* MemoryPage::readFromCache(uint_t parRVA, uint_t parLength, uint_t parCacheNewSize)
 {
     return mMemCache->readFromCache(parRVA, parLength, parCacheNewSize);
 }
 
 
-uint64 MemoryPage::getSize()
+uint_t MemoryPage::getSize()
 {
     return mSize;
 }
 
 
-uint64 MemoryPage::getBase()
+uint_t MemoryPage::getBase()
 {
     return mBase;
 }
 
 
-void MemoryPage::setAttributes(uint64 base, uint64 size)
+void MemoryPage::setAttributes(uint_t base, uint_t size)
 {
     mBase = base;
     mSize = size;

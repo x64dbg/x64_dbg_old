@@ -15,9 +15,9 @@ class MemoryCache : public QObject
 public:
     explicit MemoryCache(QObject *parent = 0);
 
-    void setMemoryToCache(uint64 parBase, uint64 parSize);
+    void setMemoryToCache(uint_t parBase, uint_t parSize);
     void resetCache();
-    byte_t* readFromCache(uint64 parRVA, uint64 parLength, uint64 parCacheNewSize);
+    byte_t* readFromCache(uint_t parRVA, uint_t parLength, uint_t parCacheNewSize);
     
 signals:
     
@@ -28,16 +28,16 @@ private:
     typedef struct _MemDataCacheStruct_t
     {
         QByteArray* memDataCachePtr;
-        uint64 memDataCacheSize;
-        uint64 rva;
+        uint_t memDataCacheSize;
+        uint_t rva;
         bool isInit;
     } MemDataCacheStruct_t;
 
 
     MemDataCacheStruct_t mMemDataCache;
 
-    uint64 mBase;
-    uint64 mSize;
+    uint_t mBase;
+    uint_t mSize;
 };
 
 #endif // PROCESSMEMORYCACHE_H

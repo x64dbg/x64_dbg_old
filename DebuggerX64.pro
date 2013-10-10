@@ -8,9 +8,9 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-#CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+# Removes all debug output when defined
+#DEFINES += QT_NO_DEBUG_OUTPUT
 
-#QMAKE_CXXFLAGS += -fpermissive
 
 TARGET = DebuggerX64
 
@@ -76,7 +76,17 @@ INCLUDEPATH += $$PWD/Src/Bridge
 
 
 
+    !contains(QMAKE_HOST.arch, x86_64) {
+        message("x86 build")
 
+        ## Windows x86 (32bit) specific build here
+
+    } else {
+        message("x86_64 build")
+
+        ## Windows x64 (64bit) specific build here
+
+    }
 
 
 

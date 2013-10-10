@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<int32>("int32");
     qRegisterMetaType<uint32>("uint32");
 
-    qRegisterMetaType<int64>("int64");
-    qRegisterMetaType<uint64>("uint64");
+    qRegisterMetaType<int_t>("int_t");
+    qRegisterMetaType<uint_t>("uint_t");
 
     qRegisterMetaType<byte_t>("byte_t");
 

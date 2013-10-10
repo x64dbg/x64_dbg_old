@@ -8,7 +8,7 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
 
     mSelection = (SelectionData_t){0, 0, 0};
 
-    mEIP = 0;
+    mCipRva = 0;
 
     mDisasm = new QBeaEngine();
 
@@ -24,7 +24,7 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
     addColumnAt(getColumnCount(), 100, false);
     addColumnAt(getColumnCount(), 100, false);
 
-    connect(Bridge::getBridge(), SIGNAL(eipChanged(uint64)), this, SLOT(disassambleAt(uint64)));
+    connect(Bridge::getBridge(), SIGNAL(eipChanged(uint_t)), this, SLOT(disassambleAt(uint_t)));
 }
 
 
@@ -68,7 +68,7 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
 
 
 
-            if(wInst.rva == mEIP)
+            if(wInst.rva == mCipRva)
             {
                 painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
                 painter->save();
@@ -424,19 +424,19 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
  */
 int Disassembly::getPreviousInstructionRVA(int rva, int count)
 {
-    int64 wBottomByteRealRVA = (int64)rva - 16 * (count + 3);
+    int_t wBottomByteRealRVA = (int_t)rva - 16 * (count + 3);
     wBottomByteRealRVA = wBottomByteRealRVA < 0 ? 0 : wBottomByteRealRVA;
 
-    int64 wVirtualRVA = (int64)rva - wBottomByteRealRVA;
+    int_t wVirtualRVA = (int_t)rva - wBottomByteRealRVA;
 
-    int64 wMaxByteCountToRead = wVirtualRVA + 1 + 16;
+    int_t wMaxByteCountToRead = wVirtualRVA + 1 + 16;
 
     uint32 wNewCacheSize = wMaxByteCountToRead > 16 * (getViewableRowsCount() + 20) ? wMaxByteCountToRead : 16 * (getViewableRowsCount() + 20);
 
     //unsigned char* wVirtualBaseAddr = mMemoryView->getDataPtrForGui(wBottomByteRealRVA, wMaxByteCountToRead,  wNewCacheSize);
-    unsigned char* wVirtualBaseAddr = mMemPage->readFromCache(wBottomByteRealRVA, wMaxByteCountToRead, wNewCacheSize);
+    byte_t* wVirtualBaseAddr = mMemPage->readFromCache(wBottomByteRealRVA, wMaxByteCountToRead, wNewCacheSize);
 
-    ulong addr = mDisasm->DisassembleBack((char*)wVirtualBaseAddr, 0,  wMaxByteCountToRead, wVirtualRVA, count);
+    uint_t addr = mDisasm->DisassembleBack((byte_t*)wVirtualBaseAddr, 0,  wMaxByteCountToRead, wVirtualRVA, count);
 
     addr += rva - wVirtualRVA;
 
@@ -455,17 +455,17 @@ int Disassembly::getPreviousInstructionRVA(int rva, int count)
  */
 int Disassembly::getNextInstructionRVA(int rva, int count)
 {
-    int64 wVirtualRVA = 0;
-    int64 wRemainingBytes = mMemPage->getSize() - rva;
-    int64 wMaxByteCountToRead = 16 * (count + 1);
+    int_t wVirtualRVA = 0;
+    int_t wRemainingBytes = mMemPage->getSize() - rva;
+    int_t wMaxByteCountToRead = 16 * (count + 1);
     wMaxByteCountToRead = wRemainingBytes > wMaxByteCountToRead ? wMaxByteCountToRead : wRemainingBytes;
 
     uint32 wNewCacheSize = wMaxByteCountToRead > 16 * (getViewableRowsCount() + 20) ? wMaxByteCountToRead : 16 * (getViewableRowsCount() + 20);
 
     //unsigned char* wVirtualBaseAddr = mMemoryView->getDataPtrForGui(rva, wMaxByteCountToRead,  wNewCacheSize);
-    unsigned char* wVirtualBaseAddr = mMemPage->readFromCache(rva, wMaxByteCountToRead, wNewCacheSize);
+    byte_t* wVirtualBaseAddr = mMemPage->readFromCache(rva, wMaxByteCountToRead, wNewCacheSize);
 
-    ulong addr = mDisasm->DisassembleNext((char*)wVirtualBaseAddr, 0,  wMaxByteCountToRead, wVirtualRVA, count);
+    uint_t addr = mDisasm->DisassembleNext((byte_t*)wVirtualBaseAddr, 0,  wMaxByteCountToRead, wVirtualRVA, count);
     addr += rva;
 
     return addr;
@@ -482,11 +482,11 @@ int Disassembly::getNextInstructionRVA(int rva, int count)
 Instruction_t Disassembly::DisassembleAt(ulong rva)
 {
     ulong base = mMemPage->getBase();
-    int64 wMaxByteCountToRead = 16 * 2;
+    int_t wMaxByteCountToRead = 16 * 2;
     uint32 wNewCacheSize = wMaxByteCountToRead > 16 * (getViewableRowsCount() + 20) ? wMaxByteCountToRead : 16 * (getViewableRowsCount() + 20);
 
     //unsigned char* wVirtualBaseAddr = mMemoryView->getDataPtrForGui(rva, wMaxByteCountToRead,  wNewCacheSize);
-    unsigned char* wVirtualBaseAddr = mMemPage->readFromCache(rva, wMaxByteCountToRead, wNewCacheSize);
+    byte_t* wVirtualBaseAddr = mMemPage->readFromCache(rva, wMaxByteCountToRead, wNewCacheSize);
 
     return mDisasm->DisassembleAt(wVirtualBaseAddr, wMaxByteCountToRead, 0, base, rva);
 }
@@ -621,6 +621,7 @@ int Disassembly::getLineToPrintcount()
     return wCount;
 }
 
+
 /************************************************************************************
                         Memory Page
 ************************************************************************************/
@@ -630,16 +631,16 @@ void Disassembly::setMemoryPage(MemoryPage* parMemPage)
 }
 
 
-void Disassembly::disassambleAt(uint64 parVA)
+void Disassembly::disassambleAt(uint_t parVA)
 {
-    uint64 wBase = Bridge::getBridge()->getBase(parVA);
-    uint64 wSize = Bridge::getBridge()->getSize(wBase);
-    uint64 wRVA = parVA - wBase;
+    uint_t wBase = Bridge::getBridge()->getBase(parVA);
+    uint_t wSize = Bridge::getBridge()->getSize(wBase);
+    uint_t wRVA = parVA - wBase;
 
-    setSingleSelection(wRVA);
-    mMemPage->resetCache();
-    mMemPage->setAttributes(wBase, wSize);
+    setSingleSelection(wRVA);               // Selects disassembled instruction
+    mMemPage->resetCache();                 // Reset cache in order to update it
+    mMemPage->setAttributes(wBase, wSize);  // Set base and size (Useful when memory page changed)
     forceScrollBarValue(wRVA);
-    mEIP = wRVA;
+    mCipRva = wRVA;
     setRowCount(wSize);
 }
