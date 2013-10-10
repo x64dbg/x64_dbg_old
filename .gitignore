@@ -16,7 +16,11 @@ x64_dbg_dbg/ODbgScript.chw
 x64_dbg_dbg/CppCheckResults.xml
 x64_dbg_dbg/.cccc/
 x64_dbg_dbg/suggestions.txt
+
+# For GUI
 *.pro.user
+x64_dbg_gui/DebuggerX64-build-Debug
+x64_dbg_gui/DebuggerX64-build-Release
 
 
 
