@@ -21,7 +21,7 @@ x64_dbg_dbg/suggestions.txt
 *.pro.user
 x64_dbg_gui/DebuggerX64-build-Debug
 x64_dbg_gui/DebuggerX64-build-Release
-
+x64_dbg_gui/bin
 
 
 todo_bridge.txt
