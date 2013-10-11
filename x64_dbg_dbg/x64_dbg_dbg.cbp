@@ -49,7 +49,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-fexceptions -Wno-format -Wno-narrowing" />
+			<Add option="-fexceptions -Wno-format" />
 			<Add directory="$(project_dir)" />
 		</Compiler>
 		<Linker>
@@ -83,6 +83,8 @@
 		<Unit filename="math.h" />
 		<Unit filename="memory.cpp" />
 		<Unit filename="memory.h" />
+		<Unit filename="msgqueue.cpp" />
+		<Unit filename="msgqueue.h" />
 		<Unit filename="simplescript.cpp" />
 		<Unit filename="simplescript.h" />
 		<Unit filename="threading.cpp" />

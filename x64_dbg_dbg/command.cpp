@@ -126,6 +126,13 @@ bool cmddel(COMMAND* command_list, const char* name)
     return true;
 }
 
+/*
+command_list:         command list
+cbUnknownCommand:     function to execute when an unknown command was found
+cbCommandProvider:    function that provides commands (fgets for example), does not return until a command was found
+cbCommandFinder:      non-default command finder
+error_is_fatal:       error return of a command callback stops the command processing
+*/
 CMDRESULT cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPROVIDER cbCommandProvider, CBCOMMANDFINDER cbCommandFinder, bool error_is_fatal)
 {
     if(!cbUnknownCommand or !cbCommandProvider)

@@ -10,6 +10,9 @@
 #include "math.h"
 #include "x64_dbg.h"
 #include "gui\disasm.h"
+#include "msgqueue.h"
+
+static MESSAGE_STACK* gMsgStack;
 
 static CMDRESULT cbStrLen(const char* cmd)
 {
@@ -113,28 +116,42 @@ static DWORD WINAPI consolePosThread(void* lpParam)
 
 static bool cbCommandProvider(char* cmd, int maxlen)
 {
-    fgets(cmd, maxlen, stdin);
-    cmd[strlen(cmd)-1]=0;
+    MESSAGE msg;
+    msgwait(gMsgStack, &msg);
+    char* newcmd=(char*)msg.param1;
+    if(strlen(newcmd)>=deflen)
+        newcmd[deflen-1]=0;
+    strcpy(cmd, newcmd);
+    efree(newcmd);
     return true;
 }
 
-static DWORD WINAPI DbgInitThread(void* a)
+extern "C" bool DLL_EXPORT _dbg_dbgcmdexec(const char* cmd)
 {
-    CreateThread(0, 0, consolePosThread, 0, 0, 0);
-    DeleteFileA("DLLLoader.exe");
-    char dir[deflen]="";
-    GetModuleFileNameA(hInst, dir, deflen);
-    int len=strlen(dir);
-    while(dir[len]!='\\')
-        len--;
-    dir[len]=0;
-    SetCurrentDirectoryA(dir);
-    CreateThread(0, 0, focusThread, 0, 0, 0);
-    varinit();
-    registercommands();
+    int len=strlen(cmd);
+    char* newcmd=(char*)emalloc((len+1)*sizeof(char));
+    strcpy(newcmd, cmd);
+    return msgsend(gMsgStack, 0, (uint)newcmd, 0);
+}
+
+static DWORD WINAPI ConsoleReadLoopThread(void* a)
+{
+    char cmd[deflen];
+    while(1)
+    {
+        fgets(cmd, deflen, stdin);
+        cmd[strlen(cmd)-1]=0;
+        while(!_dbg_dbgcmdexec(cmd)) //retry until the command came through
+            Sleep(100);
+    }
+    return 0;
+}
+
+static DWORD WINAPI DbgCommandLoopThread(void* a)
+{
     Sleep(200);
     SetForegroundWindow(GetConsoleHwnd());
-    scriptSetList(command_list);
+
     cmdloop(command_list, cbBadCmd, cbCommandProvider, cmdfindmain, false);
     DeleteFileA("DLLLoader.exe");
     ExitProcess(0);
@@ -143,6 +160,23 @@ static DWORD WINAPI DbgInitThread(void* a)
 
 extern "C" const char* DLL_EXPORT _dbg_dbginit()
 {
-    CreateThread(0, 0, DbgInitThread, 0, 0, 0);
+    DeleteFileA("DLLLoader.exe");
+    char dir[deflen]="";
+    GetModuleFileNameA(hInst, dir, deflen);
+    int len=strlen(dir);
+    while(dir[len]!='\\')
+        len--;
+    dir[len]=0;
+    SetCurrentDirectoryA(dir);
+    gMsgStack=msgallocstack();
+    if(!gMsgStack)
+        return "Could not allocate message stack!";
+    varinit();
+    registercommands();
+    scriptSetList(command_list);
+    CreateThread(0, 0, consolePosThread, 0, 0, 0);
+    CreateThread(0, 0, focusThread, 0, 0, 0);
+    CreateThread(0, 0, DbgCommandLoopThread, 0, 0, 0);
+    CreateThread(0, 0, ConsoleReadLoopThread, 0, 0, 0);
     return 0;
 }
