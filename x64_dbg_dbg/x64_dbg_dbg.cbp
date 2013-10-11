@@ -49,10 +49,11 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-fexceptions -Wno-format" />
+			<Add option="-fexceptions -Wno-format -Wno-narrowing" />
 			<Add directory="$(project_dir)" />
 		</Compiler>
 		<Linker>
+			<Add option="-static" />
 			<Add library="shlwapi" />
 			<Add library="psapi" />
 		</Linker>
