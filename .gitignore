@@ -10,7 +10,7 @@ bin/*/*
 *.chw
 *.cbTemp
 
-#whitelisten bin files
+#whitelisted bin files
 !bin/*/TitanEngine.dll
 !bin/*/test.dll
 !bin/*/test.exe
