@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtGui>
 #include "CPUWidget.h"
+#include "LineEdit.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,13 +20,17 @@ public:
 
 public slots:
     void executeCommand();
+    void cmdLineEditKeyPressedSlot(int parKey);
     
 private:
     Ui::MainWindow *ui;
     QMdiArea* mdiArea;
     CPUWidget* mCpuWin;
 
-    QLineEdit* mCmdLineEdit;
+    LineEdit* mCmdLineEdit;
+
+    QList<QString> mCmdHistory;
+    int mCmdIndex;
 };
 
 #endif // MAINWINDOW_H
