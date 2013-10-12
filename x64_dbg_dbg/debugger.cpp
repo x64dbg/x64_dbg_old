@@ -246,7 +246,6 @@ static void cbSystemBreakpoint(void* ExceptionData)
     //handle stuff (TLS, main entry, etc)
     SetCustomHandler(UE_CH_SYSTEMBREAKPOINT, 0);
     SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
-    SetCustomHandler(UE_CH_AFTERUNHANDLEDEXCEPTION, (void*)cbAfterException);
     cputs("system breakpoint reached!");
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
