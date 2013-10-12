@@ -1,5 +1,6 @@
-#ignore object files
+#ignore directories
 */obj/
+/bin
 
 #global filetypes to ignore
 *.depend
