@@ -39,7 +39,7 @@ byte_t* MemoryCache::readFromCache(uint_t parRVA, uint_t parLength, uint_t parCa
         else
         {
             // Cache Miss
-            qDebug() << "Cache has been updated. Old Size:" << mMemDataCache.memDataCacheSize << " Old RVA:" << mMemDataCache.rva << " New Size:" << parCacheNewSize << " New RVA:" << parRVA;
+            //qDebug() << "Cache has been updated. Old Size:" << mMemDataCache.memDataCacheSize << " Old RVA:" << mMemDataCache.rva << " New Size:" << parCacheNewSize << " New RVA:" << parRVA;
             mMemDataCache.memDataCacheSize = parCacheNewSize;
             mMemDataCache.memDataCachePtr->resize(parCacheNewSize);
             mMemDataCache.rva = parRVA;

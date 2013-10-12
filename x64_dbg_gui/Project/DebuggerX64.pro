@@ -69,9 +69,9 @@ FORMS    += \
 
 
 LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s_64
-LIBS += -L"$$PWD/Src/Bridge/" -lbridge
+LIBS += -L"$$PWD/Src/Bridge/" -lx64_bridge
 
-INCLUDEPATH += $$PWD/Src/BeaEngine_s_64
+#INCLUDEPATH += $$PWD/Src/BeaEngine_s_64
 INCLUDEPATH += $$PWD/Src/Bridge
 
 
