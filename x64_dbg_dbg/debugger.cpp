@@ -90,11 +90,11 @@ void DebugUpdateDisasm(uint disasm_addr)
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
-    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, GetContextData(UE_CIP));
+    uint cip=GetContextData(UE_CIP);
+    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, cip);
     efree(mem);
     //call 'real' GUI
-    //TODO: needs CIP+addr to disasm at
-    GuiChangeCIP(disasm_addr);
+    GuiDisasmAt(disasm_addr, cip);
 }
 
 static void cbUserBreakpoint()
@@ -222,7 +222,14 @@ static void cbException(void* ExceptionData)
     if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT)
         SetContextData(UE_CIP, (uint)edi->ExceptionRecord.ExceptionAddress);
     char msg[1024]="";
-    sprintf(msg, "exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
+    if(edi->dwFirstChance) //first chance exception
+        sprintf(msg, "first chance exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
+    else //lock the exception
+    {
+        sprintf(msg, "last chance exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
+        SetNextDbgContinueStatus(DBG_CONTINUE);
+    }
+
     cinsert(msg);
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
@@ -246,7 +253,6 @@ static void cbSystemBreakpoint(void* ExceptionData)
     //handle stuff (TLS, main entry, etc)
     SetCustomHandler(UE_CH_SYSTEMBREAKPOINT, 0);
     SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
-    SetCustomHandler(UE_CH_AFTERUNHANDLEDEXCEPTION, (void*)cbAfterException);
     cputs("system breakpoint reached!");
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();

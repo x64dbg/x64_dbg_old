@@ -26,14 +26,28 @@ extern "C"
 const char* DLL_IMPEXP BridgeInit();
 const char* DLL_IMPEXP BridgeStart();
 
-//Debugger
+//Debugger structs
+struct MEMPAGE
+{
+    MEMORY_BASIC_INFORMATION mbi;
+    char mod[16];
+};
+
+struct MEMMAP
+{
+    int count;
+    MEMPAGE* page;
+};
+
+//Debugger functions
 void DLL_IMPEXP DbgMemRead(duint va, unsigned char* dest, duint size);
 duint DLL_IMPEXP DbgMemGetPageSize(duint base);
 duint DLL_IMPEXP DbgMemFindBaseAddr(duint addr, duint* size);
 bool DLL_IMPEXP DbgCmdExec(const char* cmd);
+MEMMAP* DLL_IMPEXP DbgMemMap();
 
-//GUI
-void DLL_IMPEXP GuiChangeCIP(duint cip);
+//GUI functions
+void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);
 
 #ifdef __cplusplus
 }
