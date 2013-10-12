@@ -222,7 +222,14 @@ static void cbException(void* ExceptionData)
     if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT)
         SetContextData(UE_CIP, (uint)edi->ExceptionRecord.ExceptionAddress);
     char msg[1024]="";
-    sprintf(msg, "exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
+    if(edi->dwFirstChance) //first chance exception
+        sprintf(msg, "first chance exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
+    else //lock the exception
+    {
+        sprintf(msg, "last chance exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
+        SetNextDbgContinueStatus(DBG_CONTINUE);
+    }
+
     cinsert(msg);
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
