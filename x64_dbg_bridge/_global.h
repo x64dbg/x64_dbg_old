@@ -2,6 +2,7 @@
 #define _GLOBAL_H
 
 #include <windows.h>
+#include "bridgemain.h"
 
 #ifndef DLL_EXPORT
 #define DLL_EXPORT __declspec(dllexport)
@@ -22,36 +23,30 @@
 #define sint long
 #endif // _WIN64
 
-#ifdef _WIN64
-typedef unsigned long long duint;
-typedef long long dsint;
-#else
-typedef unsigned long duint;
-typedef long dsint;
-#endif //_WIN64
-
 //hInst GUI/DBG
 extern HINSTANCE hInstGui;
 extern HINSTANCE hInstDbg;
 
 //GUI typedefs
 typedef int (*GUIGUIINIT)(int, char**);
-typedef void (*GUICHANGECIP)(duint va, duint cip);
+typedef void (*GUIDISASSEMBLEAT)(duint va, duint cip);
 
 //GUI functions
 extern GUIGUIINIT _gui_guiinit;
-extern GUICHANGECIP _gui_disassembleAt;
+extern GUIDISASSEMBLEAT _gui_disassembleat;
 
 //DBG typedefs
 typedef const char* (*DBGDBGINIT)();
 typedef duint (*DBGMEMFINDBASEADDR)(duint addr, duint* size);
 typedef bool (*DBGMEMREAD)(duint addr, unsigned char* dest, duint size, duint* read);
 typedef bool (*DBGDBGCMDEXEC)(const char* cmd);
+typedef MEMMAP* (*DBGMEMMAP)();
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;
 extern DBGMEMFINDBASEADDR _dbg_memfindbaseaddr;
 extern DBGMEMREAD _dbg_memread;
 extern DBGDBGCMDEXEC _dbg_dbgcmdexec;
+extern DBGMEMMAP _dbg_memmap;
 
 #endif // _GLOBAL_H

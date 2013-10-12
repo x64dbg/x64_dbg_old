@@ -90,11 +90,11 @@ void DebugUpdateDisasm(uint disasm_addr)
     dbgenablebpx();
     memset(&dinit, 0, sizeof(DISASM_INIT));
     DisasmInit(&dinit);
-    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, GetContextData(UE_CIP));
+    uint cip=GetContextData(UE_CIP);
+    DisasmDo(mem, start, 0, disasmsize, disasm_addr-start, cip);
     efree(mem);
     //call 'real' GUI
-    //TODO: needs CIP+addr to disasm at
-    GuiChangeCIP(disasm_addr);
+    GuiDisasmAt(disasm_addr, cip);
 }
 
 static void cbUserBreakpoint()

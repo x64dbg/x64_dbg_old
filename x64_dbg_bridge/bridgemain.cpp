@@ -6,7 +6,7 @@ static HINSTANCE hInst;
 
 #ifdef _WIN64
 #define dbg_lib "x64_dbg.dll"
-#define gui_lib "DebuggerX64.dll"
+#define gui_lib "x64_gui.dll"
 #else
 #define dbg_lib "x32_dbg.dll"
 #define gui_lib "x32_gui.dll"
@@ -26,10 +26,10 @@ const char* DLL_IMPEXP BridgeInit()
     _gui_guiinit=(GUIGUIINIT)GetProcAddress(hInstGui, "_gui_guiinit");
     if(!_gui_guiinit)
         return "Export \"_gui_guiinit\" could not be found!";
-    //_gui_disassembleAt
-    _gui_disassembleAt=(GUICHANGECIP)GetProcAddress(hInstGui, "_gui_disassembleAt");
-    if(!_gui_disassembleAt)
-        return "Export \"_gui_disassembleAt\" could not be found!";
+    //_gui_disassembleat
+    _gui_disassembleat=(GUIDISASSEMBLEAT)GetProcAddress(hInstGui, "_gui_disassembleat");
+    if(!_gui_disassembleat)
+        return "Export \"_gui_disassembleat\" could not be found!";
 #endif
     //DBG Load
     hInstDbg=LoadLibraryA(dbg_lib); //Mr. eXoDia
@@ -51,6 +51,10 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_dbgcmdexec=(DBGDBGCMDEXEC)GetProcAddress(hInstDbg, "_dbg_dbgcmdexec");
     if(!_dbg_dbgcmdexec)
         return "Export \"_dbg_dbgcmdexec\" could not be found!";
+    //_dbg_memmap
+    _dbg_memmap=(DBGMEMMAP)GetProcAddress(hInstDbg, "_dbg_memmap");
+    if(!_dbg_memmap)
+        return "Export \"_dbg_memmap\" could not be found!";
     return 0;
 }
 
@@ -97,11 +101,16 @@ bool DLL_IMPEXP DbgCmdExec(const char* cmd)
     return _dbg_dbgcmdexec(cmd);
 }
 
+MEMMAP* DLL_IMPEXP DbgMemMap()
+{
+    return _dbg_memmap();
+}
+
 //GUI
-void DLL_IMPEXP GuiChangeCIP(duint cip)
+void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip)
 {
 #ifndef NO_GUI
-    _gui_disassembleAt(cip, cip);
+    _gui_disassembleat(addr, cip);
 #endif
 }
 

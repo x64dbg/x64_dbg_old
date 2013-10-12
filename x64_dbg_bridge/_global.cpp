@@ -6,10 +6,11 @@ HINSTANCE hInstDbg;
 
 //GUI functions
 GUIGUIINIT _gui_guiinit;
-GUICHANGECIP _gui_disassembleAt;
+GUIDISASSEMBLEAT _gui_disassembleat;
 
 //DBG functions
 DBGDBGINIT _dbg_dbginit;
 DBGMEMFINDBASEADDR _dbg_memfindbaseaddr;
 DBGMEMREAD _dbg_memread;
 DBGDBGCMDEXEC _dbg_dbgcmdexec;
+DBGMEMMAP _dbg_memmap;

@@ -12,7 +12,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 #DEFINES += QT_NO_DEBUG_OUTPUT
 
 
-TARGET = DebuggerX64
+
+!contains(QMAKE_HOST.arch, x86_64) {
+    TARGET = x32_gui
+} else {
+    TARGET = x64_gui
+}
 
 DEFINES += BUILD_LIB
 TEMPLATE = lib
@@ -66,25 +71,22 @@ FORMS    += \
     Src/Gui/CPUWidget.ui
 
 
-LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s_64
-LIBS += -L"$$PWD/Src/Bridge/" -lx64_bridge
-
 #INCLUDEPATH += $$PWD/Src/BeaEngine_s_64
 INCLUDEPATH += $$PWD/Src/Bridge
 
 
 
-    !contains(QMAKE_HOST.arch, x86_64) {
-        message("x86 build")
-
-        ## Windows x86 (32bit) specific build here
-
-    } else {
-        message("x86_64 build")
-
-        ## Windows x64 (64bit) specific build here
-
-    }
+!contains(QMAKE_HOST.arch, x86_64) {
+    message("x86 build")
+    LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s
+    LIBS += -L"$$PWD/Src/Bridge/" -lx32_bridge
+    ## Windows x86 (32bit) specific build here
+} else {
+    message("x86_64 build")
+    LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s_64
+    LIBS += -L"$$PWD/Src/Bridge/" -lx64_bridge
+    ## Windows x64 (64bit) specific build here
+}
 
 
 

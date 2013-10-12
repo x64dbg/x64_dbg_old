@@ -9,5 +9,15 @@ extern "C" DLL_EXPORT duint _dbg_memfindbaseaddr(duint addr, duint* size)
 
 extern "C" DLL_EXPORT bool _dbg_memread(duint addr, unsigned char* dest, duint size, duint* read)
 {
-    return memread(fdProcessInfo->hProcess, (void*)addr, dest, size, read);
+    dbgdisablebpx();
+    bool res=memread(fdProcessInfo->hProcess, (void*)addr, dest, size, read);
+    dbgenablebpx();
+    return res;
+}
+
+extern "C" DLL_EXPORT MEMPAGE* _dbg_memmap()
+{
+    static MEMPAGE mempage;
+    memset(&mempage, 0, sizeof(MEMPAGE));
+    return &mempage;
 }

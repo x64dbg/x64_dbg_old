@@ -100,7 +100,7 @@ void Bridge::initBridge()
 
 
 
-    __declspec(dllexport) int _gui_disassembleAt(unsigned long long va, unsigned long long eip)
+    __declspec(dllexport) void _gui_disassembleat(unsigned long long va, unsigned long long eip)
     {
         Bridge::getBridge()->emitDisassembleAtSignal(va, eip);
     }
