@@ -1,7 +1,6 @@
 #ignore directories
 */obj/
 bin/*/*
-!bin/*/TitanEngine.dll
 
 #global filetypes to ignore
 *.depend
@@ -11,10 +10,12 @@ bin/*/*
 *.chw
 *.cbTemp
 
-#binary files to ignore
-gui.ini
-bin/x32/test2.exe
-bin/x32/unpackme.exe
+#whitelisten bin files
+!bin/*/TitanEngine.dll
+!bin/*/test.dll
+!bin/*/test.exe
+!bin/*/gui.dll
+!bin/*/dbghelp.dll
 
 #debugger files to ignore
 x64_dbg_dbg/ODbgScript.chm
