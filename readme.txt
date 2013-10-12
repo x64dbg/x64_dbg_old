@@ -7,11 +7,16 @@ The debugger has (currently) three parts:
 
 DBG is the debugging part of the debugger. It handles debugging (using TitanEngine) and will provide data for the GUI.
 
-GUI is the graphical part of the debugger. It is built on top of QT and it provides the user interaction, the dump window (not yet implemented), the disassembly, the register window (not yet implemented), the memory map view (not yet implemented) etc.
+GUI is the graphical part of the debugger. It is built on top of QT and it
+provides the user interaction, the dump window (not yet implemented), the
+disassembly, the register window (not yet implemented), the memory map
+view (not yet implemented) etc.
 
-Bridge is the communication library for the DBG and GUI part (and maybe in the future more parts). The bridge can be used to work on new features, without having to update the other code parts.
+Bridge is the communication library for the DBG and GUI part (and maybe in
+the future more parts). The bridge can be used to work on new features,
+without having to update the other code parts.
 
-Right now the debugger supports the following features (this list will get longer soon)
+Right now the debugger supports the following features:
 - variables (with regard to the upcoming script feature)
 - basic calculations (var*@401000+.45^4A)
 - hidedebugger (very basic)
@@ -23,4 +28,5 @@ Right now the debugger supports the following features (this list will get longe
 - memory allocation/deallocation in the debuggee
 - quickly accessing API addresses (GetProcAddress->76E13620)
 
-The debugger core is based on TitanEngine (an updated version) and the disassembly is powered by BeaEngine. The icon is taken from VisualPharm.
+The debugger core is based on TitanEngine (an updated version) and the
+disassembly is powered by BeaEngine. The icon is taken from VisualPharm.
