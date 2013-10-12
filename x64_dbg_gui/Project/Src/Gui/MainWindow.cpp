@@ -27,9 +27,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     setCentralWidget(mdiArea);
 
+    // Setup the command bar
+    mCmdLineEdit = new QLineEdit(ui->cmdBar);
+    ui->cmdBar->addWidget(new QLabel("Command "));
+    ui->cmdBar->addWidget(mCmdLineEdit);
+
 
     // Setup Signals/Slots
     connect(ui->actionStepOver, SIGNAL(triggered()), mCpuWin, SLOT(stepOverSlot()));
+    connect(mCmdLineEdit, SIGNAL(returnPressed()), this, SLOT(executeCommand()));
 
 }
 
@@ -38,3 +44,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+void MainWindow::executeCommand()
+{
+    QString wCmd = mCmdLineEdit->text();
+    Bridge::getBridge()->execCmd(reinterpret_cast<const char*>(wCmd.toAscii().data()));
+}

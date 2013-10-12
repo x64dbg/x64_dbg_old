@@ -16,11 +16,16 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+public slots:
+    void executeCommand();
     
 private:
     Ui::MainWindow *ui;
     QMdiArea* mdiArea;
     CPUWidget* mCpuWin;
+
+    QLineEdit* mCmdLineEdit;
 };
 
 #endif // MAINWINDOW_H

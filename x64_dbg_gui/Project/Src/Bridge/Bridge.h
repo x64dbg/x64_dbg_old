@@ -25,6 +25,7 @@ public:
     uint_t getBase(uint_t addr);
     static Bridge* getBridge();
     static void initBridge();
+    bool execCmd(const char* cmd);
     
 signals:
     void disassembleAt(uint_t va, uint_t eip);
