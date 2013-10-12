@@ -65,6 +65,12 @@ uint_t Bridge::getBase(uint_t addr)
 }
 
 
+bool Bridge::execCmd(const char* cmd)
+{
+    return DbgCmdExec(cmd);
+}
+
+
 /************************************************************************************
                             Static Functions
 ************************************************************************************/
