@@ -4,13 +4,12 @@ MemoryPage::MemoryPage(uint_t parBase, uint_t parSize, QObject *parent) : QObjec
 {
     mBase = 0;
     mSize = 0;
-    mMemCache = new MemoryCache();
-    mMemCache->setMemoryToCache(0, 0);
 }
 
-byte_t* MemoryPage::readFromCache(uint_t parRVA, uint_t parLength, uint_t parCacheNewSize)
+
+void MemoryPage::readOriginalMemory(byte_t* parDest, uint_t parRVA, uint_t parSize)
 {
-    return mMemCache->readFromCache(parRVA, parLength, parCacheNewSize);
+    Bridge::getBridge()->readProcessMemory(parDest, mBase + parRVA, parSize);
 }
 
 
@@ -30,11 +29,4 @@ void MemoryPage::setAttributes(uint_t base, uint_t size)
 {
     mBase = base;
     mSize = size;
-    mMemCache->setMemoryToCache(base, size);
-}
-
-
-void MemoryPage::resetCache()
-{
-    mMemCache->resetCache();
 }

@@ -36,11 +36,11 @@ extern HINSTANCE hInstDbg;
 
 //GUI typedefs
 typedef int (*GUIGUIINIT)(int, char**);
-typedef void (*GUICHANGECIP)(duint cip);
+typedef void (*GUICHANGECIP)(duint va, duint cip);
 
 //GUI functions
 extern GUIGUIINIT _gui_guiinit;
-extern GUICHANGECIP _gui_changecip;
+extern GUICHANGECIP _gui_disassembleAt;
 
 //DBG typedefs
 typedef const char* (*DBGDBGINIT)();

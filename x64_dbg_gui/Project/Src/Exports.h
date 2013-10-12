@@ -7,7 +7,7 @@
 
 #ifdef BUILD_LIB
     extern "C" __declspec(dllexport) int _gui_guiinit(int argc, char *argv[]);
-    extern "C" __declspec(dllexport) int _gui_changecip(unsigned long long eip);
+    extern "C" __declspec(dllexport) int _gui_disassembleAt(unsigned long long va, unsigned long long eip);
 #endif
 
 

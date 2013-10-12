@@ -21,13 +21,13 @@ public:
     explicit Bridge(QObject *parent = 0);
     void readProcessMemory(byte_t* dest, uint_t va, uint_t size);
     uint_t getSize(uint_t va);
-    void emitEIPChangedSignal(uint_t eip);
+    void emitDisassembleAtSignal(uint_t va, uint_t eip);
     uint_t getBase(uint_t addr);
     static Bridge* getBridge();
     static void initBridge();
     
 signals:
-    void eipChanged(uint_t eip);
+    void disassembleAt(uint_t va, uint_t eip);
     
 public slots:
 

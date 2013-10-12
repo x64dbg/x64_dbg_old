@@ -49,7 +49,7 @@ public:
 signals:
     
 public slots:
-    void disassambleAt(uint_t parVA);
+    void disassambleAt(uint_t parVA, uint_t parCIP);
 
 private:
     enum GuiState_t {NoState, MultiRowsSelectionState};
@@ -73,6 +73,8 @@ private:
     MemoryPage* mMemPage;
 
     uint_t mCipRva;
+
+    QList<Instruction_t> mInstBuffer;
 };
 
 #endif // DISASSEMBLY_H
