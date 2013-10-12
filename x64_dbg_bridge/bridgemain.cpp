@@ -26,9 +26,10 @@ const char* DLL_IMPEXP BridgeInit()
     _gui_guiinit=(GUIGUIINIT)GetProcAddress(hInstGui, "_gui_guiinit");
     if(!_gui_guiinit)
         return "Export \"_gui_guiinit\" could not be found!";
-    _gui_changecip=(GUICHANGECIP)GetProcAddress(hInstGui, "_gui_changecip");
-    if(!_gui_changecip)
-        return "Export \"_gui_changecip\" could not be found!";
+    //_gui_disassembleAt
+    _gui_disassembleAt=(GUICHANGECIP)GetProcAddress(hInstGui, "_gui_disassembleAt");
+    if(!_gui_disassembleAt)
+        return "Export \"_gui_disassembleAt\" could not be found!";
 #endif
     //DBG Load
     hInstDbg=LoadLibraryA(dbg_lib); //Mr. eXoDia
@@ -100,7 +101,7 @@ bool DLL_IMPEXP DbgCmdExec(const char* cmd)
 void DLL_IMPEXP GuiChangeCIP(duint cip)
 {
 #ifndef NO_GUI
-    _gui_changecip(cip);
+    _gui_disassembleAt(cip, cip);
 #endif
 }
 

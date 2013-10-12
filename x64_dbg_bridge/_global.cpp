@@ -6,7 +6,7 @@ HINSTANCE hInstDbg;
 
 //GUI functions
 GUIGUIINIT _gui_guiinit;
-GUICHANGECIP _gui_changecip;
+GUICHANGECIP _gui_disassembleAt;
 
 //DBG functions
 DBGDBGINIT _dbg_dbginit;
