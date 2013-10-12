@@ -53,6 +53,7 @@
 			<Add directory="$(project_dir)" />
 		</Compiler>
 		<Linker>
+			<Add option="-static" />
 			<Add library="shlwapi" />
 			<Add library="psapi" />
 		</Linker>
@@ -82,6 +83,8 @@
 		<Unit filename="math.h" />
 		<Unit filename="memory.cpp" />
 		<Unit filename="memory.h" />
+		<Unit filename="msgqueue.cpp" />
+		<Unit filename="msgqueue.h" />
 		<Unit filename="simplescript.cpp" />
 		<Unit filename="simplescript.h" />
 		<Unit filename="threading.cpp" />

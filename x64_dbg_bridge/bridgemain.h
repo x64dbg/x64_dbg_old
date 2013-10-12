@@ -30,6 +30,7 @@ const char* DLL_IMPEXP BridgeStart();
 void DLL_IMPEXP DbgMemRead(duint va, unsigned char* dest, duint size);
 duint DLL_IMPEXP DbgMemGetPageSize(duint base);
 duint DLL_IMPEXP DbgMemFindBaseAddr(duint addr, duint* size);
+bool DLL_IMPEXP DbgCmdExec(const char* cmd);
 
 //GUI
 void DLL_IMPEXP GuiChangeCIP(duint cip);

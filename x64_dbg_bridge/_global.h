@@ -46,10 +46,12 @@ extern GUICHANGECIP _gui_changecip;
 typedef const char* (*DBGDBGINIT)();
 typedef duint (*DBGMEMFINDBASEADDR)(duint addr, duint* size);
 typedef bool (*DBGMEMREAD)(duint addr, unsigned char* dest, duint size, duint* read);
+typedef bool (*DBGDBGCMDEXEC)(const char* cmd);
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;
 extern DBGMEMFINDBASEADDR _dbg_memfindbaseaddr;
 extern DBGMEMREAD _dbg_memread;
+extern DBGDBGCMDEXEC _dbg_dbgcmdexec;
 
 #endif // _GLOBAL_H

@@ -46,6 +46,10 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_memread=(DBGMEMREAD)GetProcAddress(hInstDbg, "_dbg_memread");
     if(!_dbg_memread)
         return "Export \"_dbg_memread\" could not be found!";
+    //_dbg_dbgcmdexec
+    _dbg_dbgcmdexec=(DBGDBGCMDEXEC)GetProcAddress(hInstDbg, "_dbg_dbgcmdexec");
+    if(!_dbg_dbgcmdexec)
+        return "Export \"_dbg_dbgcmdexec\" could not be found!";
     return 0;
 }
 
@@ -85,6 +89,11 @@ duint DLL_IMPEXP DbgMemGetPageSize(duint base)
 duint DLL_IMPEXP DbgMemFindBaseAddr(duint addr, duint* size)
 {
     return _dbg_memfindbaseaddr(addr, size);
+}
+
+bool DLL_IMPEXP DbgCmdExec(const char* cmd)
+{
+    return _dbg_dbgcmdexec(cmd);
 }
 
 //GUI

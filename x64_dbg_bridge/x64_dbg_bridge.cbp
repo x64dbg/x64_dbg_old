@@ -42,6 +42,9 @@
 			<Add option="-fexceptions" />
 			<Add option="-DBUILD_BRIDGE" />
 		</Compiler>
+		<Linker>
+			<Add option="-static" />
+		</Linker>
 		<Unit filename="_global.cpp" />
 		<Unit filename="_global.h" />
 		<Unit filename="bridgemain.cpp" />

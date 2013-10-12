@@ -12,3 +12,4 @@ GUICHANGECIP _gui_changecip;
 DBGDBGINIT _dbg_dbginit;
 DBGMEMFINDBASEADDR _dbg_memfindbaseaddr;
 DBGMEMREAD _dbg_memread;
+DBGDBGCMDEXEC _dbg_dbgcmdexec;
