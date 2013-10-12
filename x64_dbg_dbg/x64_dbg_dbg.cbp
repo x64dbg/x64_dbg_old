@@ -24,6 +24,7 @@
 					<Add library=".\libdbg_x32.a" />
 					<Add library=".\gui\libgui_x32.a" />
 					<Add library="..\bin\x32\libx32_bridge.a" />
+					<Add library=".\dbghelp\dbghelp_x86.a" />
 				</Linker>
 			</Target>
 			<Target title="x64">
@@ -44,6 +45,7 @@
 					<Add library=".\libdbg_x64.a" />
 					<Add library=".\gui\libgui_x64.a" />
 					<Add library="..\bin\x64\libx64_bridge.a" />
+					<Add library=".\dbghelp\dbghelp_x64.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -72,6 +74,7 @@
 		<Unit filename="console.h" />
 		<Unit filename="data.h" />
 		<Unit filename="dbg.h" />
+		<Unit filename="dbghelp/dbghelp.h" />
 		<Unit filename="debugger.cpp" />
 		<Unit filename="debugger.h" />
 		<Unit filename="gui/disasm.h" />

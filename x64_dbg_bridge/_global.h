@@ -40,7 +40,7 @@ typedef const char* (*DBGDBGINIT)();
 typedef duint (*DBGMEMFINDBASEADDR)(duint addr, duint* size);
 typedef bool (*DBGMEMREAD)(duint addr, unsigned char* dest, duint size, duint* read);
 typedef bool (*DBGDBGCMDEXEC)(const char* cmd);
-typedef MEMMAP* (*DBGMEMMAP)();
+typedef bool (*DBGMEMMAP)(MEMMAP* memmap);
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;

@@ -101,9 +101,9 @@ bool DLL_IMPEXP DbgCmdExec(const char* cmd)
     return _dbg_dbgcmdexec(cmd);
 }
 
-MEMMAP* DLL_IMPEXP DbgMemMap()
+bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap)
 {
-    return _dbg_memmap();
+    return _dbg_memmap(memmap);
 }
 
 //GUI
