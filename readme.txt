@@ -5,7 +5,8 @@ The debugger has (currently) three parts:
 - GUI
 - Bridge
 
-DBG is the debugging part of the debugger. It handles debugging (using TitanEngine) and will provide data for the GUI.
+DBG is the debugging part of the debugger. It handles debugging (using
+TitanEngine) and will provide data for the GUI.
 
 GUI is the graphical part of the debugger. It is built on top of QT and it
 provides the user interaction, the dump window (not yet implemented), the
