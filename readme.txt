@@ -15,12 +15,12 @@ view (not yet implemented) etc.
 
 Bridge is the communication library for the DBG and GUI part (and maybe in
 the future more parts). The bridge can be used to work on new features,
-without having to update the other code parts.
+without having to update the code of the other parts.
 
 Right now the debugger supports the following features:
 - variables (with regard to the upcoming script feature)
 - basic calculations (var*@401000+.45^4A)
-- hidedebugger (very basic)
+- hide debugger (very basic)
 - software breakpoints (INT3, LONG INT3, UD2)
 - memory breakpoints (read, write, execute)
 - hardware breakpoints (access, write, execute)
