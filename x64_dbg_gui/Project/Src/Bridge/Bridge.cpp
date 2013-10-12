@@ -39,10 +39,10 @@ void Bridge::readProcessMemory(byte_t* dest, uint_t va, uint_t size)
 #endif
 }
 
-void Bridge::emitEIPChangedSignal(uint_t eip)
+void Bridge::emitDisassembleAtSignal(uint_t va, uint_t eip)
 {
 #ifdef BUILD_LIB
-    emit eipChanged(eip);
+    emit disassembleAt(va, eip);
 #endif
 }
 
@@ -94,9 +94,9 @@ void Bridge::initBridge()
 
 
 
-    __declspec(dllexport) int _gui_changecip(unsigned long long eip)
+    __declspec(dllexport) int _gui_disassembleAt(unsigned long long va, unsigned long long eip)
     {
-        Bridge::getBridge()->emitEIPChangedSignal(eip);
+        Bridge::getBridge()->emitDisassembleAtSignal(va, eip);
     }
 #endif
 

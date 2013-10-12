@@ -30,7 +30,6 @@ SOURCES += \
     Src/DisassemblyView/HexDump.cpp \
     Src/Memory/ProcessMemoryMap.cpp \
     Src/Memory/MemoryPage.cpp \
-    Src/Memory/MemoryCache.cpp \
     Src/Bridge/Bridge.cpp \
     Src/Memory/MapViewOfMem.cpp
 
@@ -44,7 +43,6 @@ HEADERS  += \
     Src/DisassemblyView/HexDump.h \
     Src/Memory/ProcessMemoryMap.h \
     Src/Memory/MemoryPage.h \
-    Src/Memory/MemoryCache.h \
     Src/Bridge/Bridge.h \
     Src/Exports.h \
     Src/Imports.h \
