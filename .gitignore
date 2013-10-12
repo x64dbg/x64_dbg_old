@@ -1,6 +1,7 @@
 #ignore directories
 */obj/
-/bin
+bin/*/*
+!bin/*/TitanEngine.dll
 
 #global filetypes to ignore
 *.depend
