@@ -47,6 +47,7 @@
     <addaction name="actionStepInto"/>
     <addaction name="actionStepOver"/>
     <addaction name="separator"/>
+    <addaction name="actionCommand"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
     <property name="title">
@@ -174,6 +175,14 @@
    </property>
    <property name="shortcut">
     <string>F8</string>
+   </property>
+  </action>
+  <action name="actionCommand">
+   <property name="text">
+    <string>Command</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Return</string>
    </property>
   </action>
  </widget>

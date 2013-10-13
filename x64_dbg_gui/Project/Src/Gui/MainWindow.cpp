@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setCentralWidget(mdiArea);
 
     // Setup the command bar
-    mCmdLineEdit = new QLineEdit(ui->cmdBar);
+    mCmdLineEdit = new CommandLineEdit(ui->cmdBar);
     ui->cmdBar->addWidget(new QLabel("Command "));
     ui->cmdBar->addWidget(mCmdLineEdit);
 
@@ -36,8 +36,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Setup Signals/Slots
     connect(ui->actionStepOver, SIGNAL(triggered()), mCpuWin, SLOT(stepOverSlot()));
     connect(mCmdLineEdit, SIGNAL(returnPressed()), this, SLOT(executeCommand()));
+    connect(ui->actionStepOver,SIGNAL(triggered()),this,SLOT(execStepOver()));
+    connect(ui->actionStepInto,SIGNAL(triggered()),this,SLOT(execStepInto()));
+    connect(ui->actionCommand,SIGNAL(triggered()),this,SLOT(setFocusToCommandBar()));
 
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -48,5 +52,28 @@ MainWindow::~MainWindow()
 void MainWindow::executeCommand()
 {
     QString wCmd = mCmdLineEdit->text();
+
     Bridge::getBridge()->execCmd(reinterpret_cast<const char*>(wCmd.toAscii().data()));
+
+    mCmdLineEdit->addCmdToHistory(wCmd);
+    mCmdLineEdit->setText("");
 }
+
+
+
+
+void MainWindow::execStepOver()
+{
+    Bridge::getBridge()->execCmd("sto");
+}
+
+void MainWindow::execStepInto()
+{
+    Bridge::getBridge()->execCmd("sti");
+}
+
+void MainWindow::setFocusToCommandBar()
+{
+    mCmdLineEdit->setFocusToCmd();
+}
+

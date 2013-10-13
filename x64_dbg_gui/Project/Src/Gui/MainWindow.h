@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtGui>
 #include "CPUWidget.h"
+#include "CommandLineEdit.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,13 +20,16 @@ public:
 
 public slots:
     void executeCommand();
+    void execStepOver();
+    void execStepInto();
+    void setFocusToCommandBar();
     
 private:
     Ui::MainWindow *ui;
     QMdiArea* mdiArea;
     CPUWidget* mCpuWin;
 
-    QLineEdit* mCmdLineEdit;
+    CommandLineEdit* mCmdLineEdit;
 };
 
 #endif // MAINWINDOW_H

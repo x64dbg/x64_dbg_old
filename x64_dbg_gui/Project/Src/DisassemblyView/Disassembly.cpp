@@ -93,11 +93,11 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
                 painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
                 painter->save();
                 painter->setPen(QPen(QColor("#ffffff")));
-                painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva, 8, 16, QChar('0')).toUpper());
+                painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva, 16, 16, QChar('0')).toUpper());
                 painter->restore();
             }
             else
-                wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva, 8, 16, QChar('0')).toUpper();
+                wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva, 16, 16, QChar('0')).toUpper();
 
             break;
         }
