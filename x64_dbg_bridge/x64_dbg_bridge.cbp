@@ -16,7 +16,6 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add option="-DNO_GUI" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
