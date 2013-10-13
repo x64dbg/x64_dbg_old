@@ -14,3 +14,4 @@ DBGMEMFINDBASEADDR _dbg_memfindbaseaddr;
 DBGMEMREAD _dbg_memread;
 DBGDBGCMDEXEC _dbg_dbgcmdexec;
 DBGMEMMAP _dbg_memmap;
+DBGDBGEXITSIGNAL _dbg_dbgexitsignal;

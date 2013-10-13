@@ -55,6 +55,10 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_memmap=(DBGMEMMAP)GetProcAddress(hInstDbg, "_dbg_memmap");
     if(!_dbg_memmap)
         return "Export \"_dbg_memmap\" could not be found!";
+    //_dbg_dbgexitsignal
+    _dbg_dbgexitsignal=(DBGDBGEXITSIGNAL)GetProcAddress(hInstDbg, "_dbg_dbgexitsignal");
+    if(!_dbg_dbgexitsignal)
+        return "Export \"_dbg_dbgexitsignal\" could not be found!";
     return 0;
 }
 
@@ -121,6 +125,11 @@ bool DLL_IMPEXP DbgCmdExec(const char* cmd)
 bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap)
 {
     return _dbg_memmap(memmap);
+}
+
+void DLL_IMPEXP DbgExitSignal()
+{
+    _dbg_dbgexitsignal();
 }
 
 //GUI

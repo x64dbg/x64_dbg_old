@@ -76,7 +76,7 @@ void DebugUpdateDisasm(uint disasm_addr)
 {
     uint basesize;
     uint base=memfindbaseaddr(fdProcessInfo->hProcess, disasm_addr, &basesize);
-    uint start=disasm_addr-(32)*MAXCMDSIZE; //some size back
+    uint start=disasm_addr-(32)*16; //some size back
     if(start<base)
         start=base;
     uint disasmsize=500*16;

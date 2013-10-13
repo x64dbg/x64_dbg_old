@@ -84,3 +84,8 @@ extern "C" DLL_EXPORT bool _dbg_memmap(MEMMAP* memmap)
 
     return true;
 }
+
+extern "C" DLL_EXPORT void _dbg_dbgexitsignal()
+{
+    //TODO: handle exit signal
+}

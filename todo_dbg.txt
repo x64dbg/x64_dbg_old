@@ -32,3 +32,5 @@
 - udd file format
 - analysis
 - symbol loader
+- getlasterror
+- display open handles
