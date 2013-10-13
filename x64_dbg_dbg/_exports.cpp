@@ -77,7 +77,7 @@ extern "C" DLL_EXPORT bool _dbg_memmap(MEMMAP* memmap)
 
     //process vector
     int pagecount=memmap->count;
-    memmap->page=(MEMPAGE*)emalloc(sizeof(MEMPAGE)*pagecount);
+    memmap->page=(MEMPAGE*)BridgeAlloc(sizeof(MEMPAGE)*pagecount);
     memset(memmap->page, 0, sizeof(MEMPAGE)*pagecount);
     for(int i=0; i<pagecount; i++)
         memcpy(&memmap->page[i], &pageVector.at(i), sizeof(MEMPAGE));

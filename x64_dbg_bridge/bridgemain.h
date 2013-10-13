@@ -22,9 +22,11 @@ extern "C"
 {
 #endif
 
-//Bridge
+//Bridge functions
 const char* DLL_IMPEXP BridgeInit();
 const char* DLL_IMPEXP BridgeStart();
+void* DLL_IMPEXP BridgeAlloc(size_t size);
+void DLL_IMPEXP BridgeFree(void* ptr);
 
 //Debugger structs
 struct MEMPAGE
@@ -44,7 +46,7 @@ void DLL_IMPEXP DbgMemRead(duint va, unsigned char* dest, duint size);
 duint DLL_IMPEXP DbgMemGetPageSize(duint base);
 duint DLL_IMPEXP DbgMemFindBaseAddr(duint addr, duint* size);
 bool DLL_IMPEXP DbgCmdExec(const char* cmd);
-MEMMAP* DLL_IMPEXP DbgMemMap();
+bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap);
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);

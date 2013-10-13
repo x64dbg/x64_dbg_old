@@ -59,7 +59,10 @@ bool varnew(const char* name_, uint value, VAR_TYPE type)
     else
         strcpy(name, name_);
     if(!name[1])
+    {
+        efree(name);
         return false;
+    }
     if(varfind(name, 0))
     {
         efree(name);

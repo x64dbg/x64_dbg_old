@@ -122,7 +122,7 @@ static bool cbCommandProvider(char* cmd, int maxlen)
     if(strlen(newcmd)>=deflen)
         newcmd[deflen-1]=0;
     strcpy(cmd, newcmd);
-    efree(newcmd);
+    efree(newcmd); //free allocated command
     return true;
 }
 

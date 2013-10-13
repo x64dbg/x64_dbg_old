@@ -12,7 +12,7 @@ static HINSTANCE hInst;
 #define gui_lib "x32_gui.dll"
 #endif // _WIN64
 
-//#define NO_GUI //for debugger-only testinw
+//#define NO_GUI //for debugger-only testing
 
 //Bridge
 const char* DLL_IMPEXP BridgeInit()
@@ -75,6 +75,23 @@ const char* DLL_IMPEXP BridgeStart()
     Sleep(-1);
 #endif
     return 0;
+}
+
+void* DLL_IMPEXP BridgeAlloc(size_t size)
+{
+    unsigned char* a=new unsigned char[size];
+    if(!a)
+    {
+        MessageBoxA(0, "Could not allocate memory", "Error", MB_ICONERROR);
+        ExitProcess(1);
+    }
+    memset(a, 0, size);
+    return a;
+}
+
+void DLL_IMPEXP BridgeFree(void* ptr)
+{
+    delete[] (unsigned char*)ptr;
 }
 
 //Debugger

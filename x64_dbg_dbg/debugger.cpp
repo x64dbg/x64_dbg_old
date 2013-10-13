@@ -76,7 +76,7 @@ void DebugUpdateDisasm(uint disasm_addr)
 {
     uint basesize;
     uint base=memfindbaseaddr(fdProcessInfo->hProcess, disasm_addr, &basesize);
-    uint start=disasm_addr-16*16;
+    uint start=disasm_addr-(32)*MAXCMDSIZE; //some size back
     if(start<base)
         start=base;
     uint disasmsize=500*16;
@@ -338,6 +338,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
         return 0;
     }
     strcpy(szFileName, init->exe);
+    efree(init); //free init struct
     varset("$hp", (uint)fdProcessInfo->hProcess, true);
     varset("$pid", fdProcessInfo->dwProcessId, true);
     ecount=0;
