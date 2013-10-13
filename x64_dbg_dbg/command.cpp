@@ -142,8 +142,6 @@ CMDRESULT cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPR
     bool bLoop=true;
     while(bLoop)
     {
-        printf(">");
-        consolesetlasty();
         if(!cbCommandProvider(command, deflen))
             break;
         if(strlen(command))

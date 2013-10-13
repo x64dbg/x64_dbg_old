@@ -23,6 +23,9 @@ public slots:
     void execStepOver();
     void execStepInto();
     void setFocusToCommandBar();
+    void execClose();
+    void execRun();
+    void execRtr();
     
 private:
     Ui::MainWindow *ui;

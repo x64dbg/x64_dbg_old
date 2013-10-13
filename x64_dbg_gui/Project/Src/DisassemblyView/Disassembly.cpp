@@ -118,7 +118,7 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
 
         case 2:
         {
-            wStr = mInstBuffer.at(rowOffset).instStr.toUpper();
+            wStr = mInstBuffer.at(rowOffset).instStr;//.toUpper(); (uppercase isnt needed)
             break;
         }
 

@@ -39,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionStepOver,SIGNAL(triggered()),this,SLOT(execStepOver()));
     connect(ui->actionStepInto,SIGNAL(triggered()),this,SLOT(execStepInto()));
     connect(ui->actionCommand,SIGNAL(triggered()),this,SLOT(setFocusToCommandBar()));
+    connect(ui->actionClose,SIGNAL(triggered()),this,SLOT(execClose()));
+    connect(ui->actionRun,SIGNAL(triggered()),this,SLOT(execRun()));
+    connect(ui->actionRtr,SIGNAL(triggered()),this,SLOT(execRtr()));
 
 }
 
@@ -64,16 +67,31 @@ void MainWindow::executeCommand()
 
 void MainWindow::execStepOver()
 {
-    Bridge::getBridge()->execCmd("sto");
+    Bridge::getBridge()->execCmd("StepOver");
 }
 
 void MainWindow::execStepInto()
 {
-    Bridge::getBridge()->execCmd("sti");
+    Bridge::getBridge()->execCmd("StepInto");
 }
 
 void MainWindow::setFocusToCommandBar()
 {
     mCmdLineEdit->setFocusToCmd();
+}
+
+void MainWindow::execClose()
+{
+    Bridge::getBridge()->execCmd("stop");
+}
+
+void MainWindow::execRun()
+{
+    Bridge::getBridge()->execCmd("run");
+}
+
+void MainWindow::execRtr()
+{
+    Bridge::getBridge()->execCmd("rtr");
 }
 

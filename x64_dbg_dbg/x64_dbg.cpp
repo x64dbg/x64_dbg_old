@@ -70,7 +70,7 @@ static void registercommands()
     cmdnew(cmd, "scr\1script", cbScript, false); //script testing
 }
 
-static DWORD WINAPI focusThread(void* lpParam)
+/*static DWORD WINAPI focusThread(void* lpParam)
 {
     unsigned int lastpress=0;
     HWND console=GetConsoleHwnd();
@@ -93,7 +93,7 @@ static DWORD WINAPI focusThread(void* lpParam)
         Sleep(100);
     }
     return 0;
-}
+}*/
 
 static DWORD WINAPI consolePosThread(void* lpParam)
 {
@@ -139,6 +139,8 @@ static DWORD WINAPI ConsoleReadLoopThread(void* a)
     char cmd[deflen];
     while(1)
     {
+        //consolesetlasty();
+        //printf(">");
         fgets(cmd, deflen, stdin);
         cmd[strlen(cmd)-1]=0;
         while(!_dbg_dbgcmdexec(cmd)) //retry until the command came through
@@ -175,7 +177,6 @@ extern "C" const char* DLL_EXPORT _dbg_dbginit()
     registercommands();
     scriptSetList(command_list);
     CreateThread(0, 0, consolePosThread, 0, 0, 0);
-    //CreateThread(0, 0, focusThread, 0, 0, 0);
     CreateThread(0, 0, DbgCommandLoopThread, 0, 0, 0);
     CreateThread(0, 0, ConsoleReadLoopThread, 0, 0, 0);
     return 0;
