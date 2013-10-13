@@ -1,6 +1,8 @@
 #ifndef _BRIDGEMAIN_H_
 #define _BRIDGEMAIN_H_
 
+#include <windows.h>
+
 #ifdef _WIN64
 typedef unsigned long long duint;
 typedef long long dsint;
