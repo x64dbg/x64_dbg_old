@@ -26,48 +26,51 @@ TEMPLATE = lib
 
 
 SOURCES += \
-    Src/Gui/MainWindow.cpp \
     Src/main.cpp \
+    Src/Gui/MainWindow.cpp \
     Src/Gui/CPUWidget.cpp \
+    Src/Gui/CommandLineEdit.cpp \
+    Src/BasicView/Disassembly.cpp \
+    Src/BasicView/HexDump.cpp \
+    Src/BasicView/AbstractTableView.cpp \
     Src/Disassembler/QBeaEngine.cpp \
-    Src/DisassemblyView/AbstractTableView.cpp \
-    Src/DisassemblyView/Disassembly.cpp \
-    Src/DisassemblyView/HexDump.cpp \
     Src/Memory/ProcessMemoryMap.cpp \
     Src/Memory/MemoryPage.cpp \
-    Src/Bridge/Bridge.cpp \
     Src/Memory/MapViewOfMem.cpp \
-    Src/Gui/CommandLineEdit.cpp
+    Src/Bridge/Bridge.cpp
 
-HEADERS  += \
+
+HEADERS += \
+    Src/main.h \
     Src/Gui/MainWindow.h \
     Src/Gui/CPUWidget.h \
+    Src/Gui/CommandLineEdit.h \
+    Src/BasicView/Disassembly.h \
+    Src/BasicView/HexDump.h \
+    Src/BasicView/AbstractTableView.h \
     Src/Disassembler/QBeaEngine.h \
-    Src/DisassemblyView/AbstractTableView.h \
-    Src/DisassemblyView/Disassembly.h \
-    Src/Global/NewTypes.h \
-    Src/DisassemblyView/HexDump.h \
     Src/Memory/ProcessMemoryMap.h \
     Src/Memory/MemoryPage.h \
-    Src/Bridge/Bridge.h \
-    Src/Exports.h \
-    Src/Imports.h \
-    Src/main.h \
     Src/Memory/MapViewOfMem.h \
-    Src/Gui/CommandLineEdit.h
+    Src/Bridge/Bridge.h \
+    Src/Global/NewTypes.h \
+    Src/Exports.h \
+    Src/Imports.h
+
 
 INCLUDEPATH += \
     Src \
     Src/Gui \
-    Src/DisassemblyView \
-    Src/Memory \
-    Src/BeaEngine/headers \
+    Src/BasicView \
     Src/Disassembler \
     Src/BeaEngine \
-    Src/Global \
-    Src/Bridge
+    Src/ThirdPartyLibs/BeaEngine \
+    Src/Memory \
+    Src/Bridge \
+    Src/Global
 
-FORMS    += \
+
+FORMS += \
     Src/Gui/MainWindow.ui \
     Src/Dummy.ui \
     Src/Gui/CPUWidget.ui
@@ -80,12 +83,12 @@ INCLUDEPATH += $$PWD/Src/Bridge
 
 !contains(QMAKE_HOST.arch, x86_64) {
     message("x86 build")
-    LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s
+    LIBS += -L"$$PWD/Src/ThirdPartyLibs/BeaEngine/" -lBeaEngine_s
     LIBS += -L"$$PWD/Src/Bridge/" -lx32_bridge
     ## Windows x86 (32bit) specific build here
 } else {
     message("x86_64 build")
-    LIBS += -L"$$PWD/Src/BeaEngine/" -lBeaEngine_s_64
+    LIBS += -L"$$PWD/Src/ThirdPartyLibs/BeaEngine/" -lBeaEngine_s_64
     LIBS += -L"$$PWD/Src/Bridge/" -lx64_bridge
     ## Windows x64 (64bit) specific build here
 }
