@@ -40,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionStepOver, SIGNAL(triggered()), mCpuWin, SLOT(stepOverSlot()));
     connect(mCmdLineEdit, SIGNAL(returnPressed()), this, SLOT(executeCommand()));
     connect(mCmdLineEdit, SIGNAL(keyPressed(int)), this, SLOT(cmdLineEditKeyPressedSlot(int)));
+    connect(ui->actionStepOver,SIGNAL(triggered()),this,SLOT(execStepOver()));
+    connect(ui->actionStepInto,SIGNAL(triggered()),this,SLOT(execStepInto()));
+    connect(ui->actionCommand,SIGNAL(triggered()),this,SLOT(setFocusToCommandBar()));
 
 }
 
@@ -93,3 +96,20 @@ void MainWindow::cmdLineEditKeyPressedSlot(int parKey)
 
     }
 }
+
+void MainWindow::execStepOver()
+{
+    Bridge::getBridge()->execCmd("sto");
+}
+
+void MainWindow::execStepInto()
+{
+    Bridge::getBridge()->execCmd("sti");
+}
+
+void MainWindow::setFocusToCommandBar()
+{
+    mCmdIndex = -1;
+    mCmdLineEdit->setFocus();
+}
+

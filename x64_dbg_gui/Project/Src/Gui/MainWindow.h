@@ -21,6 +21,9 @@ public:
 public slots:
     void executeCommand();
     void cmdLineEditKeyPressedSlot(int parKey);
+    void execStepOver();
+    void execStepInto();
+    void setFocusToCommandBar();
     
 private:
     Ui::MainWindow *ui;
