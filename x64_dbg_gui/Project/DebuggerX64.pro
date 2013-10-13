@@ -37,7 +37,7 @@ SOURCES += \
     Src/Memory/MemoryPage.cpp \
     Src/Bridge/Bridge.cpp \
     Src/Memory/MapViewOfMem.cpp \
-    Src/Gui/LineEdit.cpp
+    Src/Gui/CommandLineEdit.cpp
 
 HEADERS  += \
     Src/Gui/MainWindow.h \
@@ -54,7 +54,7 @@ HEADERS  += \
     Src/Imports.h \
     Src/main.h \
     Src/Memory/MapViewOfMem.h \
-    Src/Gui/LineEdit.h
+    Src/Gui/CommandLineEdit.h
 
 INCLUDEPATH += \
     Src \

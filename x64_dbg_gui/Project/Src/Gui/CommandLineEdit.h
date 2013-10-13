@@ -4,17 +4,24 @@
 #include <QtGui>
 #include <QDebug>
 
-class LineEdit : public QLineEdit
+class CommandLineEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    explicit LineEdit(QWidget *parent = 0);
+    explicit CommandLineEdit(QWidget *parent = 0);
     void keyPressEvent(QKeyEvent* event);
+    void addCmdToHistory(QString parCmd);
+    void setFocusToCmd();
     
 signals:
     void keyPressed(int parKey);
     
 public slots:
+
+
+private:
+    QList<QString> mCmdHistory;
+    int mCmdIndex;
     
 };
 
