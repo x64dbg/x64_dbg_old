@@ -223,7 +223,10 @@ static void cbException(void* ExceptionData)
         SetContextData(UE_CIP, (uint)edi->ExceptionRecord.ExceptionAddress);
     char msg[1024]="";
     if(edi->dwFirstChance) //first chance exception
+    {
         sprintf(msg, "first chance exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
+        SetNextDbgContinueStatus(DBG_EXCEPTION_NOT_HANDLED);
+    }
     else //lock the exception
     {
         sprintf(msg, "last chance exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);

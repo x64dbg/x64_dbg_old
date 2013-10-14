@@ -78,6 +78,7 @@ const char* DLL_IMPEXP BridgeStart()
 #else
     Sleep(-1);
 #endif
+    _dbg_dbgexitsignal(); //send exit signal to debugger
     return 0;
 }
 
@@ -125,11 +126,6 @@ bool DLL_IMPEXP DbgCmdExec(const char* cmd)
 bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap)
 {
     return _dbg_memmap(memmap);
-}
-
-void DLL_IMPEXP DbgExitSignal()
-{
-    _dbg_dbgexitsignal();
 }
 
 //GUI
