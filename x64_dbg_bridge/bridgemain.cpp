@@ -142,6 +142,9 @@ void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip)
 
 void DLL_IMPEXP GuiSetDebugState(DBGSTATE state)
 {
+#ifndef NO_GUI
+    _gui_setdebugstate(state);
+#endif // NO_GUI
 }
 
 //Main
