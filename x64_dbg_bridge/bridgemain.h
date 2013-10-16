@@ -43,6 +43,13 @@ struct MEMMAP
     MEMPAGE* page;
 };
 
+//Debugger enums
+enum DBGSTATE
+{
+    paused,
+    running
+};
+
 //Debugger functions
 void DLL_IMPEXP DbgMemRead(duint va, unsigned char* dest, duint size);
 duint DLL_IMPEXP DbgMemGetPageSize(duint base);
@@ -52,6 +59,7 @@ bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap);
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);
+void DLL_IMPEXP GuiSetDebugState(DBGSTATE state);
 
 #ifdef __cplusplus
 }

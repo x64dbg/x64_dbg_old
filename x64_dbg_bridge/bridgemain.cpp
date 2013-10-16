@@ -136,6 +136,10 @@ void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip)
 #endif
 }
 
+void DLL_IMPEXP GuiSetDebugState(DBGSTATE state)
+{
+}
+
 //Main
 extern "C" DLL_IMPEXP BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {

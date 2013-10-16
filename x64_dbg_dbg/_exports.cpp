@@ -88,4 +88,7 @@ extern "C" DLL_EXPORT bool _dbg_memmap(MEMMAP* memmap)
 extern "C" DLL_EXPORT void _dbg_dbgexitsignal()
 {
     //TODO: handle exit signal
+    DeleteFileA("DLLLoader.exe");
+    StopDebug();
+    ForceClose();
 }

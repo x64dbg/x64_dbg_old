@@ -38,7 +38,7 @@ static COMMAND* command_list=0;
 static void registercommands()
 {
     COMMAND* cmd=command_list=cmdinit();
-    cmdnew(cmd, "exit\1x", cbExit, false); //quit debugger
+    //cmdnew(cmd, "exit\1x", cbExit, false); //quit debugger
     cmdnew(cmd, "strlen\1charcount\1ccount", cbStrLen, false); //get strlen, arg1:string
     cmdnew(cmd, "varnew\1var", cbInstrVar, false); //make a variable arg1:name,[arg2:value]
     cmdnew(cmd, "vardel", cbInstrVarDel, false); //delete a variable, arg1:variable name
@@ -139,8 +139,6 @@ static DWORD WINAPI ConsoleReadLoopThread(void* a)
     char cmd[deflen];
     while(1)
     {
-        //consolesetlasty();
-        //printf(">");
         fgets(cmd, deflen, stdin);
         cmd[strlen(cmd)-1]=0;
         while(!_dbg_dbgcmdexec(cmd)) //retry until the command came through
@@ -151,12 +149,9 @@ static DWORD WINAPI ConsoleReadLoopThread(void* a)
 
 static DWORD WINAPI DbgCommandLoopThread(void* a)
 {
-    Sleep(200);
-    SetForegroundWindow(GetConsoleHwnd());
-
+    //Sleep(200);
+    //SetForegroundWindow(GetConsoleHwnd());
     cmdloop(command_list, cbBadCmd, cbCommandProvider, cmdfindmain, false);
-    DeleteFileA("DLLLoader.exe");
-    ExitProcess(0);
     return 0;
 }
 
