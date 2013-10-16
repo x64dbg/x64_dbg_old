@@ -37,7 +37,9 @@ SOURCES += \
     Src/Memory/ProcessMemoryMap.cpp \
     Src/Memory/MemoryPage.cpp \
     Src/Memory/MapViewOfMem.cpp \
-    Src/Bridge/Bridge.cpp
+    Src/Bridge/Bridge.cpp \
+    Src/BasicView/StdTable.cpp \
+    Src/BasicView/MemoryMapView.cpp
 
 
 HEADERS += \
@@ -55,7 +57,9 @@ HEADERS += \
     Src/Bridge/Bridge.h \
     Src/Global/NewTypes.h \
     Src/Exports.h \
-    Src/Imports.h
+    Src/Imports.h \
+    Src/BasicView/StdTable.h \
+    Src/BasicView/MemoryMapView.h
 
 
 INCLUDEPATH += \

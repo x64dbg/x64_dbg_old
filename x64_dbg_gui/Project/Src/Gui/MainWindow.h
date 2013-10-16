@@ -5,6 +5,7 @@
 #include <QtGui>
 #include "CPUWidget.h"
 #include "CommandLineEdit.h"
+#include "MemoryMapView.h"
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +24,7 @@ public slots:
     void execStepOver();
     void execStepInto();
     void setFocusToCommandBar();
+    void displayMemMapWidget();
     
 private:
     Ui::MainWindow *ui;
@@ -30,6 +32,8 @@ private:
     CPUWidget* mCpuWin;
 
     CommandLineEdit* mCmdLineEdit;
+
+    QMdiSubWindow* mMemMapView;
 };
 
 #endif // MAINWINDOW_H

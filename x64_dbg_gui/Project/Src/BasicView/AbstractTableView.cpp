@@ -585,7 +585,7 @@ int AbstractTableView::getLineToPrintcount()
  *
  * @return      y - getHeaderHeigth().
  */
-void AbstractTableView::addColumnAt(int at, int width, bool isClickable)
+int AbstractTableView::addColumnAt(int at, int width, bool isClickable)
 {
     HeaderButton_t wHeaderButton;
     Column_t wColumn;
@@ -604,6 +604,8 @@ void AbstractTableView::addColumnAt(int at, int width, bool isClickable)
         at = mColumnList.size();
 
     mColumnList.insert(at, wColumn);
+
+    return at;
 }
 
 

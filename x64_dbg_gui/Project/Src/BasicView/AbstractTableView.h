@@ -40,10 +40,10 @@ public:
     virtual int getLineToPrintcount();
 
     // New Columns
-    void addColumnAt(int at, int width, bool isClickable);
+    virtual int addColumnAt(int at, int width, bool isClickable);
 
     // Getter & Setter
-    void setRowCount(int count);
+    virtual void setRowCount(int count);
     int getRowCount();
     int getColumnCount();
     int getRowHeight();

@@ -7,6 +7,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     this->showMaximized();
 
+    mMemMapView = new QMdiSubWindow();
+    mMemMapView->setWindowTitle("Memory Map");
+    mMemMapView->setWidget(new MemoryMapView());
+    mMemMapView->hide();
+
+
     mdiArea = new QMdiArea;
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -23,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     //Add subWindow to Main QMdiArea here
     mdiArea->addSubWindow(subWindow);
+    mdiArea->addSubWindow(mMemMapView);
 
 
     setCentralWidget(mdiArea);
@@ -39,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionStepOver,SIGNAL(triggered()),this,SLOT(execStepOver()));
     connect(ui->actionStepInto,SIGNAL(triggered()),this,SLOT(execStepInto()));
     connect(ui->actionCommand,SIGNAL(triggered()),this,SLOT(setFocusToCommandBar()));
+    connect(ui->actionMemoryMap,SIGNAL(triggered()),this,SLOT(displayMemMapWidget()));
 
 }
 
@@ -60,8 +68,6 @@ void MainWindow::executeCommand()
 }
 
 
-
-
 void MainWindow::execStepOver()
 {
     Bridge::getBridge()->execCmd("sto");
@@ -77,3 +83,9 @@ void MainWindow::setFocusToCommandBar()
     mCmdLineEdit->setFocusToCmd();
 }
 
+
+void MainWindow::displayMemMapWidget()
+{
+    mMemMapView->widget()->show();
+    mMemMapView->setFocus();
+}
