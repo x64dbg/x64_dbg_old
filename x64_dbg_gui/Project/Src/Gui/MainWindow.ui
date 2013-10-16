@@ -47,6 +47,7 @@
     <addaction name="separator"/>
     <addaction name="actionStepInto"/>
     <addaction name="actionStepOver"/>
+    <addaction name="actionRtr"/>
     <addaction name="separator"/>
     <addaction name="actionCommand"/>
    </widget>
@@ -186,9 +187,17 @@
     <string>Ctrl+Alt+Return</string>
    </property>
   </action>
+  <action name="actionRtr">
+   <property name="text">
+    <string>Execute till return</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F9</string>
+   </property>
+  </action>
   <action name="actionMemoryMap">
    <property name="text">
-    <string>Memory Map</string>
+    <string>MemoryMap</string>
    </property>
   </action>
  </widget>

@@ -26,7 +26,7 @@ uint memfindbaseaddr(HANDLE hProcess, uint addr, uint* size)
 
 bool memread(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead)
 {
-    uint size;
+    uint size=0;
     uint base=memfindbaseaddr(hProcess, (uint)lpBaseAddress, &size);
     DWORD oldprotect;
     VirtualProtectEx(hProcess, (void*)base, size, PAGE_EXECUTE_READWRITE, &oldprotect);

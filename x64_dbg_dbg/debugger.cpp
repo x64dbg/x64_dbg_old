@@ -76,7 +76,7 @@ void DebugUpdateDisasm(uint disasm_addr)
 {
     uint basesize;
     uint base=memfindbaseaddr(fdProcessInfo->hProcess, disasm_addr, &basesize);
-    uint start=disasm_addr-16*16;
+    uint start=disasm_addr-(32)*16; //some size back
     if(start<base)
         start=base;
     uint disasmsize=500*16;
@@ -223,7 +223,10 @@ static void cbException(void* ExceptionData)
         SetContextData(UE_CIP, (uint)edi->ExceptionRecord.ExceptionAddress);
     char msg[1024]="";
     if(edi->dwFirstChance) //first chance exception
+    {
         sprintf(msg, "first chance exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
+        SetNextDbgContinueStatus(DBG_EXCEPTION_NOT_HANDLED);
+    }
     else //lock the exception
     {
         sprintf(msg, "last chance exception on "fhex" (%.8X)!", addr, edi->ExceptionRecord.ExceptionCode);
@@ -338,6 +341,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
         return 0;
     }
     strcpy(szFileName, init->exe);
+    efree(init); //free init struct
     varset("$hp", (uint)fdProcessInfo->hProcess, true);
     varset("$pid", fdProcessInfo->dwProcessId, true);
     ecount=0;

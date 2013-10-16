@@ -12,7 +12,7 @@ static HINSTANCE hInst;
 #define gui_lib "x32_gui.dll"
 #endif // _WIN64
 
-//#define NO_GUI //for debugger-only testinw
+//#define NO_GUI //for debugger-only testing
 
 //Bridge
 const char* DLL_IMPEXP BridgeInit()
@@ -55,6 +55,10 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_memmap=(DBGMEMMAP)GetProcAddress(hInstDbg, "_dbg_memmap");
     if(!_dbg_memmap)
         return "Export \"_dbg_memmap\" could not be found!";
+    //_dbg_dbgexitsignal
+    _dbg_dbgexitsignal=(DBGDBGEXITSIGNAL)GetProcAddress(hInstDbg, "_dbg_dbgexitsignal");
+    if(!_dbg_dbgexitsignal)
+        return "Export \"_dbg_dbgexitsignal\" could not be found!";
     return 0;
 }
 
@@ -74,7 +78,25 @@ const char* DLL_IMPEXP BridgeStart()
 #else
     Sleep(-1);
 #endif
+    _dbg_dbgexitsignal(); //send exit signal to debugger
     return 0;
+}
+
+void* DLL_IMPEXP BridgeAlloc(size_t size)
+{
+    unsigned char* a=new unsigned char[size];
+    if(!a)
+    {
+        MessageBoxA(0, "Could not allocate memory", "Error", MB_ICONERROR);
+        ExitProcess(1);
+    }
+    memset(a, 0, size);
+    return a;
+}
+
+void DLL_IMPEXP BridgeFree(void* ptr)
+{
+    delete[] (unsigned char*)ptr;
 }
 
 //Debugger
@@ -112,6 +134,10 @@ void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip)
 #ifndef NO_GUI
     _gui_disassembleat(addr, cip);
 #endif
+}
+
+void DLL_IMPEXP GuiSetDebugState(DBGSTATE state)
+{
 }
 
 //Main

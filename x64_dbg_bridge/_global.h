@@ -41,6 +41,7 @@ typedef duint (*DBGMEMFINDBASEADDR)(duint addr, duint* size);
 typedef bool (*DBGMEMREAD)(duint addr, unsigned char* dest, duint size, duint* read);
 typedef bool (*DBGDBGCMDEXEC)(const char* cmd);
 typedef bool (*DBGMEMMAP)(MEMMAP* memmap);
+typedef void (*DBGDBGEXITSIGNAL)();
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;
@@ -48,5 +49,6 @@ extern DBGMEMFINDBASEADDR _dbg_memfindbaseaddr;
 extern DBGMEMREAD _dbg_memread;
 extern DBGDBGCMDEXEC _dbg_dbgcmdexec;
 extern DBGMEMMAP _dbg_memmap;
+extern DBGDBGEXITSIGNAL _dbg_dbgexitsignal;
 
 #endif // _GLOBAL_H

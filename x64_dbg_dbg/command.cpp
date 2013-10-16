@@ -142,8 +142,6 @@ CMDRESULT cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPR
     bool bLoop=true;
     while(bLoop)
     {
-        printf(">");
-        consolesetlasty();
         if(!cbCommandProvider(command, deflen))
             break;
         if(strlen(command))
@@ -190,11 +188,6 @@ static void specialformat(char* string)
     int len=strlen(string);
     char* found=strstr(string, "=");
     char* str=(char*)emalloc(len*2);
-    if(!str)
-    {
-        cputs("error: malloc");
-        return;
-    }
     memset(str, 0, len*2);
     if(found) //contains =
     {

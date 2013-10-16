@@ -25,6 +25,9 @@ public slots:
     void execStepInto();
     void setFocusToCommandBar();
     void displayMemMapWidget();
+    void execClose();
+    void execRun();
+    void execRtr();
     
 private:
     Ui::MainWindow *ui;

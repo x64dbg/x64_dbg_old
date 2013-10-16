@@ -3,10 +3,10 @@
 
 BREAKPOINT* bpinit(BREAKPOINT* breakpoint_list)
 {
-    BREAKPOINT* cur=breakpoint_list;
     bool bNext=true;
-    if(!cur)
+    if(!breakpoint_list)
         bNext=false;
+    BREAKPOINT* cur=breakpoint_list;
     while(bNext)
     {
         BREAKPOINT* next=cur->next;
@@ -90,7 +90,7 @@ bool bpsetname(BREAKPOINT* breakpoint_list, uint addr, const char* name)
     BREAKPOINT* found=bpfind(breakpoint_list, 0, addr, 0, BPNOTYPE);
     if(!found)
         return false;
-    efree(found->name);
+    efree(found->name); //free previous name
     found->name=(char*)emalloc(strlen(name)+1);
     strcpy(found->name, name);
     return true;

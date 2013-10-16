@@ -9,6 +9,7 @@ bin/*/*
 *.bmarks
 *.chw
 *.cbTemp
+*.ini
 
 #whitelisted bin files
 !bin/*/TitanEngine.dll

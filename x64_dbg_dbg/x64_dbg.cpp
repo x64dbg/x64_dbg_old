@@ -38,7 +38,7 @@ static COMMAND* command_list=0;
 static void registercommands()
 {
     COMMAND* cmd=command_list=cmdinit();
-    cmdnew(cmd, "exit\1x", cbExit, false); //quit debugger
+    //cmdnew(cmd, "exit\1x", cbExit, false); //quit debugger
     cmdnew(cmd, "strlen\1charcount\1ccount", cbStrLen, false); //get strlen, arg1:string
     cmdnew(cmd, "varnew\1var", cbInstrVar, false); //make a variable arg1:name,[arg2:value]
     cmdnew(cmd, "vardel", cbInstrVarDel, false); //delete a variable, arg1:variable name
@@ -70,7 +70,7 @@ static void registercommands()
     cmdnew(cmd, "scr\1script", cbScript, false); //script testing
 }
 
-static DWORD WINAPI focusThread(void* lpParam)
+/*static DWORD WINAPI focusThread(void* lpParam)
 {
     unsigned int lastpress=0;
     HWND console=GetConsoleHwnd();
@@ -93,7 +93,7 @@ static DWORD WINAPI focusThread(void* lpParam)
         Sleep(100);
     }
     return 0;
-}
+}*/
 
 static DWORD WINAPI consolePosThread(void* lpParam)
 {
@@ -122,7 +122,7 @@ static bool cbCommandProvider(char* cmd, int maxlen)
     if(strlen(newcmd)>=deflen)
         newcmd[deflen-1]=0;
     strcpy(cmd, newcmd);
-    efree(newcmd);
+    efree(newcmd); //free allocated command
     return true;
 }
 
@@ -149,12 +149,9 @@ static DWORD WINAPI ConsoleReadLoopThread(void* a)
 
 static DWORD WINAPI DbgCommandLoopThread(void* a)
 {
-    Sleep(200);
-    SetForegroundWindow(GetConsoleHwnd());
-
+    //Sleep(200);
+    //SetForegroundWindow(GetConsoleHwnd());
     cmdloop(command_list, cbBadCmd, cbCommandProvider, cmdfindmain, false);
-    DeleteFileA("DLLLoader.exe");
-    ExitProcess(0);
     return 0;
 }
 
@@ -175,7 +172,6 @@ extern "C" const char* DLL_EXPORT _dbg_dbginit()
     registercommands();
     scriptSetList(command_list);
     CreateThread(0, 0, consolePosThread, 0, 0, 0);
-    //CreateThread(0, 0, focusThread, 0, 0, 0);
     CreateThread(0, 0, DbgCommandLoopThread, 0, 0, 0);
     CreateThread(0, 0, ConsoleReadLoopThread, 0, 0, 0);
     return 0;
