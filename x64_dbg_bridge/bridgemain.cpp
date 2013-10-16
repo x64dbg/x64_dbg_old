@@ -30,6 +30,10 @@ const char* DLL_IMPEXP BridgeInit()
     _gui_disassembleat=(GUIDISASSEMBLEAT)GetProcAddress(hInstGui, "_gui_disassembleat");
     if(!_gui_disassembleat)
         return "Export \"_gui_disassembleat\" could not be found!";
+    //_gui_setdebugstate
+    _gui_setdebugstate=(GUISETDEBUGSTATE)GetProcAddress(hInstGui, "_gui_setdebugstate");
+    if(!_gui_setdebugstate)
+        return "Export \"_gui_setdebugstate\" could not be found!";
 #endif
     //DBG Load
     hInstDbg=LoadLibraryA(dbg_lib); //Mr. eXoDia
