@@ -47,7 +47,8 @@ struct MEMMAP
 enum DBGSTATE
 {
     paused,
-    running
+    running,
+    stopped
 };
 
 //Debugger functions

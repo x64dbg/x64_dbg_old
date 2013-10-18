@@ -306,6 +306,7 @@ static void cbStep()
     isStepping=false;
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
+    GuiSetDebugState(paused);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -316,6 +317,7 @@ static void cbRtrFinalStep()
     cinsert("returned!");
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
+    GuiSetDebugState(paused);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -434,6 +436,7 @@ CMDRESULT cbDebugInit(const char* cmd)
 CMDRESULT cbStopDebug(const char* cmd)
 {
     StopDebug();
+    GuiSetDebugState(stopped);
     unlock(WAITID_RUN);
     return STATUS_CONTINUE;
 }
