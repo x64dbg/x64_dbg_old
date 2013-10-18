@@ -86,5 +86,7 @@ void formathex(char* string);
 void formatdec(char* string);
 bool FileExists(const char* file);
 bool DirExists(const char* dir);
+bool DevicePathToPath(const char* devicepath, char* path, size_t path_size);
+bool PathToDevicePath(const char* path, char* devicepath, size_t devicepath_size);
 
 #endif // _GLOBAL_H

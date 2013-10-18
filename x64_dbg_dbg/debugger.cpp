@@ -9,9 +9,10 @@
 #include "gui\disasm.h"
 #include "gui\memmap.h"
 #include "memory.h"
+#include <psapi.h>
 #include "..\x64_dbg_bridge\bridgemain.h"
 
-static PROCESS_INFORMATION g_pi={0,0,0,0};
+static PROCESS_INFORMATION g_pi= {0,0,0,0};
 PROCESS_INFORMATION* fdProcessInfo=&g_pi;
 static char szFileName[deflen]="";
 bool bFileIsDll;
@@ -137,6 +138,7 @@ static void cbUserBreakpoint()
     }
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
+    GuiSetDebugState(paused);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -160,6 +162,7 @@ static void cbHardwareBreakpoint(void* ExceptionAddress)
     }
     DebugUpdateDisasm(cip);
     DebugUpdateMemoryMap();
+    GuiSetDebugState(paused);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -187,6 +190,7 @@ static void cbMemoryBreakpoint(void* ExceptionAddress)
         bpdel(bplist, 0, base, BPMEMORY); //delete from breakpoint list
     DebugUpdateDisasm(cip);
     DebugUpdateMemoryMap();
+    GuiSetDebugState(paused);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -197,6 +201,7 @@ static void cbEntryBreakpoint()
     cinsert("entry point reached!");
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
+    GuiSetDebugState(paused);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
@@ -236,53 +241,63 @@ static void cbException(void* ExceptionData)
     cinsert(msg);
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
+    GuiSetDebugState(paused);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
 }
 
-static void cbLoadDll(void* ExceptionData)
+static void cbLoadDll(LOAD_DLL_DEBUG_INFO* LoadDll)
 {
-    cputs("dll loaded!");
-    DebugUpdateDisasm(GetContextData(UE_CIP));
-    DebugUpdateMemoryMap();
-    //lock
-    lock(WAITID_RUN);
-    wait(WAITID_RUN);
+    char DLLDebugFileName[deflen]="";
+    if(!GetMappedFileNameA(fdProcessInfo->hProcess, LoadDll->lpBaseOfDll, DLLDebugFileName, deflen))
+        strcpy(DLLDebugFileName, "??? (GetMappedFileName failed)");
+    else
+        DevicePathToPath(DLLDebugFileName, DLLDebugFileName, deflen);
+    cprintf("DLL Loaded: "fhex" %s\n", LoadDll->lpBaseOfDll, DLLDebugFileName);
+}
+
+static void cbUnloadDll(UNLOAD_DLL_DEBUG_INFO* UnloadDll)
+{
+    char DLLDebugFileName[deflen]="";
+    if(GetMappedFileNameA(fdProcessInfo->hProcess, UnloadDll->lpBaseOfDll, DLLDebugFileName, deflen))
+        DevicePathToPath(DLLDebugFileName, DLLDebugFileName, deflen);
+    cprintf("DLL Unloaded: "fhex" %s\n", UnloadDll->lpBaseOfDll, DLLDebugFileName);
 }
 
 static void cbSystemBreakpoint(void* ExceptionData)
 {
-    //handle stuff (TLS, main entry, etc)
+    //TODO: handle stuff (TLS, main entry, etc)
     SetCustomHandler(UE_CH_SYSTEMBREAKPOINT, 0);
-    SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
     cputs("system breakpoint reached!");
+    //NOTE: call GUI
     DebugUpdateDisasm(GetContextData(UE_CIP));
     DebugUpdateMemoryMap();
+    GuiSetDebugState(paused);
     //unlock
     unlock(WAITID_SYSBREAK);
     //lock
     lock(WAITID_RUN);
     wait(WAITID_RUN);
 
-   /*//my code
+    /*//my code
 
-    //list memorymap(cbListPage)
-    ReadMemory(va)
-    setBP(va, type, callback)
+     //list memorymap(cbListPage)
+     ReadMemory(va)
+     setBP(va, type, callback)
 
-    //gui
-    GuiChangeCIP(va, base, size)
+     //gui
+     GuiChangeCIP(va, base, size)
 
 
-    //gui
-    cbClearMap
-    cbAddPage(MEMORY_BASIC_INFO, modulename)
-    cbEndMap
+     //gui
+     cbClearMap
+     cbAddPage(MEMORY_BASIC_INFO, modulename)
+     cbEndMap
 
-    //dbg
-    MemoryMap(cbClear, cbAddPage, cbEndMap)
-    */
+     //dbg
+     MemoryMap(cbClear, cbAddPage, cbEndMap)
+     */
 }
 
 static void cbStep()
@@ -346,8 +361,12 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     varset("$pid", fdProcessInfo->dwProcessId, true);
     ecount=0;
     bplist=bpinit(bplist);
+    //NOTE: set custom handlers
     SetCustomHandler(UE_CH_SYSTEMBREAKPOINT, (void*)cbSystemBreakpoint);
-    //SetEngineVariable(UE_ENGINE_PASS_ALL_EXCEPTIONS, true);
+    SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
+    SetCustomHandler(UE_CH_LOADDLL, (void*)cbLoadDll);
+    SetCustomHandler(UE_CH_UNLOADDLL, (void*)cbUnloadDll);
+
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
     DeleteFileA("DLLLoader.exe");
@@ -426,6 +445,7 @@ CMDRESULT cbDebugRun(const char* cmd)
         cputs("program is already running");
         return STATUS_ERROR;
     }
+    GuiSetDebugState(running);
     unlock(WAITID_RUN);
     return STATUS_CONTINUE;
 }
