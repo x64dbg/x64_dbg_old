@@ -2,6 +2,7 @@
 #include <QtGui>
 #include "MainWindow.h"
 #include "NewTypes.h"
+#include "Bridge.h"
 
 
 int main(int argc, char *argv[])
@@ -16,6 +17,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<uint_t>("uint_t");
 
     qRegisterMetaType<byte_t>("byte_t");
+
+    qRegisterMetaType<DBGSTATE>("DBGSTATE");
 
     // Init communication with debugger
     Bridge::initBridge();

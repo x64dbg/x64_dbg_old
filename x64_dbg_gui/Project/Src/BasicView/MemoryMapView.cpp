@@ -35,7 +35,11 @@ void MemoryMapView::stateChangedSlot(DBGSTATE state)
 
         for(wI = 0; wI < wMemMapStruct.count; wI++)
         {
-            setCellContent(wI, 0, QString::number((uint_t)(wMemMapStruct.page)[wI].mbi.BaseAddress));
+            QString s = QString("%1").arg((uint_t)(wMemMapStruct.page)[wI].mbi.BaseAddress, 16, 16, QChar('0')).toUpper();
+            setCellContent(wI, 0, s);
+
+            s = QString("%1").arg((uint_t)(wMemMapStruct.page)[wI].mbi.RegionSize, 16, 16, QChar('0')).toUpper();
+            setCellContent(wI, 1, s);
         }
 
     }
