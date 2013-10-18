@@ -29,6 +29,7 @@ public:
     // Data Management
     int addColumnAt(int at, int width, bool isClickable);
     void setRowCount(int count);
+    void setCellContent(int r, int c, QString s);
 
 signals:
     

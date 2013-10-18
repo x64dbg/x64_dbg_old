@@ -65,10 +65,24 @@ uint_t Bridge::getBase(uint_t addr)
 }
 
 
+void Bridge::emitDbgStateChanged(DBGSTATE state)
+{
+#ifdef BUILD_LIB
+    emit dbgStateChanged(state);
+#endif
+}
+
+
 bool Bridge::execCmd(const char* cmd)
 {
     return DbgCmdExec(cmd);
 }
+
+bool Bridge::getMemMapFromDbg(MEMMAP* parMemMap)
+{
+    return DbgMemMap(parMemMap);
+}
+
 
 
 /************************************************************************************
@@ -99,10 +113,15 @@ void Bridge::initBridge()
     }
 
 
-
     __declspec(dllexport) void _gui_disassembleat(duint va, duint eip)
     {
         Bridge::getBridge()->emitDisassembleAtSignal(va, eip);
+    }
+
+
+    __declspec(dllexport) void _gui_setdebugstate(DBGSTATE state)
+    {
+        Bridge::getBridge()->emitDbgStateChanged(state);
     }
 #endif
 

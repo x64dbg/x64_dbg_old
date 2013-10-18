@@ -232,3 +232,31 @@ void StdTable::setRowCount(int count)
 }
 
 
+
+
+void StdTable::setCellContent(int r, int c, QString s)
+{
+    mData->at(c)->replace(r, s);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

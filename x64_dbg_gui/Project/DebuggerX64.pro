@@ -20,7 +20,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 }
 
 DEFINES += BUILD_LIB
-DEFINES += QT_NO_DEBUG_STREAM #no debug output in release mode (finally)
+#DEFINES += QT_NO_DEBUG_STREAM #no debug output in release mode (finally)
 TEMPLATE = lib
 #TEMPLATE = app
 

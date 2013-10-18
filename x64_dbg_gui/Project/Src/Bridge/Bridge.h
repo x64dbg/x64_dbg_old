@@ -22,13 +22,16 @@ public:
     void readProcessMemory(byte_t* dest, uint_t va, uint_t size);
     uint_t getSize(uint_t va);
     void emitDisassembleAtSignal(uint_t va, uint_t eip);
+    void emitDbgStateChanged(DBGSTATE state);
     uint_t getBase(uint_t addr);
     static Bridge* getBridge();
     static void initBridge();
     bool execCmd(const char* cmd);
+    bool getMemMapFromDbg(MEMMAP* parMemMap);
     
 signals:
     void disassembleAt(uint_t va, uint_t eip);
+    void dbgStateChanged(DBGSTATE state);
     
 public slots:
 

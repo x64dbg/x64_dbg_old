@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include "StdTable.h"
+#include "Bridge.h"
 
 class MemoryMapView : public StdTable
 {
@@ -13,6 +14,7 @@ public:
 signals:
     
 public slots:
+    void stateChangedSlot(DBGSTATE state);
 
 private:
 
