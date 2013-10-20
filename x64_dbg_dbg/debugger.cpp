@@ -8,6 +8,7 @@
 #include "instruction.h"
 #include "memory.h"
 #include <psapi.h>
+#include "_exports.h"
 
 static PROCESS_INFORMATION g_pi= {0,0,0,0};
 PROCESS_INFORMATION* fdProcessInfo=&g_pi;
@@ -245,7 +246,9 @@ static void cbLoadDll(LOAD_DLL_DEBUG_INFO* LoadDll)
 static void cbUnloadDll(UNLOAD_DLL_DEBUG_INFO* UnloadDll)
 {
     char DLLDebugFileName[deflen]="";
-    if(GetMappedFileNameA(fdProcessInfo->hProcess, UnloadDll->lpBaseOfDll, DLLDebugFileName, deflen))
+    if(!GetMappedFileNameA(fdProcessInfo->hProcess, UnloadDll->lpBaseOfDll, DLLDebugFileName, deflen))
+        strcpy(DLLDebugFileName, "??? (GetMappedFileName failed)");
+    else
         DevicePathToPath(DLLDebugFileName, DLLDebugFileName, deflen);
     dprintf("DLL Unloaded: "fhex" %s\n", UnloadDll->lpBaseOfDll, DLLDebugFileName);
 }
@@ -1055,5 +1058,23 @@ CMDRESULT cbDebugMemset(const char* cmd)
         dputs("memset failed");
     else
         dprintf("memory "fhex" (size: %.8X) set to %.2X\n", addr, size&0xFFFFFFFF, value&0xFF);
+    return STATUS_CONTINUE;
+}
+
+CMDRESULT cbBenchmark(const char* cmd)
+{
+    char arg1[deflen]="";
+    if(!argget(cmd, arg1, 0, false))
+        return STATUS_ERROR;
+    uint addr=0;
+    if(!valfromstring(arg1, &addr, 0, 0, false, 0))
+        return STATUS_ERROR;
+    uint ticks=GetTickCount();
+    for(int i=0; i<1000; i++)
+    {
+        unsigned char dest[0x1000];
+        _dbg_memread(addr, dest, 0x1000, 0);
+    }
+    dprintf("%ums\n", GetTickCount()-ticks);
     return STATUS_CONTINUE;
 }

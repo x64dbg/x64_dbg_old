@@ -79,5 +79,5 @@ bool msgget(MESSAGE_STACK* msgstack, MESSAGE* msg)
 void msgwait(MESSAGE_STACK* msgstack, MESSAGE* msg)
 {
     while(!msgget(msgstack, msg))
-        Sleep(100);
+        Sleep(1);
 }

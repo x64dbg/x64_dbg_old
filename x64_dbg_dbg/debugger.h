@@ -40,6 +40,7 @@ CMDRESULT cbDebugSetHardwareBreakpoint(const char* cmd);
 CMDRESULT cbDebugAlloc(const char* cmd);
 CMDRESULT cbDebugFree(const char* cmd);
 CMDRESULT cbDebugMemset(const char* cmd);
+CMDRESULT cbBenchmark(const char* cmd);
 
 //variables
 extern PROCESS_INFORMATION* fdProcessInfo;

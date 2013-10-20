@@ -1,4 +1,4 @@
-- attach debugger
+- attach/detach debugger
 - asm command
 - advanced readprocessmemory (over multiple pages)
 - memcpy
@@ -35,3 +35,22 @@
 - getlasterror
 - display open handles
 - log clear command
+- build howto
+- step to user code
+- tracing(?)
+- child processes (TitanEngine)
+- display source
+- patching
+- handle view
+- window view
+- debug strings
+- process privileges
+- loaded modules
+- strings
+- references
+- callstack
+- stack
+- heap
+- functions
+- TEB/TBI
+- PEB/PBI

@@ -67,6 +67,7 @@ static void registercommands()
     cmdnew(cmd, "free", cbDebugFree, true); //free memory
     cmdnew(cmd, "Fill\1memset", cbDebugMemset, true); //memset
     cmdnew(cmd, "scr\1script", cbScript, false); //script testing
+    cmdnew(cmd, "benchmark", cbBenchmark, true); //benchmark test (readmem etc)
 }
 
 static bool cbCommandProvider(char* cmd, int maxlen)
@@ -104,8 +105,6 @@ static DWORD WINAPI ConsoleReadLoopThread(void* a)
 
 static DWORD WINAPI DbgCommandLoopThread(void* a)
 {
-    //Sleep(200);
-    //SetForegroundWindow(GetConsoleHwnd());
     cmdloop(command_list, cbBadCmd, cbCommandProvider, cmdfindmain, false);
     return 0;
 }

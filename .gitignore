@@ -33,3 +33,5 @@ x64_dbg_gui/bin
 
 
 todo_bridge.txt
+x64_dbg_gui/Project/Src/Bridge/libx32_bridge.a
+x64_dbg_gui/Project/Src/Bridge/libx64_bridge.a
