@@ -34,3 +34,4 @@
 - symbol loader
 - getlasterror
 - display open handles
+- log clear command

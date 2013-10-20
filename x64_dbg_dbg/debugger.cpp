@@ -350,11 +350,13 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
     SetCustomHandler(UE_CH_LOADDLL, (void*)cbLoadDll);
     SetCustomHandler(UE_CH_UNLOADDLL, (void*)cbUnloadDll);
-
+    //inform GUI start we started without problems
+    GuiSetDebugState(initialized);
     //run debug loop (returns when process debugging is stopped)
     DebugLoop();
     DeleteFileA("DLLLoader.exe");
     //message the user/do final stuff
+    GuiSetDebugState(stopped);
     dputs("debugging stopped!");
     varset("$hp", 0, true);
     varset("$pid", 0, true);
@@ -418,7 +420,6 @@ CMDRESULT cbDebugInit(const char* cmd)
 CMDRESULT cbStopDebug(const char* cmd)
 {
     StopDebug();
-    GuiSetDebugState(stopped);
     unlock(WAITID_RUN);
     return STATUS_CONTINUE;
 }
