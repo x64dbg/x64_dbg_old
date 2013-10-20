@@ -186,7 +186,7 @@ bool argget(const char* cmd, char* arg, int arg_num, bool optional)
     if((arg_num+1)>argcount)
     {
         if(!optional)
-            cprintf("missing argument nr %d\n", arg_num+1);
+            dprintf("missing argument nr %d\n", arg_num+1);
         return false;
     }
     int len=strlen(cmd);

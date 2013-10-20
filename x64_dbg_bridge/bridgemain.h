@@ -46,6 +46,7 @@ struct MEMMAP
 //Debugger enums
 enum DBGSTATE
 {
+    initialized,
     paused,
     running,
     stopped
@@ -61,6 +62,7 @@ bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap);
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);
 void DLL_IMPEXP GuiSetDebugState(DBGSTATE state);
+void DLL_IMPEXP GuiAddLogMessage(const char* msg);
 
 #ifdef __cplusplus
 }

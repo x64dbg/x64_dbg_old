@@ -4,10 +4,7 @@
 #include "_global.h"
 
 //functions
-void cinsert(const char* text);
-int consolegetlasty();
-int consolesetlasty();
-int cputs(const char* text);
-int cprintf(const char* format, ...);
+void dputs(const char* text);
+void dprintf(const char* format, ...);
 
 #endif // _CONSOLE_H

@@ -34,6 +34,14 @@ const char* DLL_IMPEXP BridgeInit()
     _gui_setdebugstate=(GUISETDEBUGSTATE)GetProcAddress(hInstGui, "_gui_setdebugstate");
     if(!_gui_setdebugstate)
         return "Export \"_gui_setdebugstate\" could not be found!";
+    //_gui_addlogmessage
+    _gui_addlogmessage=(GUIADDLOGMESSAGE)GetProcAddress(hInstGui, "_gui_addlogmessage");
+    if(!_gui_addlogmessage)
+        return "Export \"_gui_addlogmessage\" could not be found!";
+    //_gui_logclear
+    _gui_logclear=(GUILOGCLEAR)GetProcAddress(hInstGui, "_gui_logclear");
+    if(!_gui_logclear)
+        return "Export \"_gui_logclear\" could not be found!";
 #endif
     //DBG Load
     hInstDbg=LoadLibraryA(dbg_lib); //Mr. eXoDia
@@ -144,6 +152,20 @@ void DLL_IMPEXP GuiSetDebugState(DBGSTATE state)
 {
 #ifndef NO_GUI
     _gui_setdebugstate(state);
+#endif // NO_GUI
+}
+
+void DLL_IMPEXP GuiAddLogMessage(const char* msg)
+{
+#ifndef NO_GUI
+    _gui_addlogmessage(msg);
+#endif // NO_GUI
+}
+
+void DLL_IMPEXP GuiLogClear()
+{
+#ifndef NO_GUI
+    _gui_logclear();
 #endif // NO_GUI
 }
 

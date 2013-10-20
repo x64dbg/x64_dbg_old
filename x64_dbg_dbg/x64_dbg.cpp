@@ -9,7 +9,6 @@
 #include "console.h"
 #include "math.h"
 #include "x64_dbg.h"
-#include "gui\disasm.h"
 #include "msgqueue.h"
 
 static MESSAGE_STACK* gMsgStack;
@@ -18,7 +17,7 @@ static CMDRESULT cbStrLen(const char* cmd)
 {
     char arg1[deflen]="";
     if(argget(cmd, arg1, 0, false))
-        cprintf("\"%s\"[%d]\n", arg1, strlen(arg1));
+        dprintf("\"%s\"[%d]\n", arg1, strlen(arg1));
     return STATUS_CONTINUE;
 }
 
@@ -68,50 +67,6 @@ static void registercommands()
     cmdnew(cmd, "free", cbDebugFree, true); //free memory
     cmdnew(cmd, "Fill\1memset", cbDebugMemset, true); //memset
     cmdnew(cmd, "scr\1script", cbScript, false); //script testing
-}
-
-/*static DWORD WINAPI focusThread(void* lpParam)
-{
-    unsigned int lastpress=0;
-    HWND console=GetConsoleHwnd();
-    HWND lastwindow=console;
-    while(1)
-    {
-        if(GetAsyncKeyState(VK_RMENU))
-        {
-            if(GetTickCount()-lastpress<300)
-                continue;
-            if(GetForegroundWindow()==console)
-                SetForegroundWindow(lastwindow);
-            else
-            {
-                lastwindow=GetForegroundWindow();
-                SetForegroundWindow(console);
-            }
-            lastpress=GetTickCount();
-        }
-        Sleep(100);
-    }
-    return 0;
-}*/
-
-static DWORD WINAPI consolePosThread(void* lpParam)
-{
-    HWND console=GetConsoleHwnd();
-    RECT rc;
-    int window_pos[2]= {0,0};
-    while(1)
-    {
-        GetWindowRect(console, &rc);
-        if(window_pos[0]!=rc.left and window_pos[1]!=rc.top)
-        {
-            window_pos[0]=rc.left;
-            window_pos[1]=rc.top;
-            SaveWindowPos("console", console);
-        }
-        Sleep(200);
-    }
-    return 0;
 }
 
 static bool cbCommandProvider(char* cmd, int maxlen)
@@ -171,7 +126,6 @@ extern "C" const char* DLL_EXPORT _dbg_dbginit()
     varinit();
     registercommands();
     scriptSetList(command_list);
-    CreateThread(0, 0, consolePosThread, 0, 0, 0);
     CreateThread(0, 0, DbgCommandLoopThread, 0, 0, 0);
     CreateThread(0, 0, ConsoleReadLoopThread, 0, 0, 0);
     return 0;

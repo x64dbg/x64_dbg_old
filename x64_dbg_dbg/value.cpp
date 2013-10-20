@@ -4,7 +4,6 @@
 #include "console.h"
 #include "math.h"
 #include "memory.h"
-#include "gui\disasm.h"
 #include <psapi.h>
 
 static bool dosignedcalc=false;
@@ -990,7 +989,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
         {
             char szModName[MAX_PATH];
             if(!GetModuleFileNameEx(fdProcessInfo->hProcess, hMods[i], szModName, MAX_PATH))
-                cprintf("could not get filename of module "fhex"\n", hMods[i]);
+                dprintf("could not get filename of module "fhex"\n", hMods[i]);
             char szBaseName[256]="";
             int len=strlen(szModName);
             while(szModName[len]!='\\')
@@ -998,7 +997,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
             strcpy(szBaseName, szModName+len+1);
             HMODULE mod=LoadLibraryExA(szModName, 0, DONT_RESOLVE_DLL_REFERENCES|LOAD_LIBRARY_AS_DATAFILE);
             if(!mod)
-                cprintf("unable to load library %s\n", szBaseName);
+                dprintf("unable to load library %s\n", szBaseName);
             uint addr=(uint)GetProcAddress(mod, name);
             FreeLibrary(mod);
             if(addr)
@@ -1023,7 +1022,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
             return true;
         for(int i=0; i<found; i++)
             if(i!=kernelbase)
-                cprintf(fhex"\n", addrfound[i]);
+                dprintf(fhex"\n", addrfound[i]);
     }
     else
     {
@@ -1031,7 +1030,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
         if(!printall)
             return true;
         for(int i=1; i<found; i++)
-            cprintf(fhex"\n", addrfound[i]);
+            dprintf(fhex"\n", addrfound[i]);
     }
     return true;
 }
@@ -1099,7 +1098,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         if(!IsFileBeingDebugged())
         {
             if(!silent)
-                cputs("not debugging");
+                dputs("not debugging");
             *value=0;
             if(value_size)
                 *value_size=0;
@@ -1129,7 +1128,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         if(!rpm)
         {
             if(!silent)
-                cputs("failed to read memory");
+                dputs("failed to read memory");
             return false;
         }
         if(value_size)
@@ -1143,7 +1142,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         if(!IsFileBeingDebugged())
         {
             if(!silent)
-                cputs("not debugging!");
+                dputs("not debugging!");
             *value=0;
             if(value_size)
                 *value_size=0;
@@ -1161,7 +1160,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         if(!IsFileBeingDebugged())
         {
             if(!silent)
-                cputs("not debugging");
+                dputs("not debugging");
             *value=0;
             if(value_size)
                 *value_size=0;
@@ -1222,7 +1221,7 @@ bool valtostring(const char* string, uint* value, bool silent)
         if(!IsFileBeingDebugged())
         {
             if(!silent)
-                cputs("not debugging");
+                dputs("not debugging");
             return false;
         }
         int read_size=sizeof(uint);
@@ -1246,7 +1245,7 @@ bool valtostring(const char* string, uint* value, bool silent)
         if(!wpm)
         {
             if(!silent)
-                cputs("failed to write memory");
+                dputs("failed to write memory");
             return false;
         }
         return true;
@@ -1256,7 +1255,7 @@ bool valtostring(const char* string, uint* value, bool silent)
         if(!IsFileBeingDebugged())
         {
             if(!silent)
-                cputs("not debugging!");
+                dputs("not debugging!");
             return false;
         }
         bool ok=setregister(string, *value);
@@ -1269,7 +1268,7 @@ bool valtostring(const char* string, uint* value, bool silent)
         if(!IsFileBeingDebugged())
         {
             if(!silent)
-                cputs("not debugging");
+                dputs("not debugging");
             return false;
         }
         bool set=false;

@@ -42,7 +42,6 @@ static bool provider(char* cmd, int size)
     if(i>total)
         return false;
     return true;
-    printf("b");
 }
 
 CMDRESULT cbScript(const char* cmd)

@@ -366,7 +366,7 @@ bool mathfromstring(const char* string, uint* value, int* value_size, bool* isva
     memset(strright, 0, len+1);
     strncpy(strleft, string, highestop_pos);
     strcpy(strright, string+highestop_pos+1);
-    //printf("left: %s, right: %s, op: %c\n", strleft, strright, string[highestop_pos]);
+    //dprintf("left: %s, right: %s, op: %c\n", strleft, strright, string[highestop_pos]);
     if(!*strright)
     {
         efree(strleft);

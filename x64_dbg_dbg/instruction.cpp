@@ -13,7 +13,7 @@ CMDRESULT cbBadCmd(const char* cmd)
     bool hexonly=false;
     if(valfromstring(cmd, &value, &valsize, &isvar, false, &hexonly)) //dump variable/value/register/etc
     {
-        //printf("[DEBUG] valsize: %d\n", valsize);
+        //dprintf("[DEBUG] valsize: %d\n", valsize);
         if(valsize)
             valsize*=2;
         else
@@ -24,12 +24,12 @@ CMDRESULT cbBadCmd(const char* cmd)
             if(value>15 and !hexonly)
             {
                 sprintf(format_str, "%%s=%%.%d"fext"X (%%"fext"ud)\n", valsize);
-                printf(format_str, cmd, value, value);
+                dprintf(format_str, cmd, value, value);
             }
             else
             {
                 sprintf(format_str, "%%s=%%.%d"fext"X\n", valsize);
-                printf(format_str, cmd, value);
+                dprintf(format_str, cmd, value);
             }
         }
         else
@@ -37,18 +37,18 @@ CMDRESULT cbBadCmd(const char* cmd)
             if(value>15 and !hexonly)
             {
                 sprintf(format_str, "%%.%d"fext"X (%%"fext"ud)\n", valsize);
-                printf(format_str, value, value);
+                dprintf(format_str, value, value);
             }
             else
             {
                 sprintf(format_str, "%%.%d"fext"X\n", valsize);
-                printf(format_str, value);
+                dprintf(format_str, value);
             }
         }
     }
     else //unknown command
     {
-        printf("unknown command/expression: \"%s\"\n", cmd);
+        dprintf("unknown command/expression: \"%s\"\n", cmd);
         return STATUS_ERROR;
     }
     return STATUS_CONTINUE;
@@ -67,25 +67,25 @@ CMDRESULT cbInstrVar(const char* cmd)
         add++;
     if(valfromstring(arg1+add, &value, 0, 0, true, 0))
     {
-        printf("invalid variable name \"%s\"\n", arg1);
+        dprintf("invalid variable name \"%s\"\n", arg1);
         return STATUS_ERROR;
     }
     if(!valfromstring(arg2, &value, 0, 0, false, 0))
     {
-        printf("invalid value \"%s\"\n", arg2);
+        dprintf("invalid value \"%s\"\n", arg2);
         return STATUS_ERROR;
     }
     if(!varnew(arg1, value, VAR_USER))
     {
-        printf("error creating variable \"%s\"\n", arg1);
+        dprintf("error creating variable \"%s\"\n", arg1);
         return STATUS_ERROR;
     }
     else
     {
         if(value>15)
-            printf("%s=%"fext"X (%"fext"ud)\n", arg1, value, value);
+            dprintf("%s=%"fext"X (%"fext"ud)\n", arg1, value, value);
         else
-            printf("%s=%"fext"X\n", arg1, value);
+            dprintf("%s=%"fext"X\n", arg1, value);
     }
     return STATUS_CONTINUE;
 }
@@ -96,9 +96,9 @@ CMDRESULT cbInstrVarDel(const char* cmd)
     if(!argget(cmd, arg1, 0, false)) //var name
         return STATUS_ERROR;
     if(!vardel(arg1, false))
-        printf("could not delete variable \"%s\"\n", arg1);
+        dprintf("could not delete variable \"%s\"\n", arg1);
     else
-        printf("deleted variable \"%s\"\n", arg1);
+        dprintf("deleted variable \"%s\"\n", arg1);
     return STATUS_CONTINUE;
 }
 
@@ -113,7 +113,7 @@ CMDRESULT cbInstrMov(const char* cmd)
     uint set_value=0;
     if(!valfromstring(arg2, &set_value, 0, 0, false, 0))
     {
-        printf("invalid src \"%s\"\n", arg2);
+        dprintf("invalid src \"%s\"\n", arg2);
         return STATUS_ERROR;
     }
     bool isvar=false;
@@ -124,7 +124,7 @@ CMDRESULT cbInstrMov(const char* cmd)
         uint value;
         if(valfromstring(arg1, &value, 0, 0, true, 0))
         {
-            printf("invalid dest \"%s\"\n", arg1);
+            dprintf("invalid dest \"%s\"\n", arg1);
             return STATUS_ERROR;
         }
         varnew(arg1, set_value, VAR_USER);
@@ -147,7 +147,7 @@ CMDRESULT cbInstrVarList(const char* cmd)
     VAR* cur=vargetptr();
     if(!cur or !cur->name)
     {
-        cputs("no variables");
+        dputs("no variables");
         return STATUS_CONTINUE;
     }
 
@@ -168,17 +168,17 @@ CMDRESULT cbInstrVarList(const char* cmd)
                 if(cur->type==filter)
                 {
                     if(value>15)
-                        cprintf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
+                        dprintf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
                     else
-                        cprintf("%s=%"fext"X\n", name, value);
+                        dprintf("%s=%"fext"X\n", name, value);
                 }
             }
             else
             {
                 if(value>15)
-                    cprintf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
+                    dprintf("%s=%"fext"X (%"fext"ud)\n", name, value, value);
                 else
-                    cprintf("%s=%"fext"X\n", name, value);
+                    dprintf("%s=%"fext"X\n", name, value);
             }
         }
         cur=cur->next;
@@ -195,10 +195,10 @@ CMDRESULT cbInstrChd(const char* cmd)
         return STATUS_ERROR;
     if(!DirExists(arg1))
     {
-        cputs("directory doesn't exist");
+        dputs("directory doesn't exist");
         return STATUS_ERROR;
     }
     SetCurrentDirectoryA(arg1);
-    cputs("current directory changed!");
+    dputs("current directory changed!");
     return STATUS_CONTINUE;
 }

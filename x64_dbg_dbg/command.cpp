@@ -163,7 +163,7 @@ CMDRESULT cmdloop(COMMAND* command_list, CBCOMMAND cbUnknownCommand, CBCOMMANDPR
             {
                 if(cmd->debugonly and !IsFileBeingDebugged())
                 {
-                    cputs("this command is debug-only");
+                    dputs("this command is debug-only");
                     if(error_is_fatal)
                         bLoop=false;
                 }

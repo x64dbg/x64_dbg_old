@@ -13,6 +13,7 @@
 #include <windows.h>
 #include <shlwapi.h>
 #include <stdarg.h>
+#include "..\x64_dbg_bridge\bridgemain.h"
 
 #ifndef DLL_EXPORT
 #define DLL_EXPORT __declspec(dllexport)

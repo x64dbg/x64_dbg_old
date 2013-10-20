@@ -2,7 +2,6 @@
 #define _EXPORTS_H
 
 #include "_global.h"
-#include "..\x64_dbg_bridge\bridgemain.h"
 
 #ifdef __cplusplus
 extern "C"
