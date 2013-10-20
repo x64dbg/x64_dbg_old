@@ -22,7 +22,6 @@
 					<Add option="-s" />
 					<Add library=".\TitanEngine\TitanEngine_x86.a" />
 					<Add library=".\libdbg_x32.a" />
-					<Add library=".\gui\libgui_x32.a" />
 					<Add library="..\bin\x32\libx32_bridge.a" />
 					<Add library=".\dbghelp\dbghelp_x86.a" />
 				</Linker>
@@ -42,7 +41,6 @@
 					<Add option="-s" />
 					<Add library=".\TitanEngine\TitanEngine_x64.a" />
 					<Add library=".\libdbg_x64.a" />
-					<Add library=".\gui\libgui_x64.a" />
 					<Add library="..\bin\x64\libx64_bridge.a" />
 					<Add library=".\dbghelp\dbghelp_x64.a" />
 				</Linker>
@@ -76,8 +74,6 @@
 		<Unit filename="dbghelp/dbghelp.h" />
 		<Unit filename="debugger.cpp" />
 		<Unit filename="debugger.h" />
-		<Unit filename="gui/disasm.h" />
-		<Unit filename="gui/memmap.h" />
 		<Unit filename="instruction.cpp" />
 		<Unit filename="instruction.h" />
 		<Unit filename="main.cpp" />
