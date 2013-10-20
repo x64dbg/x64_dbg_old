@@ -35,6 +35,7 @@
      <string>View</string>
     </property>
     <addaction name="actionMemoryMap"/>
+    <addaction name="actionLog"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
@@ -198,6 +199,11 @@
   <action name="actionMemoryMap">
    <property name="text">
     <string>MemoryMap</string>
+   </property>
+  </action>
+  <action name="actionLog">
+   <property name="text">
+    <string>Log</string>
    </property>
   </action>
  </widget>

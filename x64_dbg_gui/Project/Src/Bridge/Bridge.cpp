@@ -73,6 +73,19 @@ void Bridge::emitDbgStateChanged(DBGSTATE state)
 }
 
 
+void Bridge::emitAddMsgToLog(QString msg)
+{
+    emit addMsgToLog(msg);
+}
+
+
+void Bridge::emitClearLog()
+{
+    emit clearLog();
+}
+
+
+
 bool Bridge::execCmd(const char* cmd)
 {
     return DbgCmdExec(cmd);
@@ -122,6 +135,18 @@ void Bridge::initBridge()
     __declspec(dllexport) void _gui_setdebugstate(DBGSTATE state)
     {
         Bridge::getBridge()->emitDbgStateChanged(state);
+    }
+
+
+    __declspec(dllexport) void _gui_addlogmessage(const char* msg)
+    {
+       Bridge::getBridge()->emitAddMsgToLog(QString(msg));
+    }
+
+
+    __declspec(dllexport) void _gui_logclear()
+    {
+        Bridge::getBridge()->emitClearLog();
     }
 #endif
 

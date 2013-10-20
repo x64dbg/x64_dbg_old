@@ -6,6 +6,7 @@
 #include "CPUWidget.h"
 #include "CommandLineEdit.h"
 #include "MemoryMapView.h"
+#include "LogView.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,7 @@ public slots:
     void execStepInto();
     void setFocusToCommandBar();
     void displayMemMapWidget();
+    void displayLogWidget();
     void execClose();
     void execRun();
     void execRtr();
@@ -37,6 +39,7 @@ private:
     CommandLineEdit* mCmdLineEdit;
 
     QMdiSubWindow* mMemMapView;
+    QMdiSubWindow* mLogView;
 };
 
 #endif // MAINWINDOW_H

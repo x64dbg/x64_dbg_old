@@ -28,10 +28,14 @@ public:
     static void initBridge();
     bool execCmd(const char* cmd);
     bool getMemMapFromDbg(MEMMAP* parMemMap);
+    void emitAddMsgToLog(QString msg);
+    void emitClearLog();
     
 signals:
     void disassembleAt(uint_t va, uint_t eip);
     void dbgStateChanged(DBGSTATE state);
+    void addMsgToLog(QString msg);
+    void clearLog();
     
 public slots:
 

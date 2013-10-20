@@ -11,6 +11,8 @@
     extern "C" __declspec(dllexport) int _gui_guiinit(int argc, char *argv[]);
     extern "C" __declspec(dllexport) void _gui_disassembleat(duint va, duint cip);
     extern "C" __declspec(dllexport) void _gui_setdebugstate(DBGSTATE state);
+    extern "C" __declspec(dllexport) void _gui_addlogmessage(const char* msg);
+    extern "C" __declspec(dllexport) void _gui_logclear();
 #endif
 
 

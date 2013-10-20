@@ -7,10 +7,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     this->showMaximized();
 
+    // Memory Map View
     mMemMapView = new QMdiSubWindow();
     mMemMapView->setWindowTitle("Memory Map");
     mMemMapView->setWidget(new MemoryMapView());
     mMemMapView->hide();
+
+    // Log View
+    mLogView = new QMdiSubWindow();
+    mLogView->setWindowTitle("Log");
+    mLogView->setWidget(new LogView());
+    mLogView->hide();
 
 
     mdiArea = new QMdiArea;
@@ -30,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Add subWindow to Main QMdiArea here
     mdiArea->addSubWindow(subWindow);
     mdiArea->addSubWindow(mMemMapView);
+    mdiArea->addSubWindow(mLogView);
 
 
     setCentralWidget(mdiArea);
@@ -50,6 +58,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionMemoryMap,SIGNAL(triggered()),this,SLOT(displayMemMapWidget()));
     connect(ui->actionRun,SIGNAL(triggered()),this,SLOT(execRun()));
     connect(ui->actionRtr,SIGNAL(triggered()),this,SLOT(execRtr()));
+    connect(ui->actionLog,SIGNAL(triggered()),this,SLOT(displayLogWidget()));
 
 }
 
@@ -106,4 +115,10 @@ void MainWindow::displayMemMapWidget()
 {
     mMemMapView->widget()->show();
     mMemMapView->setFocus();
+}
+
+void MainWindow::displayLogWidget()
+{
+    mLogView->widget()->show();
+    mLogView->setFocus();
 }
