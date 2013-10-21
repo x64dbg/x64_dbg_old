@@ -7,16 +7,30 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     this->showMaximized();
 
+    //Set window title
+#ifdef _WIN64
+    setWindowTitle("x64_dbg");
+#else
+    setWindowTitle("x32_dbg");
+#endif
+
+    //Load application icon
+    HICON hIcon=LoadIcon(GetModuleHandleA(0), MAKEINTRESOURCE(100));
+    setWindowIcon(QIcon(QPixmap::fromWinHICON(hIcon)));
+    DestroyIcon(hIcon);
+
     // Memory Map View
     mMemMapView = new QMdiSubWindow();
     mMemMapView->setWindowTitle("Memory Map");
     mMemMapView->setWidget(new MemoryMapView());
+    mMemMapView->setWindowIcon(QIcon(":/icons/images/alphabet/M.png"));
     mMemMapView->hide();
 
     // Log View
     mLogView = new QMdiSubWindow();
     mLogView->setWindowTitle("Log");
     mLogView->setWidget(new LogView());
+    mLogView->setWindowIcon(QIcon(":/icons/images/alphabet/L.png"));
     mLogView->hide();
 
 
@@ -26,11 +40,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     //Create QMdiSubWindow
     QMdiSubWindow* subWindow = new QMdiSubWindow();
-    subWindow->setWindowTitle("Disassembly");
+    subWindow->setWindowTitle("CPU");
     subWindow->showMaximized();
 
     mCpuWin = new CPUWidget();
-
+    mCpuWin->setWindowIcon(QIcon(":/icons/images/alphabet/C.png"));
 
     subWindow->setWidget(mCpuWin);
 

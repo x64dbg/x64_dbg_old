@@ -102,6 +102,9 @@ INCLUDEPATH += $$PWD/Src/Bridge
     ## Windows x64 (64bit) specific build here
 }
 
+RESOURCES += \
+    resource.qrc
+
 
 
 
