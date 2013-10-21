@@ -27,6 +27,7 @@ public slots:
     void setFocusToCommandBar();
     void displayMemMapWidget();
     void displayLogWidget();
+    void displayAboutWidget();
     void execClose();
     void execRun();
     void execRtr();

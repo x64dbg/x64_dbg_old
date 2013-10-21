@@ -33,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mLogView->setWindowIcon(QIcon(":/icons/images/alphabet/L.png"));
     mLogView->hide();
 
-
     mdiArea = new QMdiArea;
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -73,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionRun,SIGNAL(triggered()),this,SLOT(execRun()));
     connect(ui->actionRtr,SIGNAL(triggered()),this,SLOT(execRtr()));
     connect(ui->actionLog,SIGNAL(triggered()),this,SLOT(displayLogWidget()));
-
+    connect(ui->actionAbout,SIGNAL(triggered()),this,SLOT(displayAboutWidget()));
 }
 
 
@@ -124,7 +123,6 @@ void MainWindow::execRtr()
     Bridge::getBridge()->execCmd("rtr");
 }
 
-
 void MainWindow::displayMemMapWidget()
 {
     mMemMapView->widget()->show();
@@ -135,4 +133,14 @@ void MainWindow::displayLogWidget()
 {
     mLogView->widget()->show();
     mLogView->setFocus();
+}
+
+void MainWindow::displayAboutWidget()
+{
+#ifdef _WIN64
+    const char* title="About x64_dbg";
+#else
+    const char* title="About x32_dbg";
+#endif
+    MessageBoxA(MainWindow::winId(), "Created by:\nSigma (GUI)\nMr. eXoDia (DBG)\n\nSpecial Thanks:\nVisualPharm (http://visualpharm.com)\nReversingLabs (http://reversinglabs.com)\nBeatriX (http://beaengine.org)\nQt Project (http://qt-project.org)", title, MB_ICONINFORMATION);
 }
