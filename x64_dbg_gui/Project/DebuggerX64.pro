@@ -9,7 +9,8 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # Removes all debug output when defined
-#DEFINES += QT_NO_DEBUG_OUTPUT
+DEFINES += QT_NO_DEBUG_OUTPUT
+DEFINES += QT_NO_DEBUG_STREAM #no debug output in release mode (finally)
 
 #QMAKE_CFLAGS_RELEASE += -O3
 #QMAKE_CXXFLAGS_RELEASE += -O3
@@ -22,7 +23,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 }
 
 DEFINES += BUILD_LIB
-#DEFINES += QT_NO_DEBUG_STREAM #no debug output in release mode (finally)
 TEMPLATE = lib
 #TEMPLATE = app
 
@@ -43,7 +43,8 @@ SOURCES += \
     Src/Bridge/Bridge.cpp \
     Src/BasicView/StdTable.cpp \
     Src/BasicView/MemoryMapView.cpp \
-    Src/BasicView/LogView.cpp
+    Src/BasicView/LogView.cpp \
+    Src/Gui/GotoDialog.cpp
 
 
 HEADERS += \
@@ -64,7 +65,8 @@ HEADERS += \
     Src/Imports.h \
     Src/BasicView/StdTable.h \
     Src/BasicView/MemoryMapView.h \
-    Src/BasicView/LogView.h
+    Src/BasicView/LogView.h \
+    Src/Gui/GotoDialog.h
 
 
 INCLUDEPATH += \
@@ -82,7 +84,8 @@ INCLUDEPATH += \
 FORMS += \
     Src/Gui/MainWindow.ui \
     Src/Dummy.ui \
-    Src/Gui/CPUWidget.ui
+    Src/Gui/CPUWidget.ui \
+    Src/Gui/GotoDialog.ui
 
 
 #INCLUDEPATH += $$PWD/Src/BeaEngine_s_64

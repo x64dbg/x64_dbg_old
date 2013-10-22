@@ -58,6 +58,7 @@ duint DLL_IMPEXP DbgMemGetPageSize(duint base);
 duint DLL_IMPEXP DbgMemFindBaseAddr(duint addr, duint* size);
 bool DLL_IMPEXP DbgCmdExec(const char* cmd);
 bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap);
+bool DLL_IMPEXP DbgIsValidExpression(const char* expression);
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);

@@ -4,7 +4,7 @@
 #include "debugger.h"
 #include <psapi.h>
 #include "dbghelp\dbghelp.h"
-
+#include "value.h"
 
 extern "C" DLL_EXPORT duint _dbg_memfindbaseaddr(duint addr, duint* size)
 {
@@ -91,4 +91,9 @@ extern "C" DLL_EXPORT void _dbg_dbgexitsignal()
     DeleteFileA("DLLLoader.exe");
     StopDebug();
     ForceClose();
+}
+
+extern "C" DLL_EXPORT bool _dbg_valfromstring(const char* string, duint* value)
+{
+    return valfromstring(string, value, 0, 0, true, 0);
 }

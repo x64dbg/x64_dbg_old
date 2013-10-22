@@ -80,7 +80,7 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
 
     switch(col)
     {
-        case 0:
+        case 0: //draw address (+ label)
         {
             //ulong wAddr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
             //wStr = QString("%1").arg(wAddr, 8, 16, QChar('0')).toUpper();
@@ -93,16 +93,16 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
                 painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
                 painter->save();
                 painter->setPen(QPen(QColor("#ffffff")));
-                painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva, 16, 16, QChar('0')).toUpper());
+                painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper());
                 painter->restore();
             }
             else
-                wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva, 16, 16, QChar('0')).toUpper();
+                wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper();
 
             break;
         }
 
-        case 1:
+        case 1: //draw bytes
         {
             for(int i = 0; i < mInstBuffer.at(rowOffset).dump.size(); i++)
                 wStr += QString("%1").arg((unsigned char)(mInstBuffer.at(rowOffset).dump.at(i)), 2, 16, QChar('0')).toUpper();
@@ -116,9 +116,9 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
             break;
         }
 
-        case 2:
+        case 2: //draw disassembly
         {
-            wStr = mInstBuffer.at(rowOffset).instStr;//.toUpper(); (uppercase isnt needed)
+            wStr = mInstBuffer.at(rowOffset).instStr;
             break;
         }
 

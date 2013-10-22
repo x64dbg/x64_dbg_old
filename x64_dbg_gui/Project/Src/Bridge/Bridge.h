@@ -28,6 +28,7 @@ public:
     static void initBridge();
     bool execCmd(const char* cmd);
     bool getMemMapFromDbg(MEMMAP* parMemMap);
+    bool isValidExpression(const char* expression);
     void emitAddMsgToLog(QString msg);
     void emitClearLog();
     

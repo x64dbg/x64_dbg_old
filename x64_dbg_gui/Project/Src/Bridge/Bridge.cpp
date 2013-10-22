@@ -96,7 +96,10 @@ bool Bridge::getMemMapFromDbg(MEMMAP* parMemMap)
     return DbgMemMap(parMemMap);
 }
 
-
+bool Bridge::isValidExpression(const char* expression)
+{
+    return DbgIsValidExpression(expression);
+}
 
 /************************************************************************************
                             Static Functions
@@ -111,6 +114,8 @@ void Bridge::initBridge()
 {
     mBridge = new Bridge();
 }
+
+
 
 
 

@@ -17,7 +17,7 @@ public slots:
     void stateChangedSlot(DBGSTATE state);
 
 private:
-
+    QString getProtectionString(DWORD Protect);
     
 };
 

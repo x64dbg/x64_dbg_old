@@ -974,7 +974,7 @@ static bool setregister(const char* string, uint value)
     return false;
 }
 
-bool valapifromstring(const char* name, uint* value, int* value_size, bool printall, bool* hexonly)
+bool valapifromstring(const char* name, uint* value, int* value_size, bool printall, bool silent, bool* hexonly)
 {
     if(!value or !IsFileBeingDebugged())
         return false;
@@ -988,7 +988,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
         for(unsigned int i=0; i<(cbNeeded/sizeof(HMODULE)); i++)
         {
             char szModName[MAX_PATH];
-            if(!GetModuleFileNameEx(fdProcessInfo->hProcess, hMods[i], szModName, MAX_PATH))
+            if(!GetModuleFileNameEx(fdProcessInfo->hProcess, hMods[i], szModName, MAX_PATH) and !silent)
                 dprintf("could not get filename of module "fhex"\n", hMods[i]);
             char szBaseName[256]="";
             int len=strlen(szModName);
@@ -996,7 +996,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
                 len--;
             strcpy(szBaseName, szModName+len+1);
             HMODULE mod=LoadLibraryExA(szModName, 0, DONT_RESOLVE_DLL_REFERENCES|LOAD_LIBRARY_AS_DATAFILE);
-            if(!mod)
+            if(!mod and !silent)
                 dprintf("unable to load library %s\n", szBaseName);
             uint addr=(uint)GetProcAddress(mod, name);
             FreeLibrary(mod);
@@ -1027,7 +1027,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
     else
     {
         *value=*addrfound;
-        if(!printall)
+        if(!printall or silent)
             return true;
         for(int i=1; i<found; i++)
             dprintf(fhex"\n", addrfound[i]);
@@ -1201,7 +1201,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
         sscanf(string+inc, "%"fext"x", value);
         return true;
     }
-    else if(valapifromstring(string, value, value_size, true, hexonly)) //then come APIs
+    else if(valapifromstring(string, value, value_size, true, silent, hexonly)) //then come APIs
         return true;
     else if(varget(string, value, value_size, 0)) //finally variables
     {

@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mMemMapView->setWidget(new MemoryMapView());
     mMemMapView->setWindowIcon(QIcon(":/icons/images/alphabet/M.png"));
     mMemMapView->hide();
+    mMemMapView->setGeometry(10, 10, 600, 400);
 
     // Log View
     mLogView = new QMdiSubWindow();
@@ -32,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mLogView->setWidget(new LogView());
     mLogView->setWindowIcon(QIcon(":/icons/images/alphabet/L.png"));
     mLogView->hide();
+    mLogView->setGeometry(20, 20, 800, 300);
 
     mdiArea = new QMdiArea;
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -52,14 +54,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mdiArea->addSubWindow(mMemMapView);
     mdiArea->addSubWindow(mLogView);
 
-
     setCentralWidget(mdiArea);
 
     // Setup the command bar
     mCmdLineEdit = new CommandLineEdit(ui->cmdBar);
-    ui->cmdBar->addWidget(new QLabel("Command "));
+    ui->cmdBar->addWidget(new QLabel("Command: "));
     ui->cmdBar->addWidget(mCmdLineEdit);
-
 
     // Setup Signals/Slots
     connect(ui->actionStepOver, SIGNAL(triggered()), mCpuWin, SLOT(stepOverSlot()));
@@ -143,4 +143,15 @@ void MainWindow::displayAboutWidget()
     const char* title="About x32_dbg";
 #endif
     MessageBoxA(MainWindow::winId(), "Created by:\nSigma (GUI)\nMr. eXoDia (DBG)\n\nSpecial Thanks:\nVisualPharm (http://visualpharm.com)\nReversingLabs (http://reversinglabs.com)\nBeatriX (http://beaengine.org)\nQt Project (http://qt-project.org)", title, MB_ICONINFORMATION);
+}
+
+void MainWindow::on_actionGoto_triggered()
+{
+    GotoDialog mGoto;
+    mGoto.setModal(true); //modal window
+    if(mGoto.exec()==QDialog::Accepted)
+    {
+        QString cmd;
+        Bridge::getBridge()->execCmd(cmd.sprintf("disasm \"%s\"", mGoto.expressionText.toUtf8().constData()).toUtf8().constData());
+    }
 }

@@ -7,6 +7,7 @@
 #include "CommandLineEdit.h"
 #include "MemoryMapView.h"
 #include "LogView.h"
+#include "GotoDialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -32,6 +33,9 @@ public slots:
     void execRun();
     void execRtr();
     
+private slots:
+    void on_actionGoto_triggered();
+
 private:
     Ui::MainWindow *ui;
     QMdiArea* mdiArea;

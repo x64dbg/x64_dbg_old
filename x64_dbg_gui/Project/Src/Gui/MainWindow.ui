@@ -98,6 +98,8 @@
    <addaction name="actionPause"/>
    <addaction name="actionStepInto"/>
    <addaction name="actionStepOver"/>
+   <addaction name="separator"/>
+   <addaction name="actionGoto"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="cmdBar">
@@ -210,6 +212,14 @@
   <action name="actionAbout">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionGoto">
+   <property name="text">
+    <string>Goto</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
    </property>
   </action>
  </widget>

@@ -10,6 +10,7 @@ MemoryMapView::MemoryMapView(StdTable *parent) : StdTable(parent)
     addColumnAt(getColumnCount(), 100, false);
     addColumnAt(getColumnCount(), 100, false);
     addColumnAt(getColumnCount(), 100, false);
+    addColumnAt(getColumnCount(), 100, false);
 
 
     //setRowCount(100);
@@ -18,10 +19,45 @@ MemoryMapView::MemoryMapView(StdTable *parent) : StdTable(parent)
     connect(Bridge::getBridge(), SIGNAL(dbgStateChanged(DBGSTATE)), this, SLOT(stateChangedSlot(DBGSTATE)));
 }
 
+QString MemoryMapView::getProtectionString(DWORD Protect)
+{
+    QString wS;
+    switch(Protect & 0xFF)
+    {
+    case PAGE_EXECUTE:
+        wS = QString("E---");
+        break;
+    case PAGE_EXECUTE_READ:
+        wS = QString("ER--");
+        break;
+    case PAGE_EXECUTE_READWRITE:
+        wS = QString("ERW-");
+        break;
+    case PAGE_EXECUTE_WRITECOPY:
+        wS = QString("ERWC");
+        break;
+    case PAGE_NOACCESS:
+        wS = QString("----");
+        break;
+    case PAGE_READONLY:
+        wS = QString("-R--");
+        break;
+    case PAGE_READWRITE:
+        wS = QString("-RW-");
+        break;
+    case PAGE_WRITECOPY:
+        wS = QString("-RWC");
+        break;
+    }
+    if(Protect&PAGE_GUARD)
+        wS+=QString("G");
+    else
+        wS+=QString("-");
+    return wS;
+}
 
 void MemoryMapView::stateChangedSlot(DBGSTATE state)
 {
-
     if(state == paused)
     {
         MEMMAP wMemMapStruct;
@@ -42,11 +78,11 @@ void MemoryMapView::stateChangedSlot(DBGSTATE state)
             MEMORY_BASIC_INFORMATION wMbi = (wMemMapStruct.page)[wI].mbi;
 
             // Base address
-            wS = QString("%1").arg((uint_t)wMbi.BaseAddress, 16, 16, QChar('0')).toUpper();
+            wS = QString("%1").arg((uint_t)wMbi.BaseAddress, sizeof(uint_t)*2, 16, QChar('0')).toUpper();
             setCellContent(wI, 0, wS);
 
             // Size
-            wS = QString("%1").arg((uint_t)wMbi.RegionSize, 16, 16, QChar('0')).toUpper();
+            wS = QString("%1").arg((uint_t)wMbi.RegionSize, sizeof(uint_t)*2, 16, QChar('0')).toUpper();
             setCellContent(wI, 1, wS);
 
             // Module Name
@@ -57,79 +93,43 @@ void MemoryMapView::stateChangedSlot(DBGSTATE state)
             switch(wMbi.State)
             {
                 case MEM_FREE:
-                    wS = QString("Free");
+                    wS = QString("FREE");
                     break;
                 case MEM_COMMIT:
-                    wS = QString("Commited");
+                    wS = QString("COMM");
                     break;
                 case MEM_RESERVE:
-                    wS = QString("Reserved");
+                    wS = QString("RESV");
                     break;
                 default:
-                    wS = QString("N/A");
+                    wS = QString("????");
             }
             setCellContent(wI, 3, wS);
-
-            // Access
-            if(wMbi.State != MEM_COMMIT)
-            {
-                wS = QString("N/A");
-            }
-            else
-            {
-                switch(wMbi.Protect & 0xFF)
-                {
-                    case PAGE_EXECUTE:
-                        wS = QString("Execute");
-                        break;
-                    case PAGE_EXECUTE_READ:
-                        wS = QString("Execute/Read");
-                        break;
-                    case PAGE_EXECUTE_READWRITE:
-                        wS = QString("Execute/Read/Write");
-                        break;
-                    case PAGE_NOACCESS:
-                        wS = QString("No Access");
-                        break;
-                    case PAGE_READONLY:
-                        wS = QString("Read");
-                        break;
-                    case PAGE_READWRITE:
-                        wS = QString("Read/Write");
-                        break;
-                    case PAGE_WRITECOPY:
-                        wS = QString("Copy on Write");
-                        break;
-                    case PAGE_EXECUTE_WRITECOPY:
-                        wS = QString("Execute/Copy on Write");
-                        break;
-                }
-
-                switch(wMbi.Protect & 0xFF00)
-                {
-                    case PAGE_GUARD:
-                        wS += QString(" + Guard");
-                }
-
-                setCellContent(wI, 4, wS);
-            }
 
             // Type
             switch(wMbi.Type)
             {
                 case MEM_IMAGE:
-                    wS = QString("Image");
+                    wS = QString("IMG");
                     break;
                 case MEM_MAPPED:
-                    wS = QString("Mapped");
+                    wS = QString("MAP");
                     break;
                 case MEM_PRIVATE:
-                    wS = QString("Private");
+                    wS = QString("PRV");
                     break;
                 default:
                     wS = QString("N/A");
                     break;
             }
+            setCellContent(wI, 3, wS);
+
+            // current access protection
+            wS=getProtectionString(wMbi.Protect);
+            setCellContent(wI, 4, wS);
+
+            // allocation protection
+            wS=getProtectionString(wMbi.AllocationProtect);
             setCellContent(wI, 5, wS);
 
         }
