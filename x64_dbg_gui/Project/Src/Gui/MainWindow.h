@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QtGui>
+#include <QFileDialog>
 #include "CPUWidget.h"
 #include "CommandLineEdit.h"
 #include "MemoryMapView.h"
@@ -32,6 +33,7 @@ public slots:
     void execClose();
     void execRun();
     void execRtr();
+    void openFile();
     
 private slots:
     void on_actionGoto_triggered();

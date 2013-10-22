@@ -73,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionRtr,SIGNAL(triggered()),this,SLOT(execRtr()));
     connect(ui->actionLog,SIGNAL(triggered()),this,SLOT(displayLogWidget()));
     connect(ui->actionAbout,SIGNAL(triggered()),this,SLOT(displayAboutWidget()));
+    connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(openFile()));
 }
 
 
@@ -155,4 +156,16 @@ void MainWindow::on_actionGoto_triggered()
         QString cmd;
         Bridge::getBridge()->execCmd(cmd.sprintf("disasm \"%s\"", mGoto.expressionText.toUtf8().constData()).toUtf8().constData());
     }
+}
+
+void MainWindow::openFile()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open file"), 0, tr("Executables (*.exe *.dll)"));
+    if(!filename.length())
+        return;
+    //TODO: add check if a file is currently open
+    Bridge::getBridge()->execCmd("stop"); //close current file (when present)
+    Sleep(400);
+    QString cmd;
+    Bridge::getBridge()->execCmd(cmd.sprintf("init \"%s\"", filename.toUtf8().constData()).toUtf8().constData());
 }
