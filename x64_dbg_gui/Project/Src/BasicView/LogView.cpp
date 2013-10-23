@@ -16,7 +16,8 @@ LogView::LogView(QWidget *parent) : QTextEdit(parent)
 
 void LogView::addMsgToLogSlot(QString msg)
 {
-    this->append(msg);
+    this->moveCursor(QTextCursor::End);
+    this->insertPlainText(msg);
 }
 
 
