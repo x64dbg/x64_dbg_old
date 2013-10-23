@@ -59,11 +59,13 @@ duint DLL_IMPEXP DbgMemFindBaseAddr(duint addr, duint* size);
 bool DLL_IMPEXP DbgCmdExec(const char* cmd);
 bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap);
 bool DLL_IMPEXP DbgIsValidExpression(const char* expression);
+bool DLL_IMPEXP DbgIsDebugging();
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);
 void DLL_IMPEXP GuiSetDebugState(DBGSTATE state);
 void DLL_IMPEXP GuiAddLogMessage(const char* msg);
+void DLL_IMPEXP GuiLogClear();
 
 #ifdef __cplusplus
 }

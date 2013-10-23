@@ -44,7 +44,8 @@ SOURCES += \
     Src/BasicView/StdTable.cpp \
     Src/BasicView/MemoryMapView.cpp \
     Src/BasicView/LogView.cpp \
-    Src/Gui/GotoDialog.cpp
+    Src/Gui/GotoDialog.cpp \
+    Src/Disassembler/BeaHighlight.cpp
 
 
 HEADERS += \
@@ -66,7 +67,8 @@ HEADERS += \
     Src/BasicView/StdTable.h \
     Src/BasicView/MemoryMapView.h \
     Src/BasicView/LogView.h \
-    Src/Gui/GotoDialog.h
+    Src/Gui/GotoDialog.h \
+    Src/Disassembler/BeaHighlight.h
 
 
 INCLUDEPATH += \

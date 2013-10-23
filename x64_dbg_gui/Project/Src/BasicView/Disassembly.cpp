@@ -29,6 +29,45 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
     connect(Bridge::getBridge(), SIGNAL(disassembleAt(uint_t, uint_t)), this, SLOT(disassambleAt(uint_t, uint_t)));
 }
 
+/************************************************************************************
+                            Private Functions
+************************************************************************************/
+
+void Disassembly::paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, QList<CustomRichText_t> richText)
+{
+    int len=richText.size();
+    int charwidth=QFontMetrics(this->font()).width(QChar(' '));
+    for(int i=0; i<len; i++)
+    {
+        CustomRichText_t curRichText=richText.at(i);
+        int curRichTextLength=curRichText.text.length();
+        switch(curRichText.flags)
+        {
+        case FlagNone: //defaults
+            painter->drawText(QRect(x+xinc, y, w-xinc, h), 0, curRichText.text);
+            break;
+        case FlagColor: //color only
+            painter->save();
+            painter->setPen(QPen(curRichText.textColor));
+            painter->drawText(QRect(x+xinc, y, w-xinc, h), 0, curRichText.text);
+            painter->restore();
+            break;
+        case FlagBackground: //background only
+            painter->fillRect(QRect(x+xinc, y, charwidth*curRichTextLength, h), QBrush(curRichText.textBackground));
+            painter->drawText(QRect(x+xinc, y, w-xinc, h), 0, curRichText.text);
+            break;
+        case FlagAll: //color+background
+            painter->fillRect(QRect(x+xinc, y, charwidth*curRichTextLength, h), QBrush(curRichText.textBackground));
+            painter->save();
+            painter->setPen(QPen(curRichText.textColor));
+            painter->drawText(QRect(x+xinc, y, w-xinc, h), 0, curRichText.text);
+            painter->restore();
+            break;
+        }
+        xinc+=charwidth*curRichTextLength;
+    }
+}
+
 
 /************************************************************************************
                             Reimplemented Functions
@@ -46,7 +85,7 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
  * @param[in]   w           Rectangle width
  * @param[in]   h           Rectangle heigth
  *
- * @return      Nothing.
+ * @return      String to paint.
  */
 QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
 {
@@ -86,8 +125,6 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
             //wStr = QString("%1").arg(wAddr, 8, 16, QChar('0')).toUpper();
             // QString::number(wInst.rva)
 
-
-
             if(mInstBuffer.at(rowOffset).rva == mCipRva)
             {
                 painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
@@ -116,9 +153,41 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
             break;
         }
 
-        case 2: //draw disassembly
+        case 2: //draw disassembly (with colours needed)
         {
-            wStr = mInstBuffer.at(rowOffset).instStr;
+            Instruction_t curInst = mInstBuffer.at(rowOffset);
+            QList<CustomRichText_t> richText;
+            BeaHighlight::PrintRtfInstruction(&richText, &curInst.disasm);
+            //BeaHighlight::PrintRtfInstruction(richText, &curInst.disasm);
+            /*CustomRichText_t mnemonic;
+            mnemonic.text=QString(curInst.disasm.Instruction.Mnemonic);
+            mnemonic.textColor=QColor(255,0,0);
+            mnemonic.flags=FlagColor;
+            richText.push_back(mnemonic);
+            CustomRichText_t rest;
+            rest.text=QString(curInst.disasm.CompleteInstr+mnemonic.text.length());
+            rest.textBackground=QColor(0,255,255);
+            rest.flags=FlagBackground;
+            richText.push_back(rest);*/
+            Disassembly::paintRichText(painter, x, y, getColumnWidth(col), getRowHeight(), 4, richText);
+            //richText.push_back();
+
+            /*QString mnemonic = QString();
+            int mnemoniclen = mnemonic.length();
+            int mnemonicwidth = QFontMetrics(this->font()).width(mnemonic);
+            QString rest = QString(curInst.disasm.CompleteInstr+mnemoniclen);
+            int xinc=4;
+            int columnwidth=getColumnWidth(col);
+            int rowheight=getRowHeight();
+            painter->save();
+            painter->setPen(QPen(QColor("#ff0000")));
+            painter->drawText(QRect(x + xinc, y, columnwidth - xinc, rowheight), 0, mnemonic);
+            painter->restore();
+            if(rest.length())
+            {
+                xinc+=mnemonicwidth;
+                painter->drawText(QRect(x + xinc, y, columnwidth - xinc, rowheight), 0, rest);
+            }*/
             break;
         }
 
@@ -387,7 +456,7 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
     }
 
     painter->save() ;
-    painter->setPen(QColor(0, 0, 0));
+    painter->setPen(QColor(0, 0, 0)); //change pen color when jump is executed
 
     if(wPict == GD_Vert)
     {

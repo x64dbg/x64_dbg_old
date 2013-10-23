@@ -14,7 +14,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>Follow expression...</string>
+   <string>Enter expression to follow...</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../../resource.qrc">

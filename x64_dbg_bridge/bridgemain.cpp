@@ -75,6 +75,10 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_valfromstring=(DBGVALFROMSTRING)GetProcAddress(hInstDbg, "_dbg_valfromstring");
     if(!_dbg_valfromstring)
         return "Export \"_dbg_valfromstring\" could not be found!";
+    //_dbg_isdebugging
+    _dbg_isdebugging=(DBGISDEBUGGING)GetProcAddress(hInstDbg, "_dbg_isdebugging");
+    if(!_dbg_isdebugging)
+        return "Export \"_dbg_isdebugging\" could not be found!";
     return 0;
 }
 
@@ -148,6 +152,11 @@ bool DLL_IMPEXP DbgIsValidExpression(const char* expression)
 {
     duint value=0;
     return _dbg_valfromstring(expression, &value);
+}
+
+bool DLL_IMPEXP DbgIsDebugging()
+{
+    return _dbg_isdebugging();
 }
 
 //GUI

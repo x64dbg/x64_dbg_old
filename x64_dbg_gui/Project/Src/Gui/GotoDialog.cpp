@@ -7,8 +7,12 @@ GotoDialog::GotoDialog(QWidget *parent) :
 {
     //setup UI first
     ui->setupUi(this);
+    this->setFixedSize(this->size()); //fixed size
     //initialize stuff
-    ui->labelError->setText("<font color='red'><b>Invalid expression...</b></color>");
+    if(!DbgIsDebugging()) //not debugging
+        ui->labelError->setText("<font color='red'><b>Not debugging...</b></color>");
+    else
+        ui->labelError->setText("<font color='red'><b>Invalid expression...</b></color>");
     ui->buttonOk->setEnabled(false);
 }
 
@@ -19,7 +23,13 @@ GotoDialog::~GotoDialog()
 
 void GotoDialog::on_editExpression_textChanged(const QString &arg1)
 {
-    if(!Bridge::getBridge()->isValidExpression(arg1.toUtf8().constData())) //invalid expression
+    if(!DbgIsDebugging()) //not debugging
+    {
+        ui->labelError->setText("<font color='red'><b>Not debugging...</b></color>");
+        ui->buttonOk->setEnabled(false);
+        expressionText.clear();
+    }
+    else if(!Bridge::getBridge()->isValidExpression(arg1.toUtf8().constData())) //invalid expression
     {
         ui->labelError->setText("<font color='red'><b>Invalid expression...</b></color>");
         ui->buttonOk->setEnabled(false);

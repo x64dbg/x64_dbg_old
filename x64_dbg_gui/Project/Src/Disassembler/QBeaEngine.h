@@ -8,8 +8,6 @@
 #include "BeaEngine.h"
 #include "NewTypes.h"
 
-
-
 typedef struct _Instruction_t
 {
     QString instStr;

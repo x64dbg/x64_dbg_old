@@ -49,6 +49,7 @@ typedef bool (*DBGDBGCMDEXEC)(const char* cmd);
 typedef bool (*DBGMEMMAP)(MEMMAP* memmap);
 typedef void (*DBGDBGEXITSIGNAL)();
 typedef bool (*DBGVALFROMSTRING)(const char* string, duint* value);
+typedef bool (*DBGISDEBUGGING)();
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;
@@ -58,5 +59,6 @@ extern DBGDBGCMDEXEC _dbg_dbgcmdexec;
 extern DBGMEMMAP _dbg_memmap;
 extern DBGDBGEXITSIGNAL _dbg_dbgexitsignal;
 extern DBGVALFROMSTRING _dbg_valfromstring;
+extern DBGISDEBUGGING _dbg_isdebugging;
 
 #endif // _GLOBAL_H

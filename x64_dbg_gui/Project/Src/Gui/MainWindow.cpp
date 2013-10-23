@@ -163,9 +163,11 @@ void MainWindow::openFile()
     QString filename = QFileDialog::getOpenFileName(this, tr("Open file"), 0, tr("Executables (*.exe *.dll)"));
     if(!filename.length())
         return;
-    //TODO: add check if a file is currently open
-    Bridge::getBridge()->execCmd("stop"); //close current file (when present)
-    Sleep(400);
+    if(DbgIsDebugging())
+    {
+        Bridge::getBridge()->execCmd("stop"); //close current file (when present)
+        Sleep(400);
+    }
     QString cmd;
     Bridge::getBridge()->execCmd(cmd.sprintf("init \"%s\"", filename.toUtf8().constData()).toUtf8().constData());
 }
