@@ -22,8 +22,10 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
 
     qDebug() << "size" << parMemPage->getSize();
 
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
+    int charwidth=QFontMetrics(this->font()).width(QChar(' '));
+
+    addColumnAt(getColumnCount(), charwidth*2*sizeof(uint_t)+8, false);
+    addColumnAt(getColumnCount(), charwidth*2*12+8, false);
     addColumnAt(getColumnCount(), 100, false);
 
     connect(Bridge::getBridge(), SIGNAL(disassembleAt(uint_t, uint_t)), this, SLOT(disassambleAt(uint_t, uint_t)));

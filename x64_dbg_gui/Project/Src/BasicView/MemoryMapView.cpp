@@ -4,12 +4,14 @@ MemoryMapView::MemoryMapView(StdTable *parent) : StdTable(parent)
 {
     enableMultiSelection(false);
 
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
+    int charwidth=QFontMetrics(this->font()).width(QChar(' '));
+
+    addColumnAt(getColumnCount(), 8+charwidth*2*sizeof(uint_t), false);
+    addColumnAt(getColumnCount(), 8+charwidth*2*sizeof(uint_t), false);
+    addColumnAt(getColumnCount(), 8+charwidth*16, false);
+    addColumnAt(getColumnCount(), 8+charwidth*3, false);
+    addColumnAt(getColumnCount(), 8+charwidth*5, false);
+    addColumnAt(getColumnCount(), 8+charwidth*5, false);
     addColumnAt(getColumnCount(), 100, false);
 
 

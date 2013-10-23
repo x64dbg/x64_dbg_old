@@ -28,6 +28,7 @@ Right now the debugger supports the following features:
 - rtr (return from function)
 - memory allocation/deallocation in the debuggee
 - quickly accessing API addresses (GetProcAddress->76E13620)
+- highlighting (not yet customizable, but really helpful)
 
 The debugger core is based on TitanEngine (an updated version) and the
 disassembly is powered by BeaEngine. The icon is taken from VisualPharm.
