@@ -60,6 +60,7 @@ bool DLL_IMPEXP DbgCmdExec(const char* cmd);
 bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap);
 bool DLL_IMPEXP DbgIsValidExpression(const char* expression);
 bool DLL_IMPEXP DbgIsDebugging();
+bool DLL_IMPEXP DbgIsJumpGoingToExecute(duint addr);
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);

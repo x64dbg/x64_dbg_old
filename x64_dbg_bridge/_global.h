@@ -50,6 +50,7 @@ typedef bool (*DBGMEMMAP)(MEMMAP* memmap);
 typedef void (*DBGDBGEXITSIGNAL)();
 typedef bool (*DBGVALFROMSTRING)(const char* string, duint* value);
 typedef bool (*DBGISDEBUGGING)();
+typedef bool (*DBGISJUMPGOINGTOEXECUTE)(duint addr);
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;
@@ -60,5 +61,6 @@ extern DBGMEMMAP _dbg_memmap;
 extern DBGDBGEXITSIGNAL _dbg_dbgexitsignal;
 extern DBGVALFROMSTRING _dbg_valfromstring;
 extern DBGISDEBUGGING _dbg_isdebugging;
+extern DBGISJUMPGOINGTOEXECUTE _dbg_isjumpgoingtoexecute;
 
 #endif // _GLOBAL_H

@@ -20,3 +20,4 @@ DBGMEMMAP _dbg_memmap;
 DBGDBGEXITSIGNAL _dbg_dbgexitsignal;
 DBGVALFROMSTRING _dbg_valfromstring;
 DBGISDEBUGGING _dbg_isdebugging;
+DBGISJUMPGOINGTOEXECUTE _dbg_isjumpgoingtoexecute;

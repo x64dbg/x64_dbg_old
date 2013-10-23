@@ -102,3 +102,8 @@ extern "C" DLL_EXPORT bool _dbg_isdebugging()
 {
     return IsFileBeingDebugged();
 }
+
+extern "C" DLL_EXPORT bool _dbg_isjumpgoingtoexecute(duint addr)
+{
+    return true;
+}

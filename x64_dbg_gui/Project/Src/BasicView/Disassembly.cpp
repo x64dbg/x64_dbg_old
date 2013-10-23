@@ -458,7 +458,10 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
     }
 
     painter->save() ;
-    painter->setPen(QColor(0, 0, 0)); //change pen color when jump is executed
+    if(DbgIsJumpGoingToExecute(instruction.rva+mMemPage->getBase())) //change pen color when jump is executed
+        painter->setPen(QColor(255, 0, 0));
+    else
+        painter->setPen(QColor(128, 128, 128));
 
     if(wPict == GD_Vert)
     {
