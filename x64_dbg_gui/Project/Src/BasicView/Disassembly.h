@@ -46,6 +46,7 @@ public:
     // Index Management
     int getIndexFromCount(int index, int count);
     int getLineToPrintcount();
+    void prepareData();
 
 signals:
     

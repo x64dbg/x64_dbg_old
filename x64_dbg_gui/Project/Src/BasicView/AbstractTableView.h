@@ -30,6 +30,7 @@ public:
     virtual int sliderMovedAction(int type, int value, int delta);
     void forceScrollBarValue(int val);
     void moveScrollBar(int delta);
+    void refresh();
 
     // Coordinates Utils
     int getIndexOffsetFromY(int y);
@@ -38,6 +39,7 @@ public:
     int transY(int y);
     int getViewableRowsCount();
     virtual int getLineToPrintcount();
+    virtual void prepareData();
 
     // New Columns
     virtual int addColumnAt(int at, int width, bool isClickable);
@@ -53,6 +55,8 @@ public:
     int getTableHeigth();
     int getTableOffset();
     int getGuiState();
+    int getNbrOfLineToPrint();
+    void setNbrOfLineToPrint(int parNbrOfLineToPrint);
 
 signals:
     void headerButtonPressed(int col);
@@ -105,6 +109,8 @@ private:
 
     int mTableOffset;
     Header_t mHeader;
+
+    int mNbrOfLineToPrint;
 };
 
 #endif // ABSTRACTTABLEVIEW_H

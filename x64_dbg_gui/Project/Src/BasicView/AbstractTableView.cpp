@@ -24,6 +24,7 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 
     mHeaderButtonSytle.setStyleSheet(" QPushButton {\n     background-color: rgb(192, 192, 192);\n     border-style: outset;\n     border-width: 2px;\n     border-color: rgb(128, 128, 128);\n }\n QPushButton:pressed {\n     background-color: rgb(192, 192, 192);\n     border-style: inset;\n }");
 
+    mNbrOfLineToPrint = 0;
 
     mColResizeData = (ColumnResizingData_t){false, 0, 0};
 
@@ -51,7 +52,6 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
 {
     QPainter wPainter(this->viewport());
     int wViewableRowsCount = getViewableRowsCount();
-    int wLineToPrintcount = getLineToPrintcount();
 
     int x = 0;
     int y = 0;
@@ -87,7 +87,7 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
         for(int i = 0; i < wViewableRowsCount; i++)
         {
             //  Draw cells content
-            if(i < wLineToPrintcount)
+            if(i < mNbrOfLineToPrint)
             {
                QString wStr = paintContent(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
                wPainter.drawText(QRect(x + 4, y, getColumnWidth(j) - 4, getRowHeight()), Qt::AlignVCenter | Qt::AlignLeft, wStr);
@@ -211,7 +211,7 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
 
             mColResizeData.lastPosX = event->x();
 
-            this->viewport()->repaint();
+            refresh();
 
             break;
         }
@@ -230,7 +230,7 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
                 mColumnList[mHeader.activeButtonIndex].header.isMouseOver = false;
             }
 
-            this->viewport()->repaint();
+            refresh();
         }
         default:
             break;
@@ -284,7 +284,7 @@ void AbstractTableView::mousePressEvent(QMouseEvent* event)
 
             mGuiState = AbstractTableView::HeaderButtonPressed;
 
-            this->viewport()->repaint();
+            refresh();
         }
     }
 
@@ -329,7 +329,7 @@ void AbstractTableView::mouseReleaseEvent(QMouseEvent* event)
             mColumnList[i].header.isPressed = false;
         }
 
-        this->viewport()->repaint();
+        refresh();
     }
 }
 
@@ -409,7 +409,7 @@ void AbstractTableView::vertSliderActionSlot(int action)
 
     qDebug() << "New mTableOffset: " << mTableOffset;
 
-    //viewport()->repaint();
+    refresh();
 }
 
 
@@ -460,6 +460,14 @@ void AbstractTableView::moveScrollBar(int delta)
     verticalScrollBar()->setValue(wSliderPosition + delta);
     verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepSub);
 }
+
+
+void AbstractTableView::refresh()
+{
+    prepareData();
+    this->viewport()->repaint();
+}
+
 
 
 /************************************************************************************
@@ -564,11 +572,9 @@ int AbstractTableView::getViewableRowsCount()
 
 
 /**
- * @brief       Substract the header heigth from the given y.
+ * @brief       Returns the number of remaining lines to print.
  *
- * @param[in]   y      y coordinate
- *
- * @return      y - getHeaderHeigth().
+ * @return      Number of remaining lines to print.
  */
 int AbstractTableView::getLineToPrintcount()
 {
@@ -576,6 +582,21 @@ int AbstractTableView::getLineToPrintcount()
     int wRemainingRowsCount = getRowCount() - mTableOffset;
     int wCount = wRemainingRowsCount > wViewableRowsCount ? wViewableRowsCount : wRemainingRowsCount;
     return wCount;
+}
+
+
+/**
+ * @brief       This method is called every time the table offset changes.
+ *
+ * @param[in]   parTableOffset      New table offset
+ *
+ * @return      Returns the number of remaining lines to print.
+ */
+void AbstractTableView::prepareData()
+{
+    int wViewableRowsCount = getViewableRowsCount();
+    int wRemainingRowsCount = getRowCount() - mTableOffset;
+    mNbrOfLineToPrint = wRemainingRowsCount > wViewableRowsCount ? wViewableRowsCount : wRemainingRowsCount;
 }
 
 
@@ -697,4 +718,16 @@ int AbstractTableView::getGuiState()
 {
     return mGuiState;
 }
+
+
+int AbstractTableView::getNbrOfLineToPrint()
+{
+    return mNbrOfLineToPrint;
+}
+
+void AbstractTableView::setNbrOfLineToPrint(int parNbrOfLineToPrint)
+{
+    mNbrOfLineToPrint = parNbrOfLineToPrint;
+}
+
 

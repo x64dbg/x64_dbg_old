@@ -100,21 +100,6 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
     uint_t wRVA;
     Instruction_t wInst;
 
-    if(rowOffset == 0 && col == 0) // Disassemble instructions before printing them
-    {
-        wRVA = rowBase;
-        wLineToPrintcount = getLineToPrintcount();
-
-        mInstBuffer.clear();
-
-        for(wI = 0; wI < wLineToPrintcount; wI++)
-        {
-            wInst = DisassembleAt(wRVA);
-            mInstBuffer.append(wInst);
-            wRVA += wInst.lentgh;
-        }
-    }
-
     wRVA = mInstBuffer.at(rowOffset).rva;
 
     if(isSelected(rowBase, rowOffset) == true)
@@ -228,7 +213,7 @@ void Disassembly::mouseMoveEvent(QMouseEvent* event)
             {
                 expandSelectionUpTo(wRowIndex);
 
-                this->viewport()->repaint();
+                refresh();
 
                 wAccept = false;
             }
@@ -268,7 +253,7 @@ void Disassembly::mousePressEvent(QMouseEvent* event)
 
                     mGuiState = Disassembly::MultiRowsSelectionState;
 
-                    viewport()->repaint();
+                    refresh();
 
                     wAccept = true;
                 }
@@ -299,7 +284,7 @@ void Disassembly::mouseReleaseEvent(QMouseEvent* event)
         {
             mGuiState = Disassembly::NoState;
 
-            this->viewport()->repaint();
+            refresh();
 
             wAccept = false;
         }
@@ -379,7 +364,7 @@ void Disassembly::keyPressEvent(QKeyEvent* event)
             forceScrollBarValue(getIndexFromCount(getInitialSelection(),-getLineToPrintcount() + 2));
         }
 
-        viewport()->repaint();
+        refresh();
     }
     else
     {
@@ -720,6 +705,49 @@ int Disassembly::getLineToPrintcount()
     }
 
     return wCount;
+}
+
+
+
+void Disassembly::prepareData()
+{
+    int wViewableRowsCount = getViewableRowsCount();
+
+    int wAddrPrev = getTableOffset();
+    int wAddr = wAddrPrev;
+
+    int wCount = 0;
+
+    for(int wI = 0; wI < wViewableRowsCount; wI++)
+    {
+        wAddrPrev = wAddr;
+        wAddr = getNextInstructionRVA(wAddr, 1);
+
+        if(wAddr == wAddrPrev)
+        {
+            break;
+        }
+
+        wCount++;
+    }
+
+    setNbrOfLineToPrint(wCount);
+
+
+    int wI = 0;
+    uint_t wRVA;
+    Instruction_t wInst;
+
+    wRVA = getTableOffset();
+    mInstBuffer.clear();
+
+    for(wI = 0; wI < wCount; wI++)
+    {
+        wInst = DisassembleAt(wRVA);
+        mInstBuffer.append(wInst);
+        wRVA += wInst.lentgh;
+    }
+
 }
 
 
