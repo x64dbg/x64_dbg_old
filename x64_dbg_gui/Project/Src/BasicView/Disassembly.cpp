@@ -770,6 +770,20 @@ void Disassembly::disassambleAt(uint_t parVA, uint_t parCIP)
     setRowCount(wSize);
     mMemPage->setAttributes(wBase, wSize);  // Set base and size (Useful when memory page changed)
     setSingleSelection(wRVA);               // Selects disassembled instruction
-    forceScrollBarValue(wRVA);
+
     mCipRva = wCipRva;
+
+    if(mInstBuffer.size() > 0 && wRVA >= mInstBuffer.first().rva && wRVA < mInstBuffer.last().rva)
+    {
+        refresh();
+    }
+    else if(mInstBuffer.size() > 0 && wRVA == mInstBuffer.last().rva)
+    {
+        forceScrollBarValue(mInstBuffer.first().rva + mInstBuffer.first().lentgh);
+    }
+    else
+    {
+        forceScrollBarValue(wRVA);
+    }
+
 }
