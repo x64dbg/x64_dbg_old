@@ -52,6 +52,13 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
 {
     QPainter wPainter(this->viewport());
     int wViewableRowsCount = getViewableRowsCount();
+    static uint_t sTableOffset = mTableOffset + 1;
+
+    if(sTableOffset != mTableOffset)
+    {
+        prepareData();
+        sTableOffset = mTableOffset;
+    }
 
     int x = 0;
     int y = 0;
@@ -408,8 +415,6 @@ void AbstractTableView::vertSliderActionSlot(int action)
     verticalScrollBar()->setValue(mTableOffset);
 
     qDebug() << "New mTableOffset: " << mTableOffset;
-
-    refresh();
 }
 
 
@@ -464,7 +469,6 @@ void AbstractTableView::moveScrollBar(int delta)
 
 void AbstractTableView::refresh()
 {
-    prepareData();
     this->viewport()->repaint();
 }
 

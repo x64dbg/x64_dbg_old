@@ -3,7 +3,7 @@
 
 #include <QtGui>
 #include <qdebug.h>
-
+#include <NewTypes.h>
 
 
 class AbstractTableView : public QAbstractScrollArea
