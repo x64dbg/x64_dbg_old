@@ -201,12 +201,18 @@
   </action>
   <action name="actionMemoryMap">
    <property name="text">
-    <string>MemoryMap</string>
+    <string>Memory Map</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+M</string>
    </property>
   </action>
   <action name="actionLog">
    <property name="text">
-    <string>Log</string>
+    <string>Log Window</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+L</string>
    </property>
   </action>
   <action name="actionAbout">

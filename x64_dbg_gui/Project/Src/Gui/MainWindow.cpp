@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionLog,SIGNAL(triggered()),this,SLOT(displayLogWidget()));
     connect(ui->actionAbout,SIGNAL(triggered()),this,SLOT(displayAboutWidget()));
     connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(openFile()));
+    connect(ui->actionPause,SIGNAL(triggered()),this,SLOT(execPause()));
 }
 
 
@@ -170,4 +171,9 @@ void MainWindow::openFile()
     }
     QString cmd;
     Bridge::getBridge()->execCmd(cmd.sprintf("init \"%s\"", filename.toUtf8().constData()).toUtf8().constData());
+}
+
+void MainWindow::execPause()
+{
+    Bridge::getBridge()->execCmd("pause");
 }

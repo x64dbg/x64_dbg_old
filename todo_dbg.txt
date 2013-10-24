@@ -54,3 +54,9 @@
 - functions
 - TEB/TBI
 - PEB/PBI
+- debug pause
+- cpu filename+thread id
+- GetAddrInfo/SetAddrInfo
+- shift+f7f8f9
+- restart (last process)
+- log breakpoints

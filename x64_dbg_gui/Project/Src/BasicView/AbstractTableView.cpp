@@ -7,6 +7,9 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
     mHeader = (Header_t){true, 20, -1};
 
     QFont font("Monospace", 8);
+    //QFont font("Terminal", 6);
+    //font.setBold(true); //bold
+
     font.setFixedPitch(true);
     //font.setStyleHint(QFont::Monospace);
     this->setFont(font);

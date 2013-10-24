@@ -16,6 +16,7 @@ static char szFileName[deflen]="";
 bool bFileIsDll;
 BREAKPOINT* bplist=0;
 static bool isStepping=false;
+static bool isPausedByUser=false;
 
 //static functions
 static void cbStep();
@@ -212,7 +213,21 @@ static void cbException(void* ExceptionData)
     EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
     uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
     if(edi->ExceptionRecord.ExceptionCode==EXCEPTION_BREAKPOINT)
+    {
+        if(isPausedByUser)
+        {
+            dputs("paused!");
+            SetNextDbgContinueStatus(DBG_CONTINUE);
+            DebugUpdateDisasm(GetContextData(UE_CIP));
+            GuiSetDebugState(paused);
+            //lock
+            lock(WAITID_RUN);
+            wait(WAITID_RUN);
+            return;
+        }
         SetContextData(UE_CIP, (uint)edi->ExceptionRecord.ExceptionAddress);
+    }
+
     char msg[1024]="";
     if(edi->dwFirstChance) //first chance exception
     {
@@ -1076,5 +1091,17 @@ CMDRESULT cbBenchmark(const char* cmd)
         _dbg_memread(addr, dest, 0x1000, 0);
     }
     dprintf("%ums\n", GetTickCount()-ticks);
+    return STATUS_CONTINUE;
+}
+
+CMDRESULT cbDebugPause(const char* cmd)
+{
+    if(waitislocked(WAITID_RUN))
+    {
+        dputs("program is not running");
+        return STATUS_ERROR;
+    }
+    isPausedByUser=true;
+    DebugBreakProcess(fdProcessInfo->hProcess);
     return STATUS_CONTINUE;
 }

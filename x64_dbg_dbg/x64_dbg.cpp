@@ -28,7 +28,7 @@ static CMDRESULT cbExit(const char* cmd)
 
 static CMDRESULT cbCls(const char* cmd)
 {
-    system("cls");
+    GuiLogClear();
     return STATUS_CONTINUE;
 }
 
@@ -67,7 +67,8 @@ static void registercommands()
     cmdnew(cmd, "free", cbDebugFree, true); //free memory
     cmdnew(cmd, "Fill\1memset", cbDebugMemset, true); //memset
     cmdnew(cmd, "scr\1script", cbScript, false); //script testing
-    cmdnew(cmd, "benchmark", cbBenchmark, true); //benchmark test (readmem etc)
+    cmdnew(cmd, "bench", cbBenchmark, true); //benchmark test (readmem etc)
+    cmdnew(cmd, "pause", cbDebugPause, true); //pause debugger
 }
 
 static bool cbCommandProvider(char* cmd, int maxlen)

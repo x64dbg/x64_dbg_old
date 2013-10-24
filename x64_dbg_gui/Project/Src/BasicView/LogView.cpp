@@ -3,6 +3,8 @@
 LogView::LogView(QWidget *parent) : QTextEdit(parent)
 {
     QFont wFont("Monospace", 8);
+    wFont.setFixedPitch(true);
+
     this->setFont(wFont);
 
     this->setStyleSheet("QTextEdit { background-color: rgb(255, 251, 240) }");

@@ -45,7 +45,7 @@ bool arraycontains(const char* cmd_list, const char* cmd)
 
 bool scmp(const char* a, const char* b)
 {
-    if(strcmp(a, b))
+    if(strcasecmp(a, b))
         return false;
     return true;
 }

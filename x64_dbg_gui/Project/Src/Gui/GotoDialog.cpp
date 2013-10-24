@@ -14,6 +14,7 @@ GotoDialog::GotoDialog(QWidget *parent) :
     else
         ui->labelError->setText("<font color='red'><b>Invalid expression...</b></color>");
     ui->buttonOk->setEnabled(false);
+    this->setFocus();
 }
 
 GotoDialog::~GotoDialog()

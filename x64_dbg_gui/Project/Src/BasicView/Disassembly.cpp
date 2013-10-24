@@ -43,6 +43,7 @@ void Disassembly::paintRichText(QPainter* painter, int x, int y, int w, int h, i
     {
         CustomRichText_t curRichText=richText.at(i);
         int curRichTextLength=curRichText.text.length();
+        //curRichText.text=curRichText.text.toUpper();
         switch(curRichText.flags)
         {
         case FlagNone: //defaults

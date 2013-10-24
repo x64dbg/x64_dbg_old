@@ -34,6 +34,7 @@ public slots:
     void execRun();
     void execRtr();
     void openFile();
+    void execPause();
     
 private slots:
     void on_actionGoto_triggered();
