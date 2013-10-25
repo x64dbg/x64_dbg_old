@@ -106,47 +106,47 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
 
     switch(col)
     {
-        case 0: //draw address (+ label)
+    case 0: //draw address (+ label)
+    {
+        //ulong wAddr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
+        //wStr = QString("%1").arg(wAddr, 8, 16, QChar('0')).toUpper();
+        // QString::number(wInst.rva)
+
+        if(mInstBuffer.at(rowOffset).rva == mCipRva)
         {
-            //ulong wAddr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
-            //wStr = QString("%1").arg(wAddr, 8, 16, QChar('0')).toUpper();
-            // QString::number(wInst.rva)
-
-            if(mInstBuffer.at(rowOffset).rva == mCipRva)
-            {
-                painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
-                painter->save();
-                painter->setPen(QPen(QColor("#ffffff")));
-                painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper());
-                painter->restore();
-            }
-            else
-                wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper();
-
-            break;
+            painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
+            painter->save();
+            painter->setPen(QPen(QColor("#ffffff")));
+            painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper());
+            painter->restore();
         }
+        else
+            wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper();
 
-        case 1: //draw bytes
-        {
-            for(int i = 0; i < mInstBuffer.at(rowOffset).dump.size(); i++)
-                wStr += QString("%1").arg((unsigned char)(mInstBuffer.at(rowOffset).dump.at(i)), 2, 16, QChar('0')).toUpper();
+        break;
+    }
 
-            paintGraphicDump(painter, x + 5, y, wRVA);
+    case 1: //draw bytes
+    {
+        for(int i = 0; i < mInstBuffer.at(rowOffset).dump.size(); i++)
+            wStr += QString("%1").arg((unsigned char)(mInstBuffer.at(rowOffset).dump.at(i)), 2, 16, QChar('0')).toUpper();
 
-            // Draw cell content
-            painter->drawText(QRect(x + 15, y, getColumnWidth(col) - 15, getRowHeight()), 0, wStr);
+        paintGraphicDump(painter, x + 5, y, wRVA);
 
-            wStr = "";
-            break;
-        }
+        // Draw cell content
+        painter->drawText(QRect(x + 15, y, getColumnWidth(col) - 15, getRowHeight()), 0, wStr);
 
-        case 2: //draw disassembly (with colours needed)
-        {
-            Instruction_t curInst = mInstBuffer.at(rowOffset);
-            QList<CustomRichText_t> richText;
-            BeaHighlight::PrintRtfInstruction(&richText, &curInst.disasm);
-            //BeaHighlight::PrintRtfInstruction(richText, &curInst.disasm);
-            /*CustomRichText_t mnemonic;
+        wStr = "";
+        break;
+    }
+
+    case 2: //draw disassembly (with colours needed)
+    {
+        Instruction_t curInst = mInstBuffer.at(rowOffset);
+        QList<CustomRichText_t> richText;
+        BeaHighlight::PrintRtfInstruction(&richText, &curInst.disasm);
+        //BeaHighlight::PrintRtfInstruction(richText, &curInst.disasm);
+        /*CustomRichText_t mnemonic;
             mnemonic.text=QString(curInst.disasm.Instruction.Mnemonic);
             mnemonic.textColor=QColor(255,0,0);
             mnemonic.flags=FlagColor;
@@ -156,10 +156,10 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
             rest.textBackground=QColor(0,255,255);
             rest.flags=FlagBackground;
             richText.push_back(rest);*/
-            Disassembly::paintRichText(painter, x, y, getColumnWidth(col), getRowHeight(), 4, richText);
-            //richText.push_back();
+        Disassembly::paintRichText(painter, x, y, getColumnWidth(col), getRowHeight(), 4, richText);
+        //richText.push_back();
 
-            /*QString mnemonic = QString();
+        /*QString mnemonic = QString();
             int mnemoniclen = mnemonic.length();
             int mnemonicwidth = QFontMetrics(this->font()).width(mnemonic);
             QString rest = QString(curInst.disasm.CompleteInstr+mnemoniclen);
@@ -175,11 +175,21 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
                 xinc+=mnemonicwidth;
                 painter->drawText(QRect(x + xinc, y, columnwidth - xinc, rowheight), 0, rest);
             }*/
-            break;
-        }
+        break;
+    }
 
-        default:
-            break;
+    case 3: //draw comments
+    {
+        char comment[MAX_COMMENT_SIZE]="";
+        if(DbgGetCommentAt(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), comment))
+            wStr=QString(comment);
+        else
+            wStr="";
+    }
+    break;
+
+    default:
+        break;
     }
     return wStr;
 }
