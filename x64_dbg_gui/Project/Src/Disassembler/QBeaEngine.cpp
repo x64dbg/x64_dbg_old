@@ -32,6 +32,7 @@ ulong QBeaEngine::DisassembleBack(byte_t* data, uint_t base, uint_t size, uint_t
 #ifdef _WIN64
     mDisasmStruct.Archi = 64;
 #endif
+    mDisasmStruct.Options=NoformatNumeral;
 
     // Check if the pointer is not null
     if (data == NULL)
@@ -107,6 +108,8 @@ ulong QBeaEngine::DisassembleNext(byte_t* data, uint_t base, uint_t size, uint_t
 #ifdef _WIN64
     mDisasmStruct.Archi = 64;
 #endif
+    mDisasmStruct.Options=NoformatNumeral;
+
 
     if(data == NULL)
         return 0;
@@ -158,6 +161,7 @@ Instruction_t QBeaEngine::DisassembleAt(byte_t* data, uint_t size, uint_t instIn
 #ifdef _WIN64
     mDisasmStruct.Archi = 64;
 #endif
+    mDisasmStruct.Options=NoformatNumeral;
 
     mDisasmStruct.EIP = (UIntPtr)((uint_t)data + (uint_t)instIndex);
     mDisasmStruct.VirtualAddr = origBase + origInstRVA;

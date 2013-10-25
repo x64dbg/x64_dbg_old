@@ -30,6 +30,26 @@ const char* DLL_IMPEXP BridgeStart();
 void* DLL_IMPEXP BridgeAlloc(size_t size);
 void DLL_IMPEXP BridgeFree(void* ptr);
 
+//Debugger defines
+#define MAX_LABEL_SIZE 256
+#define MAX_COMMENT_SIZE 256
+
+//Debugger enums
+enum DBGSTATE
+{
+    initialized,
+    paused,
+    running,
+    stopped
+};
+
+enum ADDRINFOFLAGS
+{
+    module=1,
+    label=2,
+    comment=4
+};
+
 //Debugger structs
 struct MEMPAGE
 {
@@ -43,13 +63,12 @@ struct MEMMAP
     MEMPAGE* page;
 };
 
-//Debugger enums
-enum DBGSTATE
+struct ADDRINFO
 {
-    initialized,
-    paused,
-    running,
-    stopped
+    char module[16]; //module the address is in
+    char label[MAX_LABEL_SIZE];
+    char comment[MAX_COMMENT_SIZE];
+    int flags; //ADDRINFOFLAGS
 };
 
 //Debugger functions
@@ -61,6 +80,10 @@ bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap);
 bool DLL_IMPEXP DbgIsValidExpression(const char* expression);
 bool DLL_IMPEXP DbgIsDebugging();
 bool DLL_IMPEXP DbgIsJumpGoingToExecute(duint addr);
+bool DLL_IMPEXP DbgGetLabelAt(duint addr, char* text);
+bool DLL_IMPEXP DbgSetLabelAt(duint addr, const char* text);
+bool DLL_IMPEXP DbgGetCommentAt(duint addr, char* text);
+bool DLL_IMPEXP DbgSetCommentAt(duint addr, const char* text);
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);

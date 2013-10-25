@@ -10,17 +10,18 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, ARGTYPE* Arg
     argument.flags=FlagNone;
     int argtype=Argument->ArgType;
     int brtype=Instruction->BranchType;
-    char* argmnemonic=Argument->ArgMnemonic;
-    if(argtype!=NO_ARGUMENT && argmnemonic[0])
+    QString argmnemonic=QString(Argument->ArgMnemonic);
+    if(argtype!=NO_ARGUMENT && *Argument->ArgMnemonic)
     {
         if(*had_arg) //add a comma
         {
             CustomRichText_t comma;
-            comma.text=", ";
+            comma.text=",";
             comma.flags=FlagNone;
             richText->push_back(comma);
         }
-        if(argtype&MEMORY_TYPE) //mov
+
+        if(argtype&MEMORY_TYPE) //mov [],a or mov a,[]
         {
             char segment[3]="";
             switch(Argument->SegmentReg)
@@ -32,9 +33,11 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, ARGTYPE* Arg
                 strcpy(segment, "ds");
                 break;
             case FSReg:
+                //TODO: x32 TEB
                 strcpy(segment, "fs");
                 break;
             case GSReg:
+                //TODO: x64 TEB
                 strcpy(segment, "gs");
                 break;
             case CSReg:
@@ -56,24 +59,45 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, ARGTYPE* Arg
                 argument.textColor=QColor(0,0,128);
                 argument.flags=FlagColor;
             }
+
+            //labels
+            duint label_addr=Argument->Memory.Displacement;
+            char label_text[MAX_LABEL_SIZE]="";
+            if(DbgGetLabelAt(label_addr, label_text))
+            {
+                QString displacement;
+                displacement.sprintf("%"fext"X", label_addr);
+                argmnemonic.replace(displacement, QString(label_text));
+            }
+
             switch(Argument->ArgSize)
             {
             case 8:
-                argument.text.sprintf("byte ptr %s:[%s]", segment, argmnemonic);
+                argument.text.sprintf("byte ptr %s:[%s]", segment, argmnemonic.toUtf8().constData());
                 break;
             case 16:
-                argument.text.sprintf("word ptr %s:[%s]", segment, argmnemonic);
+                argument.text.sprintf("word ptr %s:[%s]", segment, argmnemonic.toUtf8().constData());
                 break;
             case 32:
-                argument.text.sprintf("dword ptr %s:[%s]", segment, argmnemonic);
+                argument.text.sprintf("dword ptr %s:[%s]", segment, argmnemonic.toUtf8().constData());
                 break;
             case 64:
-                argument.text.sprintf("qword ptr %s:[%s]", segment, argmnemonic);
+                argument.text.sprintf("qword ptr %s:[%s]", segment, argmnemonic.toUtf8().constData());
                 break;
             }
         }
         else
         {
+            //labels
+            duint label_addr=Instruction->Immediat;
+            char label_text[MAX_LABEL_SIZE]="";
+            if(DbgGetLabelAt(label_addr, label_text))
+            {
+                QString immediat;
+                immediat.sprintf("%"fext"X", label_addr);
+                argmnemonic.replace(immediat, QString(label_text));
+            }
+
             char shortjmp[100]="\0";
             bool has_shortjmp=false;
             if(brtype and brtype!=RetType and !(argtype&REGISTER_TYPE))
@@ -90,7 +114,7 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, ARGTYPE* Arg
                 }
                 //Highlight (un)condentional jumps and calls
             }
-            argument.text.sprintf("%s%s", shortjmp+has_shortjmp, argmnemonic);
+            argument.text.sprintf("%s%s", shortjmp+has_shortjmp, argmnemonic.toUtf8().constData());
         }
         *had_arg=true;
         richText->push_back(argument);

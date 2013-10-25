@@ -1,7 +1,5 @@
 #include "Disassembly.h"
 
-
-
 Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTableView(parent)
 {
     setMemoryPage(parMemPage);
@@ -24,9 +22,10 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
 
     int charwidth=QFontMetrics(this->font()).width(QChar(' '));
 
-    addColumnAt(getColumnCount(), charwidth*2*sizeof(uint_t)+8, false);
-    addColumnAt(getColumnCount(), charwidth*2*12+8, false);
-    addColumnAt(getColumnCount(), 100, false);
+    addColumnAt(getColumnCount(), charwidth*2*sizeof(uint_t)+8, false); //address
+    addColumnAt(getColumnCount(), charwidth*2*12+8, false); //bytes
+    addColumnAt(getColumnCount(), charwidth*40, false); //disassembly
+    addColumnAt(getColumnCount(), 100, false); //comments
 
     connect(Bridge::getBridge(), SIGNAL(disassembleAt(uint_t, uint_t)), this, SLOT(disassambleAt(uint_t, uint_t)));
 }

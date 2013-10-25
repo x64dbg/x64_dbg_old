@@ -88,10 +88,10 @@ typedef struct
 #pragma pack(1)
 typedef struct
 {
-    Int32 Category;
+    Int32 Category; //INSTRUCTION_TYPE
     Int32 Opcode;
     char Mnemonic[16];
-    Int32 BranchType;
+    Int32 BranchType; //BRANCH_TYPE
     EFLStruct Flags;
     UInt64 AddrValue;
     Int64 Immediat;
@@ -103,7 +103,7 @@ typedef struct
 typedef struct
 {
     char ArgMnemonic[64];
-    Int32 ArgType;
+    Int32 ArgType; //ARGUMENTS_TYPE
     Int32 ArgSize;
     Int32 ArgPosition;
     UInt32 AccessMode;
@@ -377,7 +377,6 @@ enum SPECIAL_INFO
     /* === mask = 0xff000000 */
     ShowSegmentRegs   = 0x01000000
 };
-
 
 #ifdef __cplusplus
 extern "C"

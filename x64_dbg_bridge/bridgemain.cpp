@@ -83,6 +83,14 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_isjumpgoingtoexecute=(DBGISJUMPGOINGTOEXECUTE)GetProcAddress(hInstDbg, "_dbg_isjumpgoingtoexecute");
     if(!_dbg_isjumpgoingtoexecute)
         return "Export \"_dbg_isjumpgoingtoexecute\" could not be found!";
+    //_dbg_addrinfoget
+    _dbg_addrinfoget=(DBGADDRINFOGET)GetProcAddress(hInstDbg, "_dbg_addrinfoget");
+    if(!_dbg_addrinfoget)
+        return "Export \"_dbg_addrinfoget\" could not be found!";
+    //_dbg_addrinfoset
+    _dbg_addrinfoset=(DBGADDRINFOSET)GetProcAddress(hInstDbg, "_dbg_addrinfoset");
+    if(!_dbg_addrinfoset)
+        return "Export \"_dbg_addrinfoset\" could not be found!";
     return 0;
 }
 
@@ -166,6 +174,61 @@ bool DLL_IMPEXP DbgIsDebugging()
 bool DLL_IMPEXP DbgIsJumpGoingToExecute(duint addr)
 {
     return _dbg_isjumpgoingtoexecute(addr);
+}
+
+bool DLL_IMPEXP DbgGetLabelAt(duint addr, char* text) //(module.)+label
+{
+    if(!text)
+        return false;
+    ADDRINFO info;
+    memset(&info, 0, sizeof(info));
+    info.flags=module|label;
+    if(!_dbg_addrinfoget(addr, &info))
+        return false;
+    if(*info.module)
+        strcpy(text, info.label);
+    else
+        sprintf(text, "%s.%s", info.label, info.comment);
+    return true;
+}
+
+bool DLL_IMPEXP DbgSetLabelAt(duint addr, const char* text)
+{
+    if(!text or strlen(text)>=MAX_LABEL_SIZE)
+        return false;
+    ADDRINFO info;
+    memset(&info, 0, sizeof(info));
+    info.flags=label;
+    strcpy(info.label, text);
+    if(!_dbg_addrinfoset(addr, &info))
+        return false;
+    return true;
+}
+
+bool DLL_IMPEXP DbgGetCommentAt(duint addr, char* text) //comment (not live)
+{
+    if(!text)
+        return false;
+    ADDRINFO info;
+    memset(&info, 0, sizeof(info));
+    info.flags=comment;
+    if(!_dbg_addrinfoget(addr, &info))
+        return false;
+    strcpy(text, info.comment);
+    return true;
+}
+
+bool DLL_IMPEXP DbgSetCommentAt(duint addr, const char* text)
+{
+    if(!text or strlen(text)>=MAX_COMMENT_SIZE)
+        return false;
+    ADDRINFO info;
+    memset(&info, 0, sizeof(info));
+    info.flags=comment;
+    strcpy(info.comment, text);
+    if(!_dbg_addrinfoset(addr, &info))
+        return false;
+    return true;
 }
 
 //GUI

@@ -51,6 +51,8 @@ typedef void (*DBGDBGEXITSIGNAL)();
 typedef bool (*DBGVALFROMSTRING)(const char* string, duint* value);
 typedef bool (*DBGISDEBUGGING)();
 typedef bool (*DBGISJUMPGOINGTOEXECUTE)(duint addr);
+typedef bool (*DBGADDRINFOGET)(duint addr, ADDRINFO* addrinfo);
+typedef bool (*DBGADDRINFOSET)(duint addr, ADDRINFO* addrinfo);
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;
@@ -62,5 +64,7 @@ extern DBGDBGEXITSIGNAL _dbg_dbgexitsignal;
 extern DBGVALFROMSTRING _dbg_valfromstring;
 extern DBGISDEBUGGING _dbg_isdebugging;
 extern DBGISJUMPGOINGTOEXECUTE _dbg_isjumpgoingtoexecute;
+extern DBGADDRINFOGET _dbg_addrinfoget;
+extern DBGADDRINFOSET _dbg_addrinfoset;
 
 #endif // _GLOBAL_H
