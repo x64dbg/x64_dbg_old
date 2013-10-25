@@ -17,6 +17,7 @@ bin/*/*
 !bin/*/test.exe
 !bin/*/gui.dll
 !bin/*/dbghelp.dll
+!bin/*/sqlite.dll
 
 #debugger files to ignore
 x64_dbg_dbg/ODbgScript.chm
