@@ -95,12 +95,12 @@ INCLUDEPATH += $$PWD/Src/Bridge
 
 !contains(QMAKE_HOST.arch, x86_64) {
     message("x86 build")
-    LIBS += -L"$$PWD/Src/ThirdPartyLibs/BeaEngine/" -lBeaEngine_s
+    LIBS += -L"$$PWD/Src/ThirdPartyLibs/BeaEngine/" -lBeaEngine
     LIBS += -L"$$PWD/Src/Bridge/" -lx32_bridge
     ## Windows x86 (32bit) specific build here
 } else {
     message("x86_64 build")
-    LIBS += -L"$$PWD/Src/ThirdPartyLibs/BeaEngine/" -lBeaEngine_s_64
+    LIBS += -L"$$PWD/Src/ThirdPartyLibs/BeaEngine/" -lBeaEngine_64
     LIBS += -L"$$PWD/Src/Bridge/" -lx64_bridge
     ## Windows x64 (64bit) specific build here
 }

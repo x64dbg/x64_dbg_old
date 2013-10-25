@@ -18,6 +18,7 @@ bin/*/*
 !bin/*/gui.dll
 !bin/*/dbghelp.dll
 !bin/*/sqlite.dll
+!bin/*/BeaEngine.dll
 
 #debugger files to ignore
 x64_dbg_dbg/ODbgScript.chm
