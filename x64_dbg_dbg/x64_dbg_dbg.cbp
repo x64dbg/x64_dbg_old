@@ -20,10 +20,11 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="..\bin\x32\libx32_bridge.a" />
 					<Add library=".\TitanEngine\TitanEngine_x86.a" />
 					<Add library=".\libdbg_x32.a" />
-					<Add library="..\bin\x32\libx32_bridge.a" />
 					<Add library=".\dbghelp\dbghelp_x86.a" />
+					<Add library=".\sqlite\libsqlite32.a" />
 				</Linker>
 			</Target>
 			<Target title="x64">
@@ -39,10 +40,11 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="..\bin\x64\libx64_bridge.a" />
 					<Add library=".\TitanEngine\TitanEngine_x64.a" />
 					<Add library=".\libdbg_x64.a" />
-					<Add library="..\bin\x64\libx64_bridge.a" />
 					<Add library=".\dbghelp\dbghelp_x64.a" />
+					<Add library=".\sqlite\libsqlite64.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -61,6 +63,8 @@
 		<Unit filename="_exports.h" />
 		<Unit filename="_global.cpp" />
 		<Unit filename="_global.h" />
+		<Unit filename="addrinfo.cpp" />
+		<Unit filename="addrinfo.h" />
 		<Unit filename="argument.cpp" />
 		<Unit filename="argument.h" />
 		<Unit filename="breakpoint.cpp" />
@@ -85,6 +89,7 @@
 		<Unit filename="msgqueue.h" />
 		<Unit filename="simplescript.cpp" />
 		<Unit filename="simplescript.h" />
+		<Unit filename="sqlite/sqlite3.h" />
 		<Unit filename="threading.cpp" />
 		<Unit filename="threading.h" />
 		<Unit filename="value.cpp" />
