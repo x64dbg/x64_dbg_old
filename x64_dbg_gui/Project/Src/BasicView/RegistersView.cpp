@@ -134,3 +134,26 @@ void RegistersView::mousePressEvent(QMouseEvent* event)
         }
     }
 }
+
+void RegistersView::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    int wI = 0;
+    int wSelected = -1;
+    QPalette wPalette;
+
+    for(wI = 0; wI < mRegList->size(); wI++)
+    {
+        if(mRegList->at(wI)->geometry().contains(event->pos()))
+        {
+            wSelected = wI;
+        }
+    }
+    if(wSelected == -1) //no register selection
+        return;
+
+    //double click test code, toggle enabled
+    if(mRegList->at(wSelected)->isEnabled())
+        mRegList->at(wSelected)->setEnabled(false);
+    else
+        mRegList->at(wSelected)->setEnabled(true);
+}

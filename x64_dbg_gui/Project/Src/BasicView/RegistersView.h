@@ -15,6 +15,7 @@ public:
     explicit RegistersView(QWidget *parent = 0);
     ~RegistersView();
     void mousePressEvent(QMouseEvent* event);
+    void mouseDoubleClickEvent(QMouseEvent* event);
     
 private:
     Ui::RegistersView *ui;
