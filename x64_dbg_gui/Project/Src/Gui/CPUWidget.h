@@ -4,6 +4,7 @@
 #include <QtGui>
 #include "Disassembly.h"
 #include "HexDump.h"
+#include "RegistersView.h"
 
 
 namespace Ui {
@@ -31,6 +32,7 @@ public slots:
 private:
     Ui::CPUWidget *ui;
     Disassembly* mDisas;
+    RegistersView* mRegs;
 
 };
 

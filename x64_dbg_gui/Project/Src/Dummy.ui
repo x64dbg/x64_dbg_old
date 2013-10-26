@@ -354,8 +354,8 @@
   <widget class="QTableView" name="tableView">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>270</y>
+     <x>80</x>
+     <y>20</y>
      <width>256</width>
      <height>192</height>
     </rect>
@@ -364,8 +364,8 @@
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>140</y>
+     <x>370</x>
+     <y>160</y>
      <width>231</width>
      <height>191</height>
     </rect>
@@ -377,6 +377,19 @@
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(255, 251, 240);</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>310</y>
+     <width>111</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
    </property>
   </widget>
  </widget>

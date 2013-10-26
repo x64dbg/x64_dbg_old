@@ -9,6 +9,9 @@ CPUWidget::CPUWidget(QWidget *parent) :QWidget(parent), ui(new Ui::CPUWidget)
     mDisas = new Disassembly(new MemoryPage(0, 0), 0);
     ui->mTopLeftFrameLayout->addWidget(mDisas);
 
+    mRegs = new RegistersView(0);
+    ui->mTopRightFrameLayout->addWidget(mRegs);
+
     HexDump* hx = new HexDump(0);
     ui->mBotLeftFrameLayout->addWidget(hx);
 
