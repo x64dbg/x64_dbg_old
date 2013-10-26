@@ -26,13 +26,42 @@ uint memfindbaseaddr(HANDLE hProcess, uint addr, uint* size)
 
 bool memread(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead)
 {
-    uint size=0;
-    uint base=memfindbaseaddr(hProcess, (uint)lpBaseAddress, &size);
-    DWORD oldprotect;
-    VirtualProtectEx(hProcess, (void*)base, size, PAGE_EXECUTE_READWRITE, &oldprotect);
-    bool ret=ReadProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
-    VirtualProtectEx(hProcess, (void*)base, size, oldprotect, &oldprotect);
-    return ret;
+    if(!hProcess or !lpBaseAddress or !lpBuffer or !nSize)
+        return false;
+
+    uint addr=(uint)lpBaseAddress;
+    uint startRva=addr&(PAGE_SIZE-1); //get start rva
+    uint addrStart=addr-startRva; //round down one page
+    uint pages=((addrStart+PAGE_SIZE)-addrStart)/PAGE_SIZE;
+    SIZE_T sizeRead=0;
+    unsigned char curPage[PAGE_SIZE]; //current page memory
+    unsigned char* destBuffer=(unsigned char*)lpBuffer;
+
+    for(uint i=0; i<pages; i++)
+    {
+        SIZE_T readBytes=0;
+        void* curAddr=(void*)(addrStart+i*PAGE_SIZE);
+        DWORD oldprotect=0;
+        VirtualProtectEx(hProcess, curAddr, PAGE_SIZE, PAGE_EXECUTE_READWRITE, &oldprotect);
+        bool ret=ReadProcessMemory(hProcess, curAddr, curPage, PAGE_SIZE, &readBytes);
+        if(!ret or readBytes!=PAGE_SIZE)
+        {
+            VirtualProtectEx(hProcess, curAddr, PAGE_SIZE, PAGE_EXECUTE_READWRITE, &oldprotect);
+            ret=ReadProcessMemory(hProcess, curAddr, curPage, PAGE_SIZE, &readBytes);
+            VirtualProtectEx(hProcess, curAddr, PAGE_SIZE, oldprotect, &oldprotect);
+            if(!ret or readBytes!=PAGE_SIZE)
+                return false;
+        }
+        if(sizeRead+PAGE_SIZE>nSize) //do not overflow the buffer
+            memcpy(destBuffer, curPage+startRva, nSize-sizeRead);
+        else //default case
+            memcpy(destBuffer, curPage+startRva, PAGE_SIZE-startRva);
+        if(!i)
+            startRva=0;
+        sizeRead+=(PAGE_SIZE-startRva);
+        destBuffer+=sizeRead;
+    }
+    return true;
 }
 
 void* memalloc(HANDLE hProcess, uint addr, DWORD size, DWORD fdProtect)

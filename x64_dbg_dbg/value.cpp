@@ -1054,7 +1054,6 @@ check whether a string is a valid hex number
 */
 static bool ishexnumber(const char* string)
 {
-    dbg("ishexnumber");
     int add=0;
     if(*string=='x') //hex indicator
         add=1;
