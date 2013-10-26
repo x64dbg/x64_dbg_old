@@ -260,6 +260,13 @@ BPXTYPE DLL_IMPEXP DbgGetBpxTypeAt(duint addr)
     return bpnone;
 }
 
+duint DLL_IMPEXP DbgValFromString(const char* string)
+{
+    duint value=0;
+    _dbg_valfromstring(string, &value);
+    return value;
+}
+
 //GUI
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip)
 {

@@ -104,6 +104,7 @@ bool DLL_IMPEXP DbgSetLabelAt(duint addr, const char* text);
 bool DLL_IMPEXP DbgGetCommentAt(duint addr, char* text);
 bool DLL_IMPEXP DbgSetCommentAt(duint addr, const char* text);
 BPXTYPE DLL_IMPEXP DbgGetBpxTypeAt(duint addr);
+duint DLL_IMPEXP DbgValFromString(const char* string);
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);
