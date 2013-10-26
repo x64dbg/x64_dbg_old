@@ -34,16 +34,16 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
                             Private Functions
 ************************************************************************************/
 
-void Disassembly::paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, QList<CustomRichText_t> richText)
+void Disassembly::paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, const QList<CustomRichText_t>* richText)
 {
-    int len=richText.size();
+    int len=richText->size();
     int charwidth=QFontMetrics(this->font()).width(QChar(' '));
     for(int i=0; i<len; i++)
     {
-        CustomRichText_t curRichText=richText.at(i);
+        CustomRichText_t curRichText=richText->at(i);
         int curRichTextLength=curRichText.text.length();
         int backgroundWidth=charwidth*curRichTextLength;
-        if(charwidth*curRichTextLength+xinc>w)
+        if(backgroundWidth+xinc>w)
             backgroundWidth=w-xinc;
         switch(curRichText.flags)
         {
@@ -146,39 +146,9 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
 
     case 2: //draw disassembly (with colours needed)
     {
-        Instruction_t curInst = mInstBuffer.at(rowOffset);
         QList<CustomRichText_t> richText;
-        BeaHighlight::PrintRtfInstruction(&richText, &curInst.disasm);
-        //BeaHighlight::PrintRtfInstruction(richText, &curInst.disasm);
-        /*CustomRichText_t mnemonic;
-            mnemonic.text=QString(curInst.disasm.Instruction.Mnemonic);
-            mnemonic.textColor=QColor(255,0,0);
-            mnemonic.flags=FlagColor;
-            richText.push_back(mnemonic);
-            CustomRichText_t rest;
-            rest.text=QString(curInst.disasm.CompleteInstr+mnemonic.text.length());
-            rest.textBackground=QColor(0,255,255);
-            rest.flags=FlagBackground;
-            richText.push_back(rest);*/
-        Disassembly::paintRichText(painter, x, y, getColumnWidth(col), getRowHeight(), 4, richText);
-        //richText.push_back();
-
-        /*QString mnemonic = QString();
-            int mnemoniclen = mnemonic.length();
-            int mnemonicwidth = QFontMetrics(this->font()).width(mnemonic);
-            QString rest = QString(curInst.disasm.CompleteInstr+mnemoniclen);
-            int xinc=4;
-            int columnwidth=getColumnWidth(col);
-            int rowheight=getRowHeight();
-            painter->save();
-            painter->setPen(QPen(QColor("#ff0000")));
-            painter->drawText(QRect(x + xinc, y, columnwidth - xinc, rowheight), 0, mnemonic);
-            painter->restore();
-            if(rest.length())
-            {
-                xinc+=mnemonicwidth;
-                painter->drawText(QRect(x + xinc, y, columnwidth - xinc, rowheight), 0, rest);
-            }*/
+        BeaHighlight::PrintRtfInstruction(&richText, &mInstBuffer.at(rowOffset).disasm);
+        Disassembly::paintRichText(painter, x, y, getColumnWidth(col), getRowHeight(), 4, &richText);
         break;
     }
 

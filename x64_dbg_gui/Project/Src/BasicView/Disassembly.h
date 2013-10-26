@@ -53,7 +53,7 @@ public slots:
     void disassambleAt(uint_t parVA, uint_t parCIP);
 
 private:
-    void paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, QList<CustomRichText_t> richText);
+    void paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, const QList<CustomRichText_t>* richText);
 
     enum GuiState_t {NoState, MultiRowsSelectionState};
     enum GraphicDump_t {GD_Nothing, GD_FootToTop, GD_FootToBottom, GD_HeadFromTop, GD_HeadFromBottom, GD_Vert}; // GD_FootToTop = '- , GD_FootToBottom = ,- , GD_HeadFromTop = '-> , GD_HeadFromBottom = ,-> , GD_Vert = |

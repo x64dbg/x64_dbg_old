@@ -4,7 +4,7 @@ BeaHighlight::BeaHighlight()
 {
 }
 
-bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, ARGTYPE* Argument, INSTRTYPE* Instruction, bool* had_arg)
+bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYPE* Argument, const INSTRTYPE* Instruction, bool* had_arg)
 {
     CustomRichText_t argument;
     argument.flags=FlagNone;
@@ -124,7 +124,7 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, ARGTYPE* Arg
     return true;
 }
 
-void BeaHighlight::PrintBaseInstruction(QList<CustomRichText_t>* richText, DISASM* MyDisasm)
+void BeaHighlight::PrintBaseInstruction(QList<CustomRichText_t>* richText, const DISASM* MyDisasm)
 {
     CustomRichText_t mnemonic;
     char mnemonicText[16];
@@ -171,7 +171,7 @@ void BeaHighlight::PrintBaseInstruction(QList<CustomRichText_t>* richText, DISAS
     richText->push_back(mnemonic);
 }
 
-void BeaHighlight::PrintRtfInstruction(QList<CustomRichText_t>* richText, DISASM* MyDisasm)
+void BeaHighlight::PrintRtfInstruction(QList<CustomRichText_t>* richText, const DISASM* MyDisasm)
 {
     CustomRichText_t space;
     space.text=" ";
