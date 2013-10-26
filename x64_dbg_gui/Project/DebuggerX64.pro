@@ -45,7 +45,8 @@ SOURCES += \
     Src/BasicView/MemoryMapView.cpp \
     Src/BasicView/LogView.cpp \
     Src/Gui/GotoDialog.cpp \
-    Src/Disassembler/BeaHighlight.cpp
+    Src/Disassembler/BeaHighlight.cpp \
+    Src/BasicView/RegistersView.cpp
 
 
 HEADERS += \
@@ -68,7 +69,8 @@ HEADERS += \
     Src/BasicView/MemoryMapView.h \
     Src/BasicView/LogView.h \
     Src/Gui/GotoDialog.h \
-    Src/Disassembler/BeaHighlight.h
+    Src/Disassembler/BeaHighlight.h \
+    Src/BasicView/RegistersView.h
 
 
 INCLUDEPATH += \
@@ -87,7 +89,8 @@ FORMS += \
     Src/Gui/MainWindow.ui \
     Src/Dummy.ui \
     Src/Gui/CPUWidget.ui \
-    Src/Gui/GotoDialog.ui
+    Src/Gui/GotoDialog.ui \
+    Src/BasicView/RegistersView.ui
 
 
 #INCLUDEPATH += $$PWD/Src/BeaEngine_s_64
