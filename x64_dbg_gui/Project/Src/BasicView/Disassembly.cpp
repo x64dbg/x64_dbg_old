@@ -42,7 +42,9 @@ void Disassembly::paintRichText(QPainter* painter, int x, int y, int w, int h, i
     {
         CustomRichText_t curRichText=richText.at(i);
         int curRichTextLength=curRichText.text.length();
-        //curRichText.text=curRichText.text.toUpper();
+        int backgroundWidth=charwidth*curRichTextLength;
+        if(charwidth*curRichTextLength+xinc>w)
+            backgroundWidth=w-xinc;
         switch(curRichText.flags)
         {
         case FlagNone: //defaults
@@ -55,11 +57,13 @@ void Disassembly::paintRichText(QPainter* painter, int x, int y, int w, int h, i
             painter->restore();
             break;
         case FlagBackground: //background only
-            painter->fillRect(QRect(x+xinc, y, charwidth*curRichTextLength, h), QBrush(curRichText.textBackground));
+            if(backgroundWidth>0)
+                painter->fillRect(QRect(x+xinc, y, backgroundWidth, h), QBrush(curRichText.textBackground));
             painter->drawText(QRect(x+xinc, y, w-xinc, h), 0, curRichText.text);
             break;
         case FlagAll: //color+background
-            painter->fillRect(QRect(x+xinc, y, charwidth*curRichTextLength, h), QBrush(curRichText.textBackground));
+            if(backgroundWidth>0)
+                painter->fillRect(QRect(x+xinc, y, backgroundWidth, h), QBrush(curRichText.textBackground));
             painter->save();
             painter->setPen(QPen(curRichText.textColor));
             painter->drawText(QRect(x+xinc, y, w-xinc, h), 0, curRichText.text);
