@@ -12,8 +12,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 DEFINES += QT_NO_DEBUG_OUTPUT
 DEFINES += QT_NO_DEBUG_STREAM #no debug output in release mode (finally)
 
-#QMAKE_CFLAGS_RELEASE += -O3
-#QMAKE_CXXFLAGS_RELEASE += -O3
+QMAKE_CFLAGS_RELEASE += -O3
+QMAKE_CXXFLAGS_RELEASE += -O3
 
 
 !contains(QMAKE_HOST.arch, x86_64) {

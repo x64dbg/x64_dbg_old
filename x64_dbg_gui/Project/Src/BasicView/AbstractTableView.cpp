@@ -4,6 +4,7 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 {
     // Class variable initialization
     mTableOffset = 0;
+    mPrevTableOffset = mTableOffset + 1;
     mHeader = (Header_t){true, 20, -1};
 
     QFont font("Monospace", 8);
@@ -52,12 +53,11 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
 {
     QPainter wPainter(this->viewport());
     int wViewableRowsCount = getViewableRowsCount();
-    static uint_t sTableOffset = mTableOffset + 1;
 
-    if(sTableOffset != mTableOffset)
+    if(mPrevTableOffset != mTableOffset)
     {
         prepareData();
-        sTableOffset = mTableOffset;
+        mPrevTableOffset = mTableOffset;
     }
 
     int x = 0;

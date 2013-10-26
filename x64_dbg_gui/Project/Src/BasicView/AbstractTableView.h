@@ -111,6 +111,8 @@ private:
     Header_t mHeader;
 
     int mNbrOfLineToPrint;
+
+    int mPrevTableOffset;
 };
 
 #endif // ABSTRACTTABLEVIEW_H
