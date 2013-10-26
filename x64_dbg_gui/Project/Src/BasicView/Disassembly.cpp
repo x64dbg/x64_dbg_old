@@ -216,7 +216,7 @@ void Disassembly::mouseMoveEvent(QMouseEvent* event)
 
         if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {
-            int wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
+            int wRowIndex = mInstBuffer.at(getIndexOffsetFromY(transY(event->y()))).rva;
 
             if(wRowIndex < getRowCount())
             {
@@ -352,12 +352,11 @@ int Disassembly::sliderMovedAction(int type, int value, int delta)
 void Disassembly::keyPressEvent(QKeyEvent* event)
 {
     int key = event->key();
-    qDebug() << "keyPressEvent " << getLineToPrintcount();
 
     if(key == Qt::Key_Up || key == Qt::Key_Down)
     {
         int botRVA = getTableOffset();
-        int topRVA = getIndexFromCount(getTableOffset(), getLineToPrintcount() - 1);
+        int topRVA = getIndexFromCount(getTableOffset(), getNbrOfLineToPrint() - 1);
 
         if(key == Qt::Key_Up)
             selectPrevious();
@@ -370,7 +369,7 @@ void Disassembly::keyPressEvent(QKeyEvent* event)
         }
         else if(getInitialSelection() >= topRVA)
         {
-            forceScrollBarValue(getIndexFromCount(getInitialSelection(),-getLineToPrintcount() + 2));
+            forceScrollBarValue(getIndexFromCount(getInitialSelection(),-getNbrOfLineToPrint() + 2));
         }
 
         refresh();
@@ -688,32 +687,6 @@ int Disassembly::getIndexFromCount(int index, int count)
         wAddr = getRowCount() - 1;
 
     return wAddr;
-}
-
-
-int Disassembly::getLineToPrintcount()
-{
-    int wViewableRowsCount = getViewableRowsCount();
-
-    int wAddrPrev = getTableOffset();
-    int wAddr = wAddrPrev;
-
-    int wCount = 0;
-
-    for(int wI = 0; wI < wViewableRowsCount; wI++)
-    {
-        wAddrPrev = wAddr;
-        wAddr = getNextInstructionRVA(wAddr, 1);
-
-        if(wAddr == wAddrPrev)
-        {
-            break;
-        }
-
-        wCount++;
-    }
-
-    return wCount;
 }
 
 
