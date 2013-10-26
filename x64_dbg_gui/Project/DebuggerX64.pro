@@ -90,7 +90,6 @@ FORMS += \
     Src/Dummy.ui \
     Src/Gui/CPUWidget.ui \
     Src/Gui/GotoDialog.ui \
-    Src/BasicView/RegistersView.ui
 
 
 #INCLUDEPATH += $$PWD/Src/BeaEngine_s_64
@@ -100,11 +99,13 @@ INCLUDEPATH += $$PWD/Src/Bridge
     message("x86 build")
     LIBS += -L"$$PWD/Src/ThirdPartyLibs/BeaEngine/" -lBeaEngine
     LIBS += -L"$$PWD/Src/Bridge/" -lx32_bridge
+    FORMS += Src/BasicView/RegistersView32.ui
     ## Windows x86 (32bit) specific build here
 } else {
     message("x86_64 build")
     LIBS += -L"$$PWD/Src/ThirdPartyLibs/BeaEngine/" -lBeaEngine_64
     LIBS += -L"$$PWD/Src/Bridge/" -lx64_bridge
+    FORMS += Src/BasicView/RegistersView64.ui
     ## Windows x64 (64bit) specific build here
 }
 

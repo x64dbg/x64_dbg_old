@@ -1,5 +1,10 @@
 #include "RegistersView.h"
-#include "ui_RegistersView.h"
+#ifdef _WIN64
+#include "ui_RegistersView64.h"
+#else
+#include "ui_RegistersView32.h"
+#endif
+
 
 RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::RegistersView)
 {
@@ -14,85 +19,103 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mSelected = -1;
 
     mRegList = new QList<QWidget*>();
-    mRegList->append(ui->RAXRegLabel);
-    mRegList->append(ui->RCXRegLabel);
-    mRegList->append(ui->RDXRegLabel);
-    mRegList->append(ui->RBXRegLabel);
-    mRegList->append(ui->RDIRegLabel);
-    mRegList->append(ui->RBPRegLabel);
-    mRegList->append(ui->RSIRegLabel);
-    mRegList->append(ui->RSPRegLabel);
-    mRegList->append(ui->R9RegLabel);
-    mRegList->append(ui->RFLAGSRegLabel);
+#ifdef _WIN64
+    mRegList->append(ui->AXRegLabel);
+    mRegList->append(ui->CXRegLabel);
+    mRegList->append(ui->DXRegLabel);
+    mRegList->append(ui->BXRegLabel);
+    mRegList->append(ui->DIRegLabel);
+    mRegList->append(ui->BPRegLabel);
+    mRegList->append(ui->SIRegLabel);
+    mRegList->append(ui->SPRegLabel);
+#endif
+
     mRegList->append(ui->R8RegLabel);
+    mRegList->append(ui->R9RegLabel);
     mRegList->append(ui->R10RegLabel);
-    mRegList->append(ui->RIPRegLabel);
+    mRegList->append(ui->R11RegLabel);
     mRegList->append(ui->R12RegLabel);
     mRegList->append(ui->R13RegLabel);
-    mRegList->append(ui->R11RegLabel);
     mRegList->append(ui->R14RegLabel);
     mRegList->append(ui->R15RegLabel);
+
+#ifdef _WIN64
+    mRegList->append(ui->IPRegLabel);
+#endif
+
+#ifdef _WIN64
+    mRegList->append(ui->FLAGSRegLabel);
+#endif
+    mRegList->append(ui->CFRegLabel);
+    mRegList->append(ui->PFRegLabel);
+    mRegList->append(ui->AFRegLabel);
+    mRegList->append(ui->ZFRegLabel);
+    mRegList->append(ui->SFRegLabel);
+    mRegList->append(ui->TFRegLabel);
+    mRegList->append(ui->IFRegLabel);
+    mRegList->append(ui->DFRegLabel);
+    mRegList->append(ui->OFRegLabel);
+
     mRegList->append(ui->GSRegLabel);
     mRegList->append(ui->FSRegLabel);
     mRegList->append(ui->ESRegLabel);
     mRegList->append(ui->DSRegLabel);
     mRegList->append(ui->CSRegLabel);
     mRegList->append(ui->SSRegLabel);
+
     mRegList->append(ui->DR2RegLabel);
     mRegList->append(ui->DR0RegLabel);
     mRegList->append(ui->DR7RegLabel);
     mRegList->append(ui->DR1RegLabel);
     mRegList->append(ui->DR6RegLabel);
     mRegList->append(ui->DR5RegLabel);
-    mRegList->append(ui->CFRegLabel);
-    mRegList->append(ui->PFRegLabel);
-    mRegList->append(ui->AFRegLabel);
-    mRegList->append(ui->ZFRegLabel);
-    mRegList->append(ui->IFRegLabel);
-    mRegList->append(ui->DFRegLabel);
-    mRegList->append(ui->SFRegLabel);
-    mRegList->append(ui->TFRegLabel);
-    mRegList->append(ui->OFRegLabel);
 
-    ui->RAXRegLabel->setAutoFillBackground(true);
-    ui->RCXRegLabel->setAutoFillBackground(true);
-    ui->RDXRegLabel->setAutoFillBackground(true);
-    ui->RBXRegLabel->setAutoFillBackground(true);
-    ui->RDIRegLabel->setAutoFillBackground(true);
-    ui->RBPRegLabel->setAutoFillBackground(true);
-    ui->RSIRegLabel->setAutoFillBackground(true);
-    ui->RSPRegLabel->setAutoFillBackground(true);
-    ui->R9RegLabel->setAutoFillBackground(true);
-    ui->RFLAGSRegLabel->setAutoFillBackground(true);
+
+    ui->AXRegLabel->setAutoFillBackground(true);
+    ui->CXRegLabel->setAutoFillBackground(true);
+    ui->DXRegLabel->setAutoFillBackground(true);
+    ui->BXRegLabel->setAutoFillBackground(true);
+    ui->DIRegLabel->setAutoFillBackground(true);
+    ui->BPRegLabel->setAutoFillBackground(true);
+    ui->SIRegLabel->setAutoFillBackground(true);
+    ui->SPRegLabel->setAutoFillBackground(true);
+
     ui->R8RegLabel->setAutoFillBackground(true);
+    ui->R9RegLabel->setAutoFillBackground(true);
     ui->R10RegLabel->setAutoFillBackground(true);
-    ui->RIPRegLabel->setAutoFillBackground(true);
+    ui->R11RegLabel->setAutoFillBackground(true);
     ui->R12RegLabel->setAutoFillBackground(true);
     ui->R13RegLabel->setAutoFillBackground(true);
-    ui->R11RegLabel->setAutoFillBackground(true);
     ui->R14RegLabel->setAutoFillBackground(true);
     ui->R15RegLabel->setAutoFillBackground(true);
+
+    ui->IPRegLabel->setAutoFillBackground(true);
+
+    ui->FLAGSRegLabel->setAutoFillBackground(true);
+    ui->CFRegLabel->setAutoFillBackground(true);
+    ui->PFRegLabel->setAutoFillBackground(true);
+    ui->AFRegLabel->setAutoFillBackground(true);
+    ui->ZFRegLabel->setAutoFillBackground(true);
+    ui->SFRegLabel->setAutoFillBackground(true);
+    ui->TFRegLabel->setAutoFillBackground(true);
+    ui->IFRegLabel->setAutoFillBackground(true);
+    ui->DFRegLabel->setAutoFillBackground(true);
+    ui->OFRegLabel->setAutoFillBackground(true);
+
     ui->GSRegLabel->setAutoFillBackground(true);
     ui->FSRegLabel->setAutoFillBackground(true);
     ui->ESRegLabel->setAutoFillBackground(true);
     ui->DSRegLabel->setAutoFillBackground(true);
     ui->CSRegLabel->setAutoFillBackground(true);
     ui->SSRegLabel->setAutoFillBackground(true);
+
     ui->DR2RegLabel->setAutoFillBackground(true);
     ui->DR0RegLabel->setAutoFillBackground(true);
     ui->DR7RegLabel->setAutoFillBackground(true);
     ui->DR1RegLabel->setAutoFillBackground(true);
     ui->DR6RegLabel->setAutoFillBackground(true);
     ui->DR5RegLabel->setAutoFillBackground(true);
-    ui->CFRegLabel->setAutoFillBackground(true);
-    ui->PFRegLabel->setAutoFillBackground(true);
-    ui->AFRegLabel->setAutoFillBackground(true);
-    ui->ZFRegLabel->setAutoFillBackground(true);
-    ui->IFRegLabel->setAutoFillBackground(true);
-    ui->DFRegLabel->setAutoFillBackground(true);
-    ui->SFRegLabel->setAutoFillBackground(true);
-    ui->TFRegLabel->setAutoFillBackground(true);
-    ui->OFRegLabel->setAutoFillBackground(true);
+
 }
 
 RegistersView::~RegistersView()
