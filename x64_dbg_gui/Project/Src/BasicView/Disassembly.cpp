@@ -112,30 +112,34 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
     {
     case 0: //draw address (+ label)
     {
-        //ulong wAddr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
-        //wStr = QString("%1").arg(wAddr, 8, 16, QChar('0')).toUpper();
-        // QString::number(wInst.rva)
-
+        char label[MAX_LABEL_SIZE]="";
+        uint_t cur_addr=mInstBuffer.at(rowOffset).rva+mMemPage->getBase();
+        QString addrText=QString("%1").arg(cur_addr, sizeof(uint_t)*2, 16, QChar('0')).toUpper();
+        if(DbgGetLabelAt(cur_addr, label)) //has label
+            addrText+=" "+QString(label);
+        else
+            *label=0;
         if(mInstBuffer.at(rowOffset).rva == mCipRva)
         {
             painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
             painter->save();
             painter->setPen(QPen(QColor("#fffbf0")));
-            painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper());
-            painter->restore();
         }
         else
         {
             painter->save();
-            if(isSelected(rowBase, rowOffset))
-                painter->setPen(QPen(QColor("#000000"))); //black address when selected
+            if(*label) //has label
+                painter->setPen(QPen(QColor("#ff0000"))); //red address + label text
             else
-                painter->setPen(QPen(QColor("#808080")));
-            painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper());
-            painter->restore();
+            {
+                if(isSelected(rowBase, rowOffset))
+                    painter->setPen(QPen(QColor("#000000"))); //black address when selected
+                else
+                    painter->setPen(QPen(QColor("#808080")));
+            }
         }
-            //wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper();
-
+        painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, addrText);
+        painter->restore();
         break;
     }
 
