@@ -255,8 +255,8 @@ bool DLL_IMPEXP DbgSetCommentAt(duint addr, const char* text)
 BPXTYPE DLL_IMPEXP DbgGetBpxTypeAt(duint addr)
 {
     //test code (highlighting.exe)
-    if(addr==0x401020 or addr==0x40101E)
-        return bpnormal;
+    /*if(addr==0x401020 or addr==0x40101E)
+        return bpnormal;*/
     return bpnone;
 }
 
