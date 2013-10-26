@@ -176,19 +176,34 @@ bool DLL_IMPEXP DbgIsJumpGoingToExecute(duint addr)
     return _dbg_isjumpgoingtoexecute(addr);
 }
 
-bool DLL_IMPEXP DbgGetLabelAt(duint addr, char* text) //(module.)+label
+bool DLL_IMPEXP DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text) //(module.)+label
 {
     if(!text)
         return false;
+    //test code (highlighting.exe)
+    if(addr==0x401020 or addr==0x401022)
+    {
+        strcpy(text, "highligh.label");
+        return true;
+    }
+    else if(addr==0x402000)
+    {
+        strcpy(text, "highligh.dataLabel");
+        return true;
+    }
     ADDRINFO info;
     memset(&info, 0, sizeof(info));
     info.flags=module|label;
-    if(!_dbg_addrinfoget(addr, &info))
+    if(!_dbg_addrinfoget(addr, segment, &info))
         return false;
-    if(*info.module)
+    if(!*info.module and !*info.label) //no module, no label
+        sprintf(text, "%"fext"X", addr);
+    else if(!*info.module) //no module
         strcpy(text, info.label);
-    else
-        sprintf(text, "%s.%s", info.label, info.comment);
+    else if(!*info.label) //module only
+        sprintf(text, "%s.%"fext"X", info.module, addr);
+    else //module+label
+        sprintf(text, "%s.%s", info.module, info.label);
     return true;
 }
 
@@ -209,10 +224,16 @@ bool DLL_IMPEXP DbgGetCommentAt(duint addr, char* text) //comment (not live)
 {
     if(!text)
         return false;
+    //test code (highlighting.exe)
+    if(addr==0x401000)
+    {
+        strcpy(text, "test comment");
+        return true;
+    }
     ADDRINFO info;
     memset(&info, 0, sizeof(info));
     info.flags=comment;
-    if(!_dbg_addrinfoget(addr, &info))
+    if(!_dbg_addrinfoget(addr, SEG_DEFAULT, &info))
         return false;
     strcpy(text, info.comment);
     return true;
@@ -229,6 +250,14 @@ bool DLL_IMPEXP DbgSetCommentAt(duint addr, const char* text)
     if(!_dbg_addrinfoset(addr, &info))
         return false;
     return true;
+}
+
+BPXTYPE DLL_IMPEXP DbgGetBpxTypeAt(duint addr)
+{
+    //test code (highlighting.exe)
+    if(addr==0x401020 or addr==0x40101E)
+        return bpnormal;
+    return bpnone;
 }
 
 //GUI

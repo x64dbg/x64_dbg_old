@@ -4,6 +4,32 @@ BeaHighlight::BeaHighlight()
 {
 }
 
+SEGMENTREG BeaHighlight::ConvertBeaSeg(int beaSeg)
+{
+    switch(beaSeg)
+    {
+    case ESReg:
+        return SEG_ES;
+        break;
+    case DSReg:
+        return SEG_DS;
+        break;
+    case FSReg:
+        return SEG_FS;
+        break;
+    case GSReg:
+        return SEG_GS;
+        break;
+    case CSReg:
+        return SEG_CS;
+        break;
+    case SSReg:
+        return SEG_SS;
+        break;
+    }
+    return SEG_DEFAULT;
+}
+
 bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYPE* Argument, const INSTRTYPE* Instruction, bool* had_arg)
 {
     CustomRichText_t argument;
@@ -24,7 +50,8 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
         if(argtype&MEMORY_TYPE) //mov [],a or mov a,[]
         {
             char segment[3]="";
-            switch(Argument->SegmentReg)
+            int segmentReg=Argument->SegmentReg;
+            switch(segmentReg)
             {
             case ESReg:
                 strcpy(segment, "es");
@@ -63,7 +90,7 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
             //labels
             duint label_addr=Argument->Memory.Displacement;
             char label_text[MAX_LABEL_SIZE]="";
-            if(DbgGetLabelAt(label_addr, label_text))
+            if(DbgGetLabelAt(label_addr, ConvertBeaSeg(segmentReg), label_text))
             {
                 QString displacement;
                 displacement.sprintf("%"fext"X", label_addr);
@@ -91,7 +118,7 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
             //labels
             duint label_addr=Instruction->Immediat;
             char label_text[MAX_LABEL_SIZE]="";
-            if(DbgGetLabelAt(label_addr, label_text))
+            if(DbgGetLabelAt(label_addr, SEG_DEFAULT, label_text))
             {
                 QString immediat;
                 immediat.sprintf("%"fext"X", label_addr);

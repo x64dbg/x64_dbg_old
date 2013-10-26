@@ -43,11 +43,30 @@ enum DBGSTATE
     stopped
 };
 
+enum SEGMENTREG
+{
+    SEG_DEFAULT,
+    SEG_ES,
+    SEG_DS,
+    SEG_FS,
+    SEG_GS,
+    SEG_CS,
+    SEG_SS
+};
+
 enum ADDRINFOFLAGS
 {
     module=1,
     label=2,
     comment=4
+};
+
+enum BPXTYPE
+{
+    bpnone,
+    bpnormal,
+    bphardware,
+    bpmemory
 };
 
 //Debugger structs
@@ -80,10 +99,11 @@ bool DLL_IMPEXP DbgMemMap(MEMMAP* memmap);
 bool DLL_IMPEXP DbgIsValidExpression(const char* expression);
 bool DLL_IMPEXP DbgIsDebugging();
 bool DLL_IMPEXP DbgIsJumpGoingToExecute(duint addr);
-bool DLL_IMPEXP DbgGetLabelAt(duint addr, char* text);
+bool DLL_IMPEXP DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text);
 bool DLL_IMPEXP DbgSetLabelAt(duint addr, const char* text);
 bool DLL_IMPEXP DbgGetCommentAt(duint addr, char* text);
 bool DLL_IMPEXP DbgSetCommentAt(duint addr, const char* text);
+BPXTYPE DLL_IMPEXP DbgGetBpxTypeAt(duint addr);
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);

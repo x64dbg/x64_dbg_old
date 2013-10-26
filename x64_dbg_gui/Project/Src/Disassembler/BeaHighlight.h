@@ -25,6 +25,7 @@ public:
     BeaHighlight();
     static void PrintRtfInstruction(QList<CustomRichText_t>* richText, const DISASM* MyDisasm);
 private:
+    static SEGMENTREG ConvertBeaSeg(int beaSeg);
     static void PrintBaseInstruction(QList<CustomRichText_t>* richText, const DISASM* MyDisasm);
     static bool PrintArgument(QList<CustomRichText_t>* richText, const ARGTYPE* Argument, const INSTRTYPE* Instruction, bool* had_arg);
 

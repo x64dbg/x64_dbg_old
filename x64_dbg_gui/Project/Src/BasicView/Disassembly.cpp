@@ -105,7 +105,8 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
 
     wRVA = mInstBuffer.at(rowOffset).rva;
 
-    if(isSelected(rowBase, rowOffset))
+    bool isselected=isSelected(rowBase, rowOffset);
+    if(isselected)
         painter->fillRect(QRect(x, y, w, h), QBrush(QColor(192,192,192)));
 
     switch(col)
@@ -115,27 +116,71 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
         char label[MAX_LABEL_SIZE]="";
         uint_t cur_addr=mInstBuffer.at(rowOffset).rva+mMemPage->getBase();
         QString addrText=QString("%1").arg(cur_addr, sizeof(uint_t)*2, 16, QChar('0')).toUpper();
-        if(DbgGetLabelAt(cur_addr, label)) //has label
-            addrText+=" "+QString(label);
+        if(DbgGetLabelAt(cur_addr, SEG_DEFAULT, label)) //has label
+            addrText+=" <"+QString(label)+">";
         else
             *label=0;
-        if(mInstBuffer.at(rowOffset).rva == mCipRva)
+        BPXTYPE bpxtype=DbgGetBpxTypeAt(cur_addr);
+        if(mInstBuffer.at(rowOffset).rva == mCipRva) //cip
         {
             painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
             painter->save();
-            painter->setPen(QPen(QColor("#fffbf0")));
-        }
-        else
-        {
-            painter->save();
-            if(*label) //has label
-                painter->setPen(QPen(QColor("#ff0000"))); //red address + label text
-            else
+            switch(bpxtype) //breakpoint
             {
-                if(isSelected(rowBase, rowOffset))
-                    painter->setPen(QPen(QColor("#000000"))); //black address when selected
-                else
-                    painter->setPen(QPen(QColor("#808080")));
+            case bpnormal:
+                painter->setPen(QPen(QColor("#ff0000")));
+                break;
+            default:
+                painter->setPen(QPen(QColor("#fffbf0")));
+                break;
+            }
+        }
+        else //other address
+        {
+            if(*label) //label
+            {
+                if(bpxtype==bpnone) //label only
+                {
+                    painter->save();
+                    painter->setPen(QPen(QColor("#ff0000"))); //red -> address + label text
+                }
+                else //label+breakpoint
+                {
+                    switch(bpxtype)
+                    {
+                    case bpnormal:
+                        painter->fillRect(QRect(x, y, w, h), QBrush(QColor("#ff0000"))); //fill red
+                        break;
+                    default:
+                        break;
+                    }
+                    painter->save();
+                    painter->setPen(QPen(QColor("#000000"))); //black address
+                }
+            }
+            else //no label
+            {
+                if(bpxtype==bpnone) //no label, no breakpoint
+                {
+                    painter->save();
+                    if(isselected)
+                        painter->setPen(QPen(QColor("#000000"))); //black address
+                    else
+                        painter->setPen(QPen(QColor("#808080")));
+                }
+                else //breakpoint only
+                {
+                    switch(bpxtype)
+                    {
+                    case bpnormal:
+                        painter->fillRect(QRect(x, y, w, h), QBrush(QColor("#ff0000"))); //fill red
+                        break;
+                    default:
+                        break;
+                    }
+                    painter->save();
+                    painter->setPen(QPen(QColor("#000000"))); //black address
+                }
             }
         }
         painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, addrText);
@@ -173,7 +218,7 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
         else
             wStr="";
     }
-    break;
+        break;
 
     default:
         break;
@@ -461,10 +506,10 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
     else if(wPict == GD_HeadFromBottom)
     {
         QPoint wPoints[] = {
-             QPoint(x + 3, y + getRowHeight() / 2 - 2),
-             QPoint(x + 5, y + getRowHeight() / 2),
-             QPoint(x + 3, y + getRowHeight() / 2 + 2),
-         };
+            QPoint(x + 3, y + getRowHeight() / 2 - 2),
+            QPoint(x + 5, y + getRowHeight() / 2),
+            QPoint(x + 3, y + getRowHeight() / 2 + 2),
+        };
 
         painter->drawLine(x, y + getRowHeight() / 2, x + 5, y + getRowHeight() / 2);
         painter->drawLine(x, y + getRowHeight() / 2, x, y + getRowHeight());
@@ -473,10 +518,10 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
     if(wPict == GD_HeadFromTop)
     {
         QPoint wPoints[] = {
-             QPoint(x + 3, y + getRowHeight() / 2 - 2),
-             QPoint(x + 5, y + getRowHeight() / 2),
-             QPoint(x + 3, y + getRowHeight() / 2 + 2),
-         };
+            QPoint(x + 3, y + getRowHeight() / 2 - 2),
+            QPoint(x + 5, y + getRowHeight() / 2),
+            QPoint(x + 3, y + getRowHeight() / 2 + 2),
+        };
 
         painter->drawLine(x, y + getRowHeight() / 2, x + 5, y + getRowHeight() / 2);
         painter->drawLine(x, y, x, y + getRowHeight() / 2);

@@ -51,7 +51,7 @@ typedef void (*DBGDBGEXITSIGNAL)();
 typedef bool (*DBGVALFROMSTRING)(const char* string, duint* value);
 typedef bool (*DBGISDEBUGGING)();
 typedef bool (*DBGISJUMPGOINGTOEXECUTE)(duint addr);
-typedef bool (*DBGADDRINFOGET)(duint addr, ADDRINFO* addrinfo);
+typedef bool (*DBGADDRINFOGET)(duint addr, SEGMENTREG segment, ADDRINFO* addrinfo);
 typedef bool (*DBGADDRINFOSET)(duint addr, ADDRINFO* addrinfo);
 
 //DBG functions

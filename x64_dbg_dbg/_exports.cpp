@@ -108,7 +108,7 @@ extern "C" DLL_EXPORT bool _dbg_isjumpgoingtoexecute(duint addr)
     return IsJumpGoingToExecuteEx(fdProcessInfo->hProcess, fdProcessInfo->hThread, (ULONG_PTR)addr, GetContextData(UE_CFLAGS));
 }
 
-extern "C" DLL_EXPORT bool _dbg_addrinfoget(duint addr, ADDRINFO* addrinfo)
+extern "C" DLL_EXPORT bool _dbg_addrinfoget(duint addr, SEGMENTREG segment, ADDRINFO* addrinfo)
 {
     return false;
 }

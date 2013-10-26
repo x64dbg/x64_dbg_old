@@ -15,7 +15,7 @@ DLL_EXPORT void _dbg_dbgexitsignal();
 DLL_EXPORT bool _dbg_valfromstring(const char* string, duint* value);
 DLL_EXPORT bool _dbg_isdebugging();
 DLL_EXPORT bool _dbg_isjumpgoingtoexecute(duint addr);
-DLL_EXPORT bool _dbg_addrinfoget(duint addr, ADDRINFO* addrinfo);
+DLL_EXPORT bool _dbg_addrinfoget(duint addr, SEGMENTREG segment, ADDRINFO* addrinfo);
 DLL_EXPORT bool _dbg_addrinfoset(duint addr, ADDRINFO* addrinfo);
 
 #ifdef __cplusplus
