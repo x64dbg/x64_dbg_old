@@ -4,6 +4,7 @@
 #include "_global.h"
 #include "TitanEngine\TitanEngine.h"
 #include "command.h"
+#include "breakpoint.h"
 
 //structures
 struct INIT_STRUCT
@@ -45,5 +46,6 @@ CMDRESULT cbDebugPause(const char* cmd);
 
 //variables
 extern PROCESS_INFORMATION* fdProcessInfo;
+extern BREAKPOINT* bplist;
 
 #endif // _DEBUGGER_H

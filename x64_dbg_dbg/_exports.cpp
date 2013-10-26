@@ -117,3 +117,23 @@ extern "C" DLL_EXPORT bool _dbg_addrinfoset(duint addr, ADDRINFO* addrinfo)
 {
     return false;
 }
+
+extern "C" DLL_EXPORT BPXTYPE _dbg_bpgettypeat(duint addr)
+{
+    BREAKPOINT* found=bpfind(bplist, 0, addr, 0, BPNOTYPE);
+    if(!found or !found->enabled) //none found or disabled
+        return bpnone;
+    switch(found->type)
+    {
+    case BPNORMAL:
+    case BPSINGLESHOOT:
+        return bpnormal;
+    case BPHARDWARE:
+        return bphardware;
+    case BPMEMORY:
+        return bpmemory;
+    default:
+        break;
+    }
+    return bpnone;
+}

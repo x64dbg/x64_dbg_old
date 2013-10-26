@@ -91,6 +91,10 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_addrinfoset=(DBGADDRINFOSET)GetProcAddress(hInstDbg, "_dbg_addrinfoset");
     if(!_dbg_addrinfoset)
         return "Export \"_dbg_addrinfoset\" could not be found!";
+    //_dbg_bpgettypeat
+    _dbg_bpgettypeat=(DBGBPGETTYPEAT)GetProcAddress(hInstDbg, "_dbg_bpgettypeat");
+    if(!_dbg_bpgettypeat)
+        return "Export \"_dbg_bpgettypeat\" could not be found!";
     return 0;
 }
 
@@ -254,10 +258,7 @@ bool DLL_IMPEXP DbgSetCommentAt(duint addr, const char* text)
 
 BPXTYPE DLL_IMPEXP DbgGetBpxTypeAt(duint addr)
 {
-    //test code (highlighting.exe)
-    /*if(addr==0x401020 or addr==0x40101E)
-        return bpnormal;*/
-    return bpnone;
+    return _dbg_bpgettypeat(addr);
 }
 
 duint DLL_IMPEXP DbgValFromString(const char* string)

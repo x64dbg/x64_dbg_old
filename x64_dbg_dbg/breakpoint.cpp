@@ -38,7 +38,7 @@ BREAKPOINT* bpfind(BREAKPOINT* breakpoint_list, const char* name, uint addr, BRE
         BP_TYPE realtype=type;
         if(realtype==BPSINGLESHOOT)
             realtype=BPNORMAL;
-        if(((name and arraycontains(cur->name, name)) or cur->addr==addr) and (bptype==BPNOTYPE or bptype==realtype))
+        if(((name and arraycontains(cur->name, name)) or cur->addr==addr) and (type==BPNOTYPE or bptype==realtype))
         {
             if(link)
                 *link=prev;
@@ -85,6 +85,7 @@ bool bpnew(BREAKPOINT* breakpoint_list, const char* name, uint addr, short oldby
 
 bool bpsetname(BREAKPOINT* breakpoint_list, uint addr, const char* name)
 {
+    //TODO: fix this BPNOTYPE, it's bullshit
     if(!name or !*name or !addr or bpfind(breakpoint_list, name, 0, 0, BPNOTYPE))
         return false;
     BREAKPOINT* found=bpfind(breakpoint_list, 0, addr, 0, BPNOTYPE);

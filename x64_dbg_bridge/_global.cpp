@@ -23,3 +23,4 @@ DBGISDEBUGGING _dbg_isdebugging;
 DBGISJUMPGOINGTOEXECUTE _dbg_isjumpgoingtoexecute;
 DBGADDRINFOGET _dbg_addrinfoget;
 DBGADDRINFOSET _dbg_addrinfoset;
+DBGBPGETTYPEAT _dbg_bpgettypeat;
