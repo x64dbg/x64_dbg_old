@@ -98,14 +98,14 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
     //return QString("Disassembly: Col:") + QString::number(col) + "Row:" + QString::number(rowBase + rowOffset);
 
     QString wStr = "";
-    int wI = 0;
-    int wLineToPrintcount;
+    //int wI = 0;
+    //int wLineToPrintcount;
     uint_t wRVA;
-    Instruction_t wInst;
+    //Instruction_t wInst;
 
     wRVA = mInstBuffer.at(rowOffset).rva;
 
-    if(isSelected(rowBase, rowOffset) == true)
+    if(isSelected(rowBase, rowOffset))
         painter->fillRect(QRect(x, y, w, h), QBrush(QColor(192,192,192)));
 
     switch(col)
@@ -120,17 +120,26 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
         {
             painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
             painter->save();
-            painter->setPen(QPen(QColor("#ffffff")));
+            painter->setPen(QPen(QColor("#fffbf0")));
             painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper());
             painter->restore();
         }
         else
-            wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper();
+        {
+            painter->save();
+            if(isSelected(rowBase, rowOffset))
+                painter->setPen(QPen(QColor("#000000"))); //black address when selected
+            else
+                painter->setPen(QPen(QColor("#808080")));
+            painter->drawText(QRect(x + 4, y , w - 4 , h), Qt::AlignVCenter | Qt::AlignLeft, QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper());
+            painter->restore();
+        }
+            //wStr += QString("%1").arg(mInstBuffer.at(rowOffset).rva+mMemPage->getBase(), sizeof(uint_t)*2, 16, QChar('0')).toUpper();
 
         break;
     }
 
-    case 1: //draw bytes
+    case 1: //draw bytes (TODO: some spaces between bytes)
     {
         for(int i = 0; i < mInstBuffer.at(rowOffset).dump.size(); i++)
             wStr += QString("%1").arg((unsigned char)(mInstBuffer.at(rowOffset).dump.at(i)), 2, 16, QChar('0')).toUpper();
