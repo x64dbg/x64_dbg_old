@@ -69,6 +69,7 @@ static void registercommands()
     cmdnew(cmd, "scr\1script", cbScript, false); //script testing
     cmdnew(cmd, "bench", cbBenchmark, true); //benchmark test (readmem etc)
     cmdnew(cmd, "pause", cbDebugPause, true); //pause debugger
+    cmdnew(cmd, "memwrite", cbMemWrite, true); //memwrite test
 }
 
 static bool cbCommandProvider(char* cmd, int maxlen)

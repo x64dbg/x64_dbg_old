@@ -32,7 +32,7 @@ bool memread(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, SIZE_T 
     uint addr=(uint)lpBaseAddress;
     uint startRva=addr&(PAGE_SIZE-1); //get start rva
     uint addrStart=addr-startRva; //round down one page
-    uint pages=((addrStart+PAGE_SIZE)-addrStart)/PAGE_SIZE;
+    uint pages=nSize/PAGE_SIZE+1;
     SIZE_T sizeRead=0;
     unsigned char curPage[PAGE_SIZE]; //current page memory
     unsigned char* destBuffer=(unsigned char*)lpBuffer;
@@ -41,11 +41,10 @@ bool memread(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, SIZE_T 
     {
         SIZE_T readBytes=0;
         void* curAddr=(void*)(addrStart+i*PAGE_SIZE);
-        DWORD oldprotect=0;
-        VirtualProtectEx(hProcess, curAddr, PAGE_SIZE, PAGE_EXECUTE_READWRITE, &oldprotect);
         bool ret=ReadProcessMemory(hProcess, curAddr, curPage, PAGE_SIZE, &readBytes);
         if(!ret or readBytes!=PAGE_SIZE)
         {
+            DWORD oldprotect=0;
             VirtualProtectEx(hProcess, curAddr, PAGE_SIZE, PAGE_EXECUTE_READWRITE, &oldprotect);
             ret=ReadProcessMemory(hProcess, curAddr, curPage, PAGE_SIZE, &readBytes);
             VirtualProtectEx(hProcess, curAddr, PAGE_SIZE, oldprotect, &oldprotect);
@@ -56,10 +55,10 @@ bool memread(HANDLE hProcess, const void* lpBaseAddress, void* lpBuffer, SIZE_T 
             memcpy(destBuffer, curPage+startRva, nSize-sizeRead);
         else //default case
             memcpy(destBuffer, curPage+startRva, PAGE_SIZE-startRva);
+        sizeRead+=(PAGE_SIZE-startRva);
+        destBuffer+=(PAGE_SIZE-startRva);
         if(!i)
             startRva=0;
-        sizeRead+=(PAGE_SIZE-startRva);
-        destBuffer+=sizeRead;
     }
     return true;
 }

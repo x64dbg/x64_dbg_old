@@ -1104,3 +1104,18 @@ CMDRESULT cbDebugPause(const char* cmd)
     DebugBreakProcess(fdProcessInfo->hProcess);
     return STATUS_CONTINUE;
 }
+
+CMDRESULT cbMemWrite(const char* cmd)
+{
+    dbg("cbMemWrite");
+    char arg1[deflen]="";
+    if(!argget(cmd, arg1, 0, false))
+        return STATUS_ERROR;
+    uint addr=0;
+    if(!valfromstring(arg1, &addr, 0, 0, false, 0))
+        return STATUS_ERROR;
+    unsigned char* blub=(unsigned char*)emalloc(0x2123);
+    memread(fdProcessInfo->hProcess, (const void*)addr, blub, 0x2123, 0);
+    //memwrite(fdProcessInfo->hProcess, (void*)addr, blub, 0x2123, 0);
+    return STATUS_CONTINUE;
+}
