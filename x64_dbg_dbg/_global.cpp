@@ -98,7 +98,7 @@ bool DevicePathToPath(const char* devicepath, char* path, size_t path_size)
     {
         *curDrive=drive;
         if(!QueryDosDeviceA(curDrive, curDevice, MAX_PATH))
-           continue;
+            continue;
         size_t curDevice_len=strlen(curDevice);
         if(!strncasecmp(devicepath, curDevice, curDevice_len)) //we match the device
         {

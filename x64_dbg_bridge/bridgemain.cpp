@@ -120,7 +120,8 @@ const char* DLL_IMPEXP BridgeStart()
 
 void* DLL_IMPEXP BridgeAlloc(size_t size)
 {
-    unsigned char* a=new unsigned char[size];
+    void* a=VirtualAlloc(0, size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+    //unsigned char* a= new unsigned char[size];
     if(!a)
     {
         MessageBoxA(0, "Could not allocate memory", "Error", MB_ICONERROR);
@@ -132,7 +133,8 @@ void* DLL_IMPEXP BridgeAlloc(size_t size)
 
 void DLL_IMPEXP BridgeFree(void* ptr)
 {
-    delete[] (unsigned char*)ptr;
+    VirtualFree(ptr, 0, MEM_RELEASE);
+    //delete[] (unsigned char*)ptr;
 }
 
 //Debugger
