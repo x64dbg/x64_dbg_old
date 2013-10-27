@@ -16,6 +16,7 @@ public:
     explicit WordEditDialog(QWidget *parent = 0);
     ~WordEditDialog();
     void setup(QString title, uint_t defVal, int byteCount);
+    uint_t getVal();
 
 public slots:
     void expressionChanged(QString s);

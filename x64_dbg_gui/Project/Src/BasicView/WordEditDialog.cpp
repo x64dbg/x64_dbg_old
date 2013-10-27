@@ -50,3 +50,9 @@ void WordEditDialog::setup(QString title, uint_t defVal, int byteCount)
 
     ui->hexLineEdit->setInputMask(QString("hh ").repeated(byteCount));
 }
+
+
+uint_t WordEditDialog::getVal()
+{
+    return mWord;
+}

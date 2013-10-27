@@ -300,7 +300,7 @@ void RegistersView::displayCustomContextMenuSlot(QPoint pos)
 
                  if(QDialog::Accepted == wEditDial.exec())
                  {
-
+                    setRegister(mRegNamesList->at(mSelected), wEditDial.getVal());
                  }
 
             }
@@ -501,7 +501,7 @@ void RegistersView::setRegister(REGISTER_NAME reg, uint_t value)
 
     if(wCmd.isEmpty() == false)
     {
-        wCmd += QString::number(value);
+        wCmd += QString::number(value, 16);
         Bridge::getBridge()->execCmd(reinterpret_cast<const char*>(wCmd.toAscii().data()));
     }
 }
