@@ -92,15 +92,15 @@ struct ADDRINFO
 
 struct FLAGS
 {
-    unsigned char c;
-    unsigned char p;
-    unsigned char a;
-    unsigned char z;
-    unsigned char s;
-    unsigned char t;
-    unsigned char i;
-    unsigned char d;
-    unsigned char o;
+    bool c;
+    bool p;
+    bool a;
+    bool z;
+    bool s;
+    bool t;
+    bool i;
+    bool d;
+    bool o;
 };
 
 struct REGDUMP
@@ -162,6 +162,7 @@ void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);
 void DLL_IMPEXP GuiSetDebugState(DBGSTATE state);
 void DLL_IMPEXP GuiAddLogMessage(const char* msg);
 void DLL_IMPEXP GuiLogClear();
+void DLL_IMPEXP GuiUpdateRegisterView();
 
 #ifdef __cplusplus
 }

@@ -13,7 +13,7 @@
     extern "C" __declspec(dllexport) void _gui_setdebugstate(DBGSTATE state);
     extern "C" __declspec(dllexport) void _gui_addlogmessage(const char* msg);
     extern "C" __declspec(dllexport) void _gui_logclear();
-    extern "C" __declspec(dllexport) void _gui_updateregisters();
+    extern "C" __declspec(dllexport) void _gui_updateregisterview();
 #endif
 
 

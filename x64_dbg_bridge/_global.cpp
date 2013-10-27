@@ -10,6 +10,7 @@ GUIDISASSEMBLEAT _gui_disassembleat;
 GUISETDEBUGSTATE _gui_setdebugstate;
 GUIADDLOGMESSAGE _gui_addlogmessage;
 GUILOGCLEAR _gui_logclear;
+GUIUPDATEREGISTERVIEW _gui_updateregisterview;
 
 //DBG functions
 DBGDBGINIT _dbg_dbginit;

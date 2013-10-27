@@ -12,13 +12,10 @@ static HINSTANCE hInst;
 #define gui_lib "x32_gui.dll"
 #endif // _WIN64
 
-//#define NO_GUI //for debugger-only testing
-
 //Bridge
 const char* DLL_IMPEXP BridgeInit()
 {
-#ifndef NO_GUI
-    //GUI Load
+    ///GUI Load
     hInstGui=LoadLibraryA(gui_lib); //Sigma
     if(!hInstGui)
         return "Error loading GUI library ("gui_lib")!";
@@ -42,8 +39,12 @@ const char* DLL_IMPEXP BridgeInit()
     _gui_logclear=(GUILOGCLEAR)GetProcAddress(hInstGui, "_gui_logclear");
     if(!_gui_logclear)
         return "Export \"_gui_logclear\" could not be found!";
-#endif
-    //DBG Load
+    //_gui_updateregisterview
+    _gui_updateregisterview=(GUIUPDATEREGISTERVIEW)GetProcAddress(hInstGui, "_gui_updateregisterview");
+    if(!_gui_updateregisterview)
+        return "Export \"_gui_updateregisterview\" could not be found!";
+
+    ///DBG Load
     hInstDbg=LoadLibraryA(dbg_lib); //Mr. eXoDia
     if(!hInstDbg)
         return "Error loading debugger library ("dbg_lib")!";
@@ -104,20 +105,12 @@ const char* DLL_IMPEXP BridgeInit()
 
 const char* DLL_IMPEXP BridgeStart()
 {
-#ifndef NO_GUI
     if(!_dbg_dbginit or !_gui_guiinit)
-#else
-    if(!_dbg_dbginit)
-#endif
         return "\"_dbg_dbginit\" or \"_gui_guiinit\" was not loaded yet, call BridgeInit!";
     const char* errormsg=_dbg_dbginit();
     if(errormsg)
         return errormsg;
-#ifndef NO_GUI
     _gui_guiinit(0, 0); //remove arguments
-#else
-    Sleep(-1);
-#endif
     _dbg_dbgexitsignal(); //send exit signal to debugger
     return 0;
 }
@@ -280,30 +273,27 @@ bool DLL_IMPEXP DbgGetRegDump(REGDUMP* regdump)
 //GUI
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip)
 {
-#ifndef NO_GUI
     _gui_disassembleat(addr, cip);
-#endif
 }
 
 void DLL_IMPEXP GuiSetDebugState(DBGSTATE state)
 {
-#ifndef NO_GUI
     _gui_setdebugstate(state);
-#endif // NO_GUI
 }
 
 void DLL_IMPEXP GuiAddLogMessage(const char* msg)
 {
-#ifndef NO_GUI
     _gui_addlogmessage(msg);
-#endif // NO_GUI
 }
 
 void DLL_IMPEXP GuiLogClear()
 {
-#ifndef NO_GUI
     _gui_logclear();
-#endif // NO_GUI
+}
+
+void DLL_IMPEXP GuiUpdateRegisterView()
+{
+    _gui_updateregisterview();
 }
 
 //Main

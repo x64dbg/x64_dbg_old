@@ -170,7 +170,7 @@ void Bridge::initBridge()
         Bridge::getBridge()->emitClearLog();
     }
 
-    __declspec(dllexport) void _gui_updateregisters()
+    __declspec(dllexport) void _gui_updateregisterview()
     {
         Bridge::getBridge()->emitUpdateRegisters();
     }

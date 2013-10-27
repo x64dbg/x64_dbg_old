@@ -33,6 +33,7 @@ typedef void (*GUIDISASSEMBLEAT)(duint va, duint cip);
 typedef void (*GUISETDEBUGSTATE)(DBGSTATE state);
 typedef void (*GUIADDLOGMESSAGE)(const char* msg);
 typedef void (*GUILOGCLEAR)();
+typedef void (*GUIUPDATEREGISTERVIEW)();
 
 //GUI functions
 extern GUIGUIINIT _gui_guiinit;
@@ -40,6 +41,7 @@ extern GUIDISASSEMBLEAT _gui_disassembleat;
 extern GUISETDEBUGSTATE _gui_setdebugstate;
 extern GUIADDLOGMESSAGE _gui_addlogmessage;
 extern GUILOGCLEAR _gui_logclear;
+extern GUIUPDATEREGISTERVIEW _gui_updateregisterview;
 
 //DBG typedefs
 typedef const char* (*DBGDBGINIT)();

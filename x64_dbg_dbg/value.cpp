@@ -255,39 +255,39 @@ static bool isregister(const char* string)
     return false;
 }
 
-int valflagfromstring(uint cflags, const char* string)
+bool valflagfromstring(uint cflags, const char* string)
 {
     if(scmp(string, "cf"))
-        return (int)(cflags&0x1);
+        return ((int)(cflags&0x1)!=0);
     if(scmp(string, "pf"))
-        return (int)(cflags&0x4);
+        return ((int)(cflags&0x4)!=0);
     if(scmp(string, "af"))
-        return (int)(cflags&0x10);
+        return ((int)(cflags&0x10)!=0);
     if(scmp(string, "zf"))
-        return (int)(cflags&0x40);
+        return ((int)(cflags&0x40)!=0);
     if(scmp(string, "sf"))
-        return (int)(cflags&0x80);
+        return ((int)(cflags&0x80)!=0);
     if(scmp(string, "tf"))
-        return (int)(cflags&0x100);
+        return ((int)(cflags&0x100)!=0);
     if(scmp(string, "if"))
-        return (int)(cflags&0x200);
+        return ((int)(cflags&0x200)!=0);
     if(scmp(string, "df"))
-        return (int)(cflags&0x400);
+        return ((int)(cflags&0x400)!=0);
     if(scmp(string, "of"))
-        return (int)(cflags&0x800);
+        return ((int)(cflags&0x800)!=0);
     if(scmp(string, "rf"))
-        return (int)(cflags&0x10000);
+        return ((int)(cflags&0x10000)!=0);
     if(scmp(string, "vm"))
-        return (int)(cflags&0x20000);
+        return ((int)(cflags&0x20000)!=0);
     if(scmp(string, "ac"))
-        return (int)(cflags&0x40000);
+        return ((int)(cflags&0x40000)!=0);
     if(scmp(string, "vif"))
-        return (int)(cflags&0x80000);
+        return ((int)(cflags&0x80000)!=0);
     if(scmp(string, "vip"))
-        return (int)(cflags&0x100000);
+        return ((int)(cflags&0x100000)!=0);
     if(scmp(string, "id"))
-        return (int)(cflags&0x200000);
-    return 0;
+        return ((int)(cflags&0x200000)!=0);
+    return false;
 }
 
 static bool setflag(const char* string, bool set)
@@ -1259,7 +1259,9 @@ bool valtostring(const char* string, uint* value, bool silent)
         }
         bool ok=setregister(string, *value);
         if(strstr(string, "ip"))
-            DebugUpdateDisasm(GetContextData(UE_CIP));
+            DebugUpdateGui(GetContextData(UE_CIP)); //update disassembly + register view
+        else
+            GuiUpdateRegisterView(); //update register view
         return ok;
     }
     else if(*string=='!' and isflag(string+1)) //flag
@@ -1274,6 +1276,7 @@ bool valtostring(const char* string, uint* value, bool silent)
         if(*value)
             set=true;
         setflag(string+1, set);
+        GuiUpdateRegisterView(); //update register view
         return true;
     }
     return varset(string, *value, false); //variable
