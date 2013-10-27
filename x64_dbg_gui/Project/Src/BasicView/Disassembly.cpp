@@ -429,8 +429,8 @@ void Disassembly::keyPressEvent(QKeyEvent* event)
  */
 void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
 {
-    ulong selHeadRVA = mSelection.fromIndex;
-    ulong rva = addr;
+    uint_t selHeadRVA = mSelection.fromIndex;
+    uint_t rva = addr;
     Instruction_t instruction = DisassembleAt(selHeadRVA);
     Int32 branchType = instruction.disasm.Instruction.BranchType;
     GraphicDump_t wPict = GD_Nothing;
@@ -457,11 +457,11 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
             branchType == (Int32)JNG     ||
             branchType == (Int32)JNB)
     {
-        ulong destRVA = (ulong)instruction.disasm.Instruction.AddrValue;
+        uint_t destRVA = (uint_t)instruction.disasm.Instruction.AddrValue;
 
-        if(destRVA > (ulong)mMemPage->getBase())
+        if(destRVA > (uint_t)mMemPage->getBase())
         {
-            destRVA -= (ulong)mMemPage->getBase();
+            destRVA -= (uint_t)mMemPage->getBase();
 
             if(destRVA < selHeadRVA)
             {
@@ -606,7 +606,7 @@ int Disassembly::getNextInstructionRVA(int rva, int count)
  *
  * @return      Return the disassembled instruction.
  */
-Instruction_t Disassembly::DisassembleAt(ulong rva)
+Instruction_t Disassembly::DisassembleAt(uint_t rva)
 {
     QByteArray wBuffer;
     uint base = mMemPage->getBase();
@@ -628,7 +628,7 @@ Instruction_t Disassembly::DisassembleAt(ulong rva)
  *
  * @return      Return the disassembled instruction.
  */
-Instruction_t Disassembly::DisassembleAt(ulong rva, ulong count)
+Instruction_t Disassembly::DisassembleAt(uint_t rva, uint_t count)
 {
     rva = getNextInstructionRVA(rva, count);
     return DisassembleAt(rva);

@@ -144,7 +144,7 @@ QString HexDump::paintContent(QPainter* painter, int rowBase, int rowOffset, int
     {
         case 0:
         {
-            //ulong wAddr = (ulong)instruction.rva + (ulong)mMemoryView->getBase();
+            //uint_t wAddr = (uint_t)instruction.rva + (uint_t)mMemoryView->getBase();
             //wStr = QString("%1").arg(wAddr, 8, 16, QChar('0')).toUpper();
             wStr += QString::number(wRva);
             break;

@@ -32,8 +32,8 @@ public:
     // Instructions Management
     int getPreviousInstructionRVA(int rva, int count);
     int getNextInstructionRVA(int rva, int count);
-    Instruction_t DisassembleAt(ulong rva);
-    Instruction_t DisassembleAt(ulong rva, ulong count);
+    Instruction_t DisassembleAt(uint_t rva);
+    Instruction_t DisassembleAt(uint_t rva, uint_t count);
 
     // Selection Management
     void expandSelectionUpTo(int to);

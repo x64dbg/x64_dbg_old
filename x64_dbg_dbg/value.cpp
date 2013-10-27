@@ -894,7 +894,7 @@ static bool setregister(const char* string, uint value)
     if(scmp(string, "rdi"))
         return SetContextData(UE_RDI, value);
     if(scmp(string, "rsi"))
-        return SetContextData(UE_RAX, value);
+        return SetContextData(UE_RSI, value);
     if(scmp(string, "rbp"))
         return SetContextData(UE_RBP, value);
     if(scmp(string, "rsp"))

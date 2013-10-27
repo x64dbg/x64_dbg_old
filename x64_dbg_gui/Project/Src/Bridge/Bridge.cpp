@@ -181,9 +181,9 @@ void Bridge::initBridge()
                             Imported Functions (Stub)
 ************************************************************************************/
 #ifndef BUILD_LIB
-    void stubReadProcessMemory(byte_t* dest, uint64 va, uint64 size)
+    void stubReadProcessMemory(byte_t* dest, uint_t va, uint_t size)
     {
-        uint64 wI;
+        uint_t wI;
 
         for(wI = 0; wI < size; wI++)
         {

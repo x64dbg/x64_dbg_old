@@ -21,29 +21,29 @@ class MapViewOfMem
     public:
         MapViewOfMem();
         explicit MapViewOfMem(QString file);
-        explicit MapViewOfMem(unsigned long long startAddress , unsigned long long size);
+        explicit MapViewOfMem(uint_t startAddress , uint_t size);
         ~MapViewOfMem();
         byte_t readByte(uint_t rva);
-        unsigned long long size();
+        uint_t size();
         unsigned char *data();
 
         Selection_t getSelection();
         void setSelection(Selection_t sel);
 
-        ulong getBase();
-        byte_t* getDataPtrForGui(uint_t rva, uint32 maxNbrOfBytesToRead, uint32 newCacheSize);
+        uint_t getBase();
+        byte_t* getDataPtrForGui(uint_t rva, uint_t maxNbrOfBytesToRead, uint_t newCacheSize);
 
     private:
         typedef struct _MemDataCacheStruct_t
         {
             QVector<byte_t>* memDataCachePtr;
-            uint32 memDataCacheSize;
+            uint_t memDataCacheSize;
             uint_t rva;
             bool isInit;
         } MemDataCacheStruct_t;
 
 
-        ulong mBase;
+        uint_t mBase;
         unsigned long mStartAddress;
         unsigned long mEndAddress;
         unsigned long mSize;

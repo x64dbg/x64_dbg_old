@@ -52,7 +52,7 @@ ulong QBeaEngine::DisassembleBack(byte_t* data, uint_t base, uint_t size, uint_t
     if(n == 0)
         return ip;
 
-    if(ip < n)
+    if(ip < (uint_t)n)
         return ip;
 
     back = 16 * (n + 3); // Instruction length limited to 16

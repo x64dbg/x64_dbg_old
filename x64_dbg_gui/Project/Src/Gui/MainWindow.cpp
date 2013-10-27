@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mMemMapView = new QMdiSubWindow();
     mMemMapView->setWindowTitle("Memory Map");
     mMemMapView->setWidget(new MemoryMapView());
-    mMemMapView->setWindowIcon(QIcon(":/icons/images/alphabet/M.png"));
+    mMemMapView->setWindowIcon(QIcon(":/icons/images/memory-map.png"));
     mMemMapView->hide();
     mMemMapView->setGeometry(10, 10, 600, 400);
 
@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     subWindow->showMaximized();
 
     mCpuWin = new CPUWidget();
-    mCpuWin->setWindowIcon(QIcon(":/icons/images/alphabet/C.png"));
+    mCpuWin->setWindowIcon(QIcon(":/icons/images/processor-cpu.png"));
 
     subWindow->setWidget(mCpuWin);
 
@@ -66,7 +66,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mStatusLabel->setText("<font color='#ff0000'>Terminated</font>");
     ui->statusBar->addWidget(mStatusLabel);
     mLastLogLabel=new StatusLabel();
-    mLastLogLabel->setText("Last log message here...");
     ui->statusBar->addPermanentWidget(mLastLogLabel, 1);
 
     // Setup Signals/Slots
@@ -152,7 +151,7 @@ void MainWindow::displayAboutWidget()
 #else
     const char* title="About x32_dbg";
 #endif
-    MessageBoxA(MainWindow::winId(), "Created by:\nSigma (GUI)\nMr. eXoDia (DBG)\n\nSpecial Thanks:\nVisualPharm (http://visualpharm.com)\nReversingLabs (http://reversinglabs.com)\nBeatriX (http://beaengine.org)\nQt Project (http://qt-project.org)", title, MB_ICONINFORMATION);
+    MessageBoxA(MainWindow::winId(), "Created by:\nSigma (GUI)\nMr. eXoDia (DBG)\n\nSpecial Thanks:\nVisualPharm (http://visualpharm.com)\nReversingLabs (http://reversinglabs.com)\nBeatriX (http://beaengine.org)\nQt Project (http://qt-project.org)\nFugue Icons (http://yusukekamiyamane.com)", title, MB_ICONINFORMATION);
 }
 
 void MainWindow::on_actionGoto_triggered()

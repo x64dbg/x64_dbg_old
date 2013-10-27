@@ -10,8 +10,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // Register custom data types
-    qRegisterMetaType<int32>("int32");
-    qRegisterMetaType<uint32>("uint32");
+    //qRegisterMetaType<int32>("int32");
+    //qRegisterMetaType<uint_t>("uint_t");
 
     qRegisterMetaType<int_t>("int_t");
     qRegisterMetaType<uint_t>("uint_t");

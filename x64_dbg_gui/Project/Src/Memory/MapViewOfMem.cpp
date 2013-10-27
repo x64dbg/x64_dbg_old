@@ -34,7 +34,7 @@ MapViewOfMem::MapViewOfMem(QString file)
 }
 
 
-MapViewOfMem::MapViewOfMem(unsigned long long startAddress , unsigned long long size)
+MapViewOfMem::MapViewOfMem(uint_t startAddress , uint_t size)
 {
     mStartAddress = startAddress;
     mEndAddress = startAddress + size - 1;
@@ -48,10 +48,10 @@ MapViewOfMem::~MapViewOfMem()
 
 byte_t MapViewOfMem::readByte(uint_t rva)
 {
-    return mData.data()[(uint32)rva];
+    return mData.data()[rva];
 }
 
-unsigned long long MapViewOfMem::size()
+uint_t MapViewOfMem::size()
 {
     return mSize;
 }
@@ -72,13 +72,13 @@ void MapViewOfMem::setSelection(Selection_t sel)
     mSelectedData = sel;
 }
 
-ulong MapViewOfMem::getBase()
+uint_t MapViewOfMem::getBase()
 {
     return mBase;
 }
 
 
-byte_t* MapViewOfMem::getDataPtrForGui(uint_t rva, uint32 maxNbrOfBytesToRead, uint32 newCacheSize)
+byte_t* MapViewOfMem::getDataPtrForGui(uint_t rva, uint_t maxNbrOfBytesToRead, uint_t newCacheSize)
 {
     byte_t* wBytePtr = 0;
 
@@ -101,7 +101,7 @@ byte_t* MapViewOfMem::getDataPtrForGui(uint_t rva, uint32 maxNbrOfBytesToRead, u
             mGuiMemDataCache.rva = rva;
             wBytePtr = mGuiMemDataCache.memDataCachePtr->data();
             // TODO: Fill cache
-            for(int wI = 0; wI < newCacheSize; wI++)
+            for(uint_t wI = 0; wI < newCacheSize; wI++)
             {
                 wBytePtr[wI] = readByte(rva + (uint_t)wI);
             }

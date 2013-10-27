@@ -284,7 +284,6 @@ static void cbSystemBreakpoint(void* ExceptionData)
 
 static void cbStep()
 {
-    dputs("stepped!");
     isStepping=false;
     DebugUpdateGui(GetContextData(UE_CIP));
     GuiSetDebugState(paused);
@@ -295,7 +294,6 @@ static void cbStep()
 
 static void cbRtrFinalStep()
 {
-    dputs("returned!");
     DebugUpdateGui(GetContextData(UE_CIP));
     GuiSetDebugState(paused);
     //lock

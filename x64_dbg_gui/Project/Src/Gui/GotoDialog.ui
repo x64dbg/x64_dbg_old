@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../../resource.qrc">
-    <normaloff>:/icons/images/alphabet/G.png</normaloff>:/icons/images/alphabet/G.png</iconset>
+    <normaloff>:/icons/images/geolocation-goto.png</normaloff>:/icons/images/geolocation-goto.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
