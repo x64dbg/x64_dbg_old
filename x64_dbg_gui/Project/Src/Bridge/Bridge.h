@@ -29,6 +29,7 @@ public:
     bool execCmd(const char* cmd);
     bool getMemMapFromDbg(MEMMAP* parMemMap);
     bool isValidExpression(const char* expression);
+    void BridgeFree(void* ptr);
     void emitAddMsgToLog(QString msg);
     void emitClearLog();
     

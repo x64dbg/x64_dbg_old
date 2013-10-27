@@ -136,6 +136,7 @@ void MemoryMapView::stateChangedSlot(DBGSTATE state)
 
         }
 
+        Bridge::getBridge()->BridgeFree(wMemMapStruct.page);
     }
 
 }

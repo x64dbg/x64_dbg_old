@@ -101,6 +101,13 @@ bool Bridge::isValidExpression(const char* expression)
     return DbgIsValidExpression(expression);
 }
 
+void Bridge::BridgeFree(void* ptr)
+{
+    BridgeFree(ptr);
+}
+
+
+
 /************************************************************************************
                             Static Functions
 ************************************************************************************/
