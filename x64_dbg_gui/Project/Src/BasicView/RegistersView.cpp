@@ -8,6 +8,7 @@
 
 RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::RegistersView)
 {
+    int wI = 0;
     ui->setupUi(this);
 
     QPalette wPalette;
@@ -69,51 +70,15 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mRegList->append(ui->DR5RegLabel);
 
 
-    ui->AXRegLabel->setAutoFillBackground(true);
-    ui->CXRegLabel->setAutoFillBackground(true);
-    ui->DXRegLabel->setAutoFillBackground(true);
-    ui->BXRegLabel->setAutoFillBackground(true);
-    ui->DIRegLabel->setAutoFillBackground(true);
-    ui->BPRegLabel->setAutoFillBackground(true);
-    ui->SIRegLabel->setAutoFillBackground(true);
-    ui->SPRegLabel->setAutoFillBackground(true);
-#ifdef _WIN64
-    ui->R8RegLabel->setAutoFillBackground(true);
-    ui->R9RegLabel->setAutoFillBackground(true);
-    ui->R10RegLabel->setAutoFillBackground(true);
-    ui->R11RegLabel->setAutoFillBackground(true);
-    ui->R12RegLabel->setAutoFillBackground(true);
-    ui->R13RegLabel->setAutoFillBackground(true);
-    ui->R14RegLabel->setAutoFillBackground(true);
-    ui->R15RegLabel->setAutoFillBackground(true);
-#endif
-    ui->IPRegLabel->setAutoFillBackground(true);
+    for(wI = 0; wI < mRegList->size(); wI++)
+    {
+        QFont wFont(mRegList->at(wI)->font());
+        wFont.setFixedPitch(true);
 
-    ui->FLAGSRegLabel->setAutoFillBackground(true);
-    ui->CFRegLabel->setAutoFillBackground(true);
-    ui->PFRegLabel->setAutoFillBackground(true);
-    ui->AFRegLabel->setAutoFillBackground(true);
-    ui->ZFRegLabel->setAutoFillBackground(true);
-    ui->SFRegLabel->setAutoFillBackground(true);
-    ui->TFRegLabel->setAutoFillBackground(true);
-    ui->IFRegLabel->setAutoFillBackground(true);
-    ui->DFRegLabel->setAutoFillBackground(true);
-    ui->OFRegLabel->setAutoFillBackground(true);
+        mRegList->at(wI)->setAutoFillBackground(true);
 
-    ui->GSRegLabel->setAutoFillBackground(true);
-    ui->FSRegLabel->setAutoFillBackground(true);
-    ui->ESRegLabel->setAutoFillBackground(true);
-    ui->DSRegLabel->setAutoFillBackground(true);
-    ui->CSRegLabel->setAutoFillBackground(true);
-    ui->SSRegLabel->setAutoFillBackground(true);
-
-    ui->DR2RegLabel->setAutoFillBackground(true);
-    ui->DR0RegLabel->setAutoFillBackground(true);
-    ui->DR7RegLabel->setAutoFillBackground(true);
-    ui->DR1RegLabel->setAutoFillBackground(true);
-    ui->DR6RegLabel->setAutoFillBackground(true);
-    ui->DR5RegLabel->setAutoFillBackground(true);
-
+        mRegList->at(wI)->setFont(wFont);
+    }
 }
 
 RegistersView::~RegistersView()
