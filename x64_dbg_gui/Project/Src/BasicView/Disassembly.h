@@ -51,8 +51,10 @@ signals:
     
 public slots:
     void disassambleAt(uint_t parVA, uint_t parCIP);
+    void debugStateChangedSlot(DBGSTATE state);
 
 private:
+    void disassembleClear();
     void paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, const QList<CustomRichText_t>* richText);
 
     enum GuiState_t {NoState, MultiRowsSelectionState};

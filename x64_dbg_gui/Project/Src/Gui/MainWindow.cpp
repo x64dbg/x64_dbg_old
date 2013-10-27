@@ -61,6 +61,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->cmdBar->addWidget(new QLabel("Command: "));
     ui->cmdBar->addWidget(mCmdLineEdit);
 
+    // Status bar
+    mStatusLabel=new StatusLabel(ui->statusBar);
+    mStatusLabel->setText("<font color='#ff0000'>Terminated</font>");
+    ui->statusBar->addWidget(mStatusLabel);
+    mLastLogLabel=new StatusLabel();
+    mLastLogLabel->setText("Last log message here...");
+    ui->statusBar->addPermanentWidget(mLastLogLabel, 1);
+
     // Setup Signals/Slots
     connect(ui->actionStepOver, SIGNAL(triggered()), mCpuWin, SLOT(stepOverSlot()));
     connect(mCmdLineEdit, SIGNAL(returnPressed()), this, SLOT(executeCommand()));

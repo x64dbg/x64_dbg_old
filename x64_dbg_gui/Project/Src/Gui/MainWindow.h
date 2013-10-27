@@ -9,6 +9,7 @@
 #include "MemoryMapView.h"
 #include "LogView.h"
 #include "GotoDialog.h"
+#include "StatusLabel.h"
 
 namespace Ui {
 class MainWindow;
@@ -48,6 +49,9 @@ private:
 
     QMdiSubWindow* mMemMapView;
     QMdiSubWindow* mLogView;
+
+    StatusLabel* mStatusLabel;
+    StatusLabel* mLastLogLabel;
 };
 
 #endif // MAINWINDOW_H

@@ -28,6 +28,7 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
     addColumnAt(getColumnCount(), 100, false); //comments
 
     connect(Bridge::getBridge(), SIGNAL(disassembleAt(uint_t, uint_t)), this, SLOT(disassambleAt(uint_t, uint_t)));
+    connect(Bridge::getBridge(), SIGNAL(dbgStateChanged(DBGSTATE)), this, SLOT(debugStateChangedSlot(DBGSTATE)));
 }
 
 /************************************************************************************
@@ -800,4 +801,18 @@ void Disassembly::disassambleAt(uint_t parVA, uint_t parCIP)
         forceScrollBarValue(wRVA);
     }
 
+}
+
+void Disassembly::disassembleClear()
+{
+    //TODO: fix this
+    setRowCount(0);
+    setNbrOfLineToPrint(0);
+    refresh();
+}
+
+void Disassembly::debugStateChangedSlot(DBGSTATE state)
+{
+    if(state==stopped)
+        disassembleClear();
 }

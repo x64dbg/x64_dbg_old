@@ -46,7 +46,8 @@ SOURCES += \
     Src/BasicView/LogView.cpp \
     Src/Gui/GotoDialog.cpp \
     Src/Disassembler/BeaHighlight.cpp \
-    Src/BasicView/RegistersView.cpp
+    Src/BasicView/RegistersView.cpp \
+    Src/Gui/StatusLabel.cpp
 
 
 HEADERS += \
@@ -70,7 +71,8 @@ HEADERS += \
     Src/BasicView/LogView.h \
     Src/Gui/GotoDialog.h \
     Src/Disassembler/BeaHighlight.h \
-    Src/BasicView/RegistersView.h
+    Src/BasicView/RegistersView.h \
+    Src/Gui/StatusLabel.h
 
 
 INCLUDEPATH += \
