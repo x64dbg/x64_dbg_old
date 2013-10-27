@@ -128,6 +128,6 @@ extern "C" const char* DLL_EXPORT _dbg_dbginit()
     registercommands();
     scriptSetList(command_list);
     CreateThread(0, 0, DbgCommandLoopThread, 0, 0, 0);
-    CreateThread(0, 0, ConsoleReadLoopThread, 0, 0, 0);
+    //CreateThread(0, 0, ConsoleReadLoopThread, 0, 0, 0);
     return 0;
 }

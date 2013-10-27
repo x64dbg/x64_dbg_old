@@ -26,8 +26,6 @@ DEFINES += BUILD_LIB
 TEMPLATE = lib
 #TEMPLATE = app
 
-
-
 SOURCES += \
     Src/main.cpp \
     Src/Gui/MainWindow.cpp \
@@ -76,7 +74,6 @@ HEADERS += \
     Src/Gui/StatusLabel.h \
     Src/BasicView/WordEditDialog.h
 
-
 INCLUDEPATH += \
     Src \
     Src/Gui \
@@ -88,7 +85,6 @@ INCLUDEPATH += \
     Src/Bridge \
     Src/Global
 
-
 FORMS += \
     Src/Gui/MainWindow.ui \
     Src/Dummy.ui \
@@ -96,8 +92,6 @@ FORMS += \
     Src/Gui/GotoDialog.ui \
     Src/BasicView/WordEditDialog.ui
 
-
-#INCLUDEPATH += $$PWD/Src/BeaEngine_s_64
 INCLUDEPATH += $$PWD/Src/Bridge
 
 !contains(QMAKE_HOST.arch, x86_64) {
