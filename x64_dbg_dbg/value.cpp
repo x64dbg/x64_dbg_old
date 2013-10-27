@@ -258,35 +258,35 @@ static bool isregister(const char* string)
 bool valflagfromstring(uint cflags, const char* string)
 {
     if(scmp(string, "cf"))
-        return ((int)(cflags&0x1)!=0);
+        return (bool)((int)(cflags&0x1)!=0);
     if(scmp(string, "pf"))
-        return ((int)(cflags&0x4)!=0);
+        return (bool)((int)(cflags&0x4)!=0);
     if(scmp(string, "af"))
-        return ((int)(cflags&0x10)!=0);
+        return (bool)((int)(cflags&0x10)!=0);
     if(scmp(string, "zf"))
-        return ((int)(cflags&0x40)!=0);
+        return (bool)((int)(cflags&0x40)!=0);
     if(scmp(string, "sf"))
-        return ((int)(cflags&0x80)!=0);
+        return (bool)((int)(cflags&0x80)!=0);
     if(scmp(string, "tf"))
-        return ((int)(cflags&0x100)!=0);
+        return (bool)((int)(cflags&0x100)!=0);
     if(scmp(string, "if"))
-        return ((int)(cflags&0x200)!=0);
+        return (bool)((int)(cflags&0x200)!=0);
     if(scmp(string, "df"))
-        return ((int)(cflags&0x400)!=0);
+        return (bool)((int)(cflags&0x400)!=0);
     if(scmp(string, "of"))
-        return ((int)(cflags&0x800)!=0);
+        return (bool)((int)(cflags&0x800)!=0);
     if(scmp(string, "rf"))
-        return ((int)(cflags&0x10000)!=0);
+        return (bool)((int)(cflags&0x10000)!=0);
     if(scmp(string, "vm"))
-        return ((int)(cflags&0x20000)!=0);
+        return (bool)((int)(cflags&0x20000)!=0);
     if(scmp(string, "ac"))
-        return ((int)(cflags&0x40000)!=0);
+        return (bool)((int)(cflags&0x40000)!=0);
     if(scmp(string, "vif"))
-        return ((int)(cflags&0x80000)!=0);
+        return (bool)((int)(cflags&0x80000)!=0);
     if(scmp(string, "vip"))
-        return ((int)(cflags&0x100000)!=0);
+        return (bool)((int)(cflags&0x100000)!=0);
     if(scmp(string, "id"))
-        return ((int)(cflags&0x200000)!=0);
+        return (bool)((int)(cflags&0x200000)!=0);
     return false;
 }
 
@@ -794,17 +794,17 @@ static bool setregister(const char* string, uint value)
         return SetContextData(UE_EFLAGS, value&0xFFFFFFFF);
 
     if(scmp(string, "gs"))
-        return SetContextData(UE_SEG_GS, value&0xFFFFFFFF);
+        return SetContextData(UE_SEG_GS, value&0xFFFF);
     if(scmp(string, "fs"))
-        return SetContextData(UE_SEG_FS, value&0xFFFFFFFF);
+        return SetContextData(UE_SEG_FS, value&0xFFFF);
     if(scmp(string, "es"))
-        return SetContextData(UE_SEG_ES, value&0xFFFFFFFF);
+        return SetContextData(UE_SEG_ES, value&0xFFFF);
     if(scmp(string, "ds"))
-        return SetContextData(UE_SEG_DS, value&0xFFFFFFFF);
+        return SetContextData(UE_SEG_DS, value&0xFFFF);
     if(scmp(string, "cs"))
-        return SetContextData(UE_SEG_CS, value&0xFFFFFFFF);
+        return SetContextData(UE_SEG_CS, value&0xFFFF);
     if(scmp(string, "ss"))
-        return SetContextData(UE_SEG_SS, value&0xFFFFFFFF);
+        return SetContextData(UE_SEG_SS, value&0xFFFF);
 
     if(scmp(string, "ax"))
         return SetContextData(UE_EAX, (value&0xFFFF)|(GetContextData(UE_EAX)&0xFFFF0000));
@@ -900,7 +900,7 @@ static bool setregister(const char* string, uint value)
     if(scmp(string, "rsp"))
         return SetContextData(UE_RSP, value);
     if(scmp(string, "rip"))
-        return SetContextData(UE_RAX, value);
+        return SetContextData(UE_RIP, value);
     if(scmp(string, "rflags"))
         return SetContextData(UE_RFLAGS, value);
     if(scmp(string, "r8"))

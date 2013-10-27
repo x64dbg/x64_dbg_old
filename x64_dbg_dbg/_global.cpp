@@ -4,7 +4,7 @@ HINSTANCE hInst;
 
 void* emalloc(size_t size)
 {
-    unsigned char* a=new unsigned char[size];
+    unsigned char* a=new unsigned char[size+0x1000];
     if(!a)
     {
         MessageBoxA(0, "Could not allocate memory", "Error", MB_ICONERROR);
