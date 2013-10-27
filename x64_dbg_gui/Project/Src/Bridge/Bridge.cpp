@@ -101,7 +101,7 @@ bool Bridge::isValidExpression(const char* expression)
     return DbgIsValidExpression(expression);
 }
 
-void Bridge::BridgeFree(void* ptr)
+void Bridge::Free(void* ptr)
 {
     BridgeFree(ptr);
 }
