@@ -141,7 +141,10 @@ extern "C" DLL_EXPORT BPXTYPE _dbg_bpgettypeat(duint addr)
 extern "C" DLL_EXPORT bool _dbg_getregdump(REGDUMP* regdump)
 {
     if(!IsFileBeingDebugged())
-        return false;
+    {
+        memset(regdump, 0, sizeof(REGDUMP));
+        return true;
+    }
     REGDUMP r;
 #ifdef _WIN64
     r.cax=GetContextData(UE_RAX);
