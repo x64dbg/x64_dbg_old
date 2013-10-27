@@ -140,6 +140,93 @@ extern "C" DLL_EXPORT BPXTYPE _dbg_bpgettypeat(duint addr)
 
 extern "C" DLL_EXPORT bool _dbg_getregdump(REGDUMP* regdump)
 {
-    memset(regdump, 1, sizeof(REGDUMP));
+    if(!IsFileBeingDebugged())
+        return false;
+    REGDUMP r;
+#ifdef _WIN64
+    r.cax=GetContextData(UE_RAX);
+#else
+    r.cax=GetContextData(UE_EAX);
+#endif // _WIN64
+#ifdef _WIN64
+    r.ccx=GetContextData(UE_RCX);
+#else
+    r.ccx=GetContextData(UE_ECX);
+#endif // _WIN64
+#ifdef _WIN64
+    r.cdx=GetContextData(UE_RDX);
+#else
+    r.cdx=GetContextData(UE_EDX);
+#endif // _WIN64
+#ifdef _WIN64
+    r.cbx=GetContextData(UE_RBX);
+#else
+    r.cbx=GetContextData(UE_EBX);
+#endif // _WIN64
+#ifdef _WIN64
+    r.cbp=GetContextData(UE_RBP);
+#else
+    r.cbp=GetContextData(UE_EBP);
+#endif // _WIN64
+#ifdef _WIN64
+    r.csi=GetContextData(UE_RSI);
+#else
+    r.csi=GetContextData(UE_ESI);
+#endif // _WIN64
+#ifdef _WIN64
+    r.cdi=GetContextData(UE_RDI);
+#else
+    r.cdi=GetContextData(UE_EDI);
+#endif // _WIN64
+#ifdef _WIN64
+    r.r8=GetContextData(UE_R8);
+#endif // _WIN64
+#ifdef _WIN64
+    r.r9=GetContextData(UE_R9);
+#endif // _WIN64
+#ifdef _WIN64
+    r.r10=GetContextData(UE_R10);
+#endif // _WIN64
+#ifdef _WIN64
+    r.r11=GetContextData(UE_R11);
+#endif // _WIN64
+#ifdef _WIN64
+    r.r12=GetContextData(UE_R12);
+#endif // _WIN64
+#ifdef _WIN64
+    r.r13=GetContextData(UE_R13);
+#endif // _WIN64
+#ifdef _WIN64
+    r.r14=GetContextData(UE_R14);
+#endif // _WIN64
+#ifdef _WIN64
+    r.r15=GetContextData(UE_R15);
+#endif // _WIN64
+    r.csp=GetContextData(UE_CSP);
+    r.cip=GetContextData(UE_CIP);
+    r.cflags=GetContextData(UE_CFLAGS);
+    r.gs=GetContextData(UE_SEG_GS);
+    r.fs=GetContextData(UE_SEG_GS);
+    r.es=GetContextData(UE_SEG_GS);
+    r.ds=GetContextData(UE_SEG_GS);
+    r.cs=GetContextData(UE_SEG_GS);
+    r.ss=GetContextData(UE_SEG_GS);
+    r.dr0=GetContextData(UE_DR0);
+    r.dr1=GetContextData(UE_DR0);
+    r.dr2=GetContextData(UE_DR0);
+    r.dr5=GetContextData(UE_DR0);
+    r.dr6=GetContextData(UE_DR0);
+    r.dr7=GetContextData(UE_DR0);
+    duint cflags=r.cflags;
+    r.flags.c=valflagfromstring(cflags, "cf");
+    r.flags.p=valflagfromstring(cflags, "pf");
+    r.flags.a=valflagfromstring(cflags, "af");
+    r.flags.z=valflagfromstring(cflags, "zf");
+    r.flags.s=valflagfromstring(cflags, "sf");
+    r.flags.t=valflagfromstring(cflags, "tf");
+    r.flags.i=valflagfromstring(cflags, "if");
+    r.flags.d=valflagfromstring(cflags, "df");
+    r.flags.o=valflagfromstring(cflags, "of");
+    memcpy(regdump, &r, sizeof(REGDUMP));
     return true;
 }

@@ -255,38 +255,38 @@ static bool isregister(const char* string)
     return false;
 }
 
-static int getflag(uint eflags, const char* string)
+int valflagfromstring(uint cflags, const char* string)
 {
     if(scmp(string, "cf"))
-        return (int)(eflags&0x1);
+        return (int)(cflags&0x1);
     if(scmp(string, "pf"))
-        return (int)(eflags&0x4);
+        return (int)(cflags&0x4);
     if(scmp(string, "af"))
-        return (int)(eflags&0x10);
+        return (int)(cflags&0x10);
     if(scmp(string, "zf"))
-        return (int)(eflags&0x40);
+        return (int)(cflags&0x40);
     if(scmp(string, "sf"))
-        return (int)(eflags&0x80);
+        return (int)(cflags&0x80);
     if(scmp(string, "tf"))
-        return (int)(eflags&0x100);
+        return (int)(cflags&0x100);
     if(scmp(string, "if"))
-        return (int)(eflags&0x200);
+        return (int)(cflags&0x200);
     if(scmp(string, "df"))
-        return (int)(eflags&0x400);
+        return (int)(cflags&0x400);
     if(scmp(string, "of"))
-        return (int)(eflags&0x800);
+        return (int)(cflags&0x800);
     if(scmp(string, "rf"))
-        return (int)(eflags&0x10000);
+        return (int)(cflags&0x10000);
     if(scmp(string, "vm"))
-        return (int)(eflags&0x20000);
+        return (int)(cflags&0x20000);
     if(scmp(string, "ac"))
-        return (int)(eflags&0x40000);
+        return (int)(cflags&0x40000);
     if(scmp(string, "vif"))
-        return (int)(eflags&0x80000);
+        return (int)(cflags&0x80000);
     if(scmp(string, "vip"))
-        return (int)(eflags&0x100000);
+        return (int)(cflags&0x100000);
     if(scmp(string, "id"))
-        return (int)(eflags&0x200000);
+        return (int)(cflags&0x200000);
     return 0;
 }
 
@@ -1168,7 +1168,7 @@ bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar
             return true;
         }
         uint eflags=GetContextData(UE_CFLAGS);
-        if(getflag(eflags, string+1))
+        if(valflagfromstring(eflags, string+1))
             *value=1;
         else
             *value=0;
