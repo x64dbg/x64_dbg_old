@@ -31,6 +31,7 @@ public:
     bool isValidExpression(const char* expression);
     void Free(void* ptr);
     bool getRegDumpFromDbg(REGDUMP* parRegDump);
+    uint_t getValFromString(const char* string);
     void emitAddMsgToLog(QString msg);
     void emitClearLog();
     void emitUpdateRegisters();

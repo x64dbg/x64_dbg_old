@@ -47,7 +47,8 @@ SOURCES += \
     Src/Gui/GotoDialog.cpp \
     Src/Disassembler/BeaHighlight.cpp \
     Src/BasicView/RegistersView.cpp \
-    Src/Gui/StatusLabel.cpp
+    Src/Gui/StatusLabel.cpp \
+    Src/BasicView/WordEditDialog.cpp
 
 
 HEADERS += \
@@ -72,7 +73,8 @@ HEADERS += \
     Src/Gui/GotoDialog.h \
     Src/Disassembler/BeaHighlight.h \
     Src/BasicView/RegistersView.h \
-    Src/Gui/StatusLabel.h
+    Src/Gui/StatusLabel.h \
+    Src/BasicView/WordEditDialog.h
 
 
 INCLUDEPATH += \
@@ -92,6 +94,7 @@ FORMS += \
     Src/Dummy.ui \
     Src/Gui/CPUWidget.ui \
     Src/Gui/GotoDialog.ui \
+    Src/BasicView/WordEditDialog.ui
 
 
 #INCLUDEPATH += $$PWD/Src/BeaEngine_s_64

@@ -42,7 +42,7 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mRegList->append(ui->SIRegLabel);
     mRegNamesList->append(CSI);
     mRegList->append(ui->SPRegLabel);
-    mRegNamesList->append(CSI);
+    mRegNamesList->append(CSP);
 
 #ifdef _WIN64
     mRegList->append(ui->R8RegLabel);
@@ -289,7 +289,12 @@ void RegistersView::displayCustomContextMenuSlot(QPoint pos)
 
             if(wAction == wEdit)
             {
-                 QMessageBox::information(this, "Todo", "This dialog will be done later");
+                 WordEditDialog wEditDial;
+                 if(QDialog::Accepted == wEditDial.exec())
+                 {
+
+                 }
+
             }
             else if(wAction == wSetTo0)
             {

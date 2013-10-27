@@ -116,6 +116,11 @@ bool Bridge::getRegDumpFromDbg(REGDUMP* parRegDump)
     return DbgGetRegDump(parRegDump);
 }
 
+uint_t Bridge::getValFromString(const char* string)
+{
+    return DbgValFromString(string);
+}
+
 
 /************************************************************************************
                             Static Functions

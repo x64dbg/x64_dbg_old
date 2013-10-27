@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include "Bridge.h"
+#include "WordEditDialog.h"
 
 namespace Ui {
 class RegistersView;
