@@ -62,12 +62,12 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mRegList->append(ui->CSRegLabel);
     mRegList->append(ui->SSRegLabel);
 
-    mRegList->append(ui->DR2RegLabel);
     mRegList->append(ui->DR0RegLabel);
-    mRegList->append(ui->DR7RegLabel);
     mRegList->append(ui->DR1RegLabel);
-    mRegList->append(ui->DR6RegLabel);
+    mRegList->append(ui->DR2RegLabel);
     mRegList->append(ui->DR5RegLabel);
+    mRegList->append(ui->DR6RegLabel);
+    mRegList->append(ui->DR7RegLabel);
 
 
     for(wI = 0; wI < mRegList->size(); wI++)
@@ -158,51 +158,49 @@ void RegistersView::updateRegistersSlot()
     Bridge::getBridge()->getRegDumpFromDbg(&wRegDumpStruct);
 
     ui->AXRegLabel->setText(QString("%1").arg(wRegDumpStruct.cax, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
-    /*
-    ui->CXRegLabel
-    ui->DXRegLabel
-    ui->BXRegLabel
-    ui->DIRegLabel
-    ui->BPRegLabel
-    ui->SIRegLabel
-    ui->SPRegLabel
+    ui->CXRegLabel->setText(QString("%1").arg(wRegDumpStruct.ccx, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->DXRegLabel->setText(QString("%1").arg(wRegDumpStruct.cdx, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->BXRegLabel->setText(QString("%1").arg(wRegDumpStruct.cbx, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->DIRegLabel->setText(QString("%1").arg(wRegDumpStruct.cdi, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->BPRegLabel->setText(QString("%1").arg(wRegDumpStruct.cbp, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->SIRegLabel->setText(QString("%1").arg(wRegDumpStruct.csi, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->SPRegLabel->setText(QString("%1").arg(wRegDumpStruct.csp, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
 
 #ifdef _WIN64
-    ui->R8RegLabel
-    ui->R9RegLabel
-    ui->R10RegLabel
-    ui->R11RegLabel
-    ui->R12RegLabel
-    ui->R13RegLabel
-    ui->R14RegLabel
-    ui->R15RegLabel
+    ui->R8RegLabel->setText(QString("%1").arg(wRegDumpStruct.r8, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->R9RegLabel->setText(QString("%1").arg(wRegDumpStruct.r9, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->R10RegLabel->setText(QString("%1").arg(wRegDumpStruct.r10, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->R11RegLabel->setText(QString("%1").arg(wRegDumpStruct.r11, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->R12RegLabel->setText(QString("%1").arg(wRegDumpStruct.r12, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->R13RegLabel->setText(QString("%1").arg(wRegDumpStruct.r13, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->R14RegLabel->setText(QString("%1").arg(wRegDumpStruct.r14, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->R15RegLabel->setText(QString("%1").arg(wRegDumpStruct.r15, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
 #endif
 
-    ui->IPRegLabel
+    ui->IPRegLabel->setText(QString("%1").arg(wRegDumpStruct.cip, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
 
-    ui->FLAGSRegLabel
-    ui->CFRegLabel
-    ui->PFRegLabel
-    ui->AFRegLabel
-    ui->ZFRegLabel
-    ui->SFRegLabel
-    ui->TFRegLabel
-    ui->IFRegLabel
-    ui->DFRegLabel
-    ui->OFRegLabel
+    ui->FLAGSRegLabel->setText(QString("%1").arg(wRegDumpStruct.cflags, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->CFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.c, 1, 16, QChar('0')).toUpper());
+    ui->PFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.p, 1, 16, QChar('0')).toUpper());
+    ui->AFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.a, 1, 16, QChar('0')).toUpper());
+    ui->ZFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.z, 1, 16, QChar('0')).toUpper());
+    ui->SFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.s, 1, 16, QChar('0')).toUpper());
+    ui->TFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.t, 1, 16, QChar('0')).toUpper());
+    ui->IFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.i, 1, 16, QChar('0')).toUpper());
+    ui->DFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.d, 1, 16, QChar('0')).toUpper());
+    ui->OFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.o, 1, 16, QChar('0')).toUpper());
 
-    ui->GSRegLabel
-    ui->FSRegLabel
-    ui->ESRegLabel
-    ui->DSRegLabel
-    ui->CSRegLabel
-    ui->SSRegLabel
+    ui->GSRegLabel->setText(QString("%1").arg(wRegDumpStruct.gs, 4, 16, QChar('0')).toUpper());
+    ui->FSRegLabel->setText(QString("%1").arg(wRegDumpStruct.fs, 4, 16, QChar('0')).toUpper());
+    ui->ESRegLabel->setText(QString("%1").arg(wRegDumpStruct.es, 4, QChar('0')).toUpper());
+    ui->DSRegLabel->setText(QString("%1").arg(wRegDumpStruct.ds, 4, QChar('0')).toUpper());
+    ui->CSRegLabel->setText(QString("%1").arg(wRegDumpStruct.cs, 4, QChar('0')).toUpper());
+    ui->SSRegLabel->setText(QString("%1").arg(wRegDumpStruct.ss, 4, 16, QChar('0')).toUpper());
 
-    ui->DR2RegLabel
-    ui->DR0RegLabel
-    ui->DR7RegLabel
-    ui->DR1RegLabel
-    ui->DR6RegLabel
-    ui->DR5RegLabel
-    */
+    ui->DR0RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr0, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->DR1RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr1, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->DR2RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr2, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->DR5RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr5, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->DR6RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr6, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->DR7RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr7, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
 }
