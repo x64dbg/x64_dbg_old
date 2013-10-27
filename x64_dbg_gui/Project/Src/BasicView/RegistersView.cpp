@@ -24,7 +24,7 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
 
     mSelected = -1;
 
-    mRegList = new QList<QWidget*>();
+    mRegList = new QList<QLabel*>();
     mRegNamesList = new QList<REGISTER_NAME>();
 
     mRegList->append(ui->AXRegLabel);
@@ -290,6 +290,14 @@ void RegistersView::displayCustomContextMenuSlot(QPoint pos)
             if(wAction == wEdit)
             {
                  WordEditDialog wEditDial;
+                 QString wReg = mRegList->at(mSelected)->text();
+
+                #ifdef _WIN64
+                    wEditDial.setup(QString("Edit"), wReg.toULongLong(0, 16), 8);
+                #else
+                    wEditDial.setup(QString("Edit"), wReg.toULong(0, 16), 4);
+                #endif
+
                  if(QDialog::Accepted == wEditDial.exec())
                  {
 

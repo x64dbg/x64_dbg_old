@@ -4,20 +4,13 @@
 WordEditDialog::WordEditDialog(QWidget *parent) : QDialog(parent), ui(new Ui::WordEditDialog)
 {
     ui->setupUi(this);
+
     setModal(true);
+    setWindowFlags(Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint);
 
     mWord = 0;
 
-#ifdef _WIN64
-    ui->hexLineEdit->setInputMask("hh hh hh hh hh hh hh hh");
-#else
-    ui->hexLineEdit->setInputMask("hh hh hh hh");
-#endif
-
     connect(ui->expressionLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(expressionChanged(QString)));
-    connect(ui->hexLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(hexaChanged(QString)));
-    connect(ui->signedLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(signedChanged(QString)));
-    connect(ui->unsignedLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(unsignedChanged(QString)));
 }
 
 WordEditDialog::~WordEditDialog()
@@ -45,17 +38,15 @@ void WordEditDialog::expressionChanged(QString s)
     }
 }
 
-void WordEditDialog::hexaChanged(QString s)
+
+
+void WordEditDialog::setup(QString title, uint_t defVal, int byteCount)
 {
+    this->setWindowTitle(title);
+    ui->expressionLineEdit->setText(QString("%1").arg(defVal, byteCount * 2, 16, QChar('0')).toUpper());
+    ui->hexLineEdit->setText(QString("%1").arg(defVal, byteCount * 2, 16, QChar('0')).toUpper());
+    ui->signedLineEdit->setText(QString::number((int_t)defVal));
+    ui->unsignedLineEdit->setText(QString::number((uint_t)defVal));
 
-}
-
-void WordEditDialog::signedChanged(QString s)
-{
-
-}
-
-void WordEditDialog::unsignedChanged(QString s)
-{
-
+    ui->hexLineEdit->setInputMask(QString("hh ").repeated(byteCount));
 }

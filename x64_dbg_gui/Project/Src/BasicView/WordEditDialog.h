@@ -15,12 +15,10 @@ class WordEditDialog : public QDialog
 public:
     explicit WordEditDialog(QWidget *parent = 0);
     ~WordEditDialog();
+    void setup(QString title, uint_t defVal, int byteCount);
 
 public slots:
     void expressionChanged(QString s);
-    void hexaChanged(QString s);
-    void signedChanged(QString s);
-    void unsignedChanged(QString s);
     
 private:
     Ui::WordEditDialog *ui;

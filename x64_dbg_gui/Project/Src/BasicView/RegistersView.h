@@ -73,7 +73,7 @@ public slots:
     
 private:
     Ui::RegistersView *ui;
-    QList<QWidget*>* mRegList;
+    QList<QLabel*>* mRegList;
     QList<REGISTER_NAME>* mRegNamesList;
     int mSelected;
 };

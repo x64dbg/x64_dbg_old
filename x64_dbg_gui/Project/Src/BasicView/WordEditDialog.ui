@@ -29,7 +29,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Edit</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../resource.qrc">
+    <normaloff>:/icons/images/ui-combo-box-edit.png</normaloff>:/icons/images/ui-combo-box-edit.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttons">
    <property name="geometry">
@@ -258,7 +262,9 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../resource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttons</sender>
