@@ -105,6 +105,11 @@ bool Bridge::isValidExpression(const char* expression)
     return DbgIsValidExpression(expression);
 }
 
+bool Bridge::valToString(const char* name, uint_t value)
+{
+    return DbgValToString(name, value);
+}
+
 void Bridge::Free(void* ptr)
 {
     BridgeFree(ptr);

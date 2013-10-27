@@ -805,9 +805,8 @@ void Disassembly::disassambleAt(uint_t parVA, uint_t parCIP)
 
 void Disassembly::disassembleClear()
 {
-    //TODO: fix this
+    //TODO: fix this (also try restarting)
     setRowCount(0);
-    setNbrOfLineToPrint(0);
     refresh();
 }
 

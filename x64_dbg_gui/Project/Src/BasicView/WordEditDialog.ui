@@ -137,6 +137,9 @@
     </item>
     <item>
      <widget class="QLineEdit" name="signedLineEdit">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -191,6 +194,9 @@
     </item>
     <item>
      <widget class="QLineEdit" name="unsignedLineEdit">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="minimumSize">
        <size>
         <width>140</width>
@@ -239,6 +245,9 @@
     </item>
     <item>
      <widget class="QLineEdit" name="hexLineEdit">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
         <horstretch>0</horstretch>

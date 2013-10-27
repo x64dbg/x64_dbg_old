@@ -114,17 +114,16 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mRegList->append(ui->DR7RegLabel);
     mRegNamesList->append(DR7);
 
-
     for(wI = 0; wI < mRegList->size(); wI++)
     {
-        QFont wFont(mRegList->at(wI)->font());
+        QLabel* curLabel=mRegList->at(wI);
+        QFont wFont(curLabel->font());
+        wFont.setFamily("Monospace");
         wFont.setFixedPitch(true);
-
-        mRegList->at(wI)->setAutoFillBackground(true);
-
-        mRegList->at(wI)->setFont(wFont);
+        curLabel->setAutoFillBackground(true);
+        curLabel->setFont(wFont);
+        curLabel->setFixedWidth(QFontMetrics(wFont).width(curLabel->text())+1);
     }
-
 
     connect(Bridge::getBridge(), SIGNAL(updateRegisters()), this, SLOT(updateRegistersSlot()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayCustomContextMenuSlot(QPoint)));
@@ -140,6 +139,12 @@ void RegistersView::mousePressEvent(QMouseEvent* event)
     int wI = 0;
     int wSelected = -1;
     QPalette wPalette;
+
+    if(!DbgIsDebugging()) //disable register editing when not debugging
+    {
+        wSelected = -1;
+        return;
+    }
 
 
     for(wI = 0; wI < mRegList->size(); wI++)
@@ -174,25 +179,45 @@ void RegistersView::mousePressEvent(QMouseEvent* event)
 
 void RegistersView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    int wI = 0;
-    int wSelected = -1;
-    QPalette wPalette;
-
-    for(wI = 0; wI < mRegList->size(); wI++)
-    {
-        if(mRegList->at(wI)->geometry().contains(event->pos()))
-        {
-            wSelected = wI;
-        }
-    }
-    if(wSelected == -1) //no register selection
+    if(mSelected==-1) //no selection
         return;
 
-    //double click test code, toggle enabled
-    if(mRegList->at(wSelected)->isEnabled())
-        mRegList->at(wSelected)->setEnabled(false);
-    else
-        mRegList->at(wSelected)->setEnabled(true);
+    if(     mRegNamesList->at(mSelected) == CAX ||
+            mRegNamesList->at(mSelected) == CCX ||
+            mRegNamesList->at(mSelected) == CDX ||
+            mRegNamesList->at(mSelected) == CBX ||
+            mRegNamesList->at(mSelected) == CDI ||
+            mRegNamesList->at(mSelected) == CBP ||
+            mRegNamesList->at(mSelected) == CSI ||
+            mRegNamesList->at(mSelected) == CSP ||
+
+            mRegNamesList->at(mSelected) == R8 ||
+            mRegNamesList->at(mSelected) == R9 ||
+            mRegNamesList->at(mSelected) == R10 ||
+            mRegNamesList->at(mSelected) == R11 ||
+            mRegNamesList->at(mSelected) == R12 ||
+            mRegNamesList->at(mSelected) == R13 ||
+            mRegNamesList->at(mSelected) == R14 ||
+            mRegNamesList->at(mSelected) == R15 ||
+
+            mRegNamesList->at(mSelected) == CIP ||
+
+            mRegNamesList->at(mSelected) == CFLAGS)
+    { //double clicked general register
+        displayEditDialog();
+    }
+    else if(mRegNamesList->at(mSelected) == CF ||
+            mRegNamesList->at(mSelected) == PF ||
+            mRegNamesList->at(mSelected) == AF ||
+            mRegNamesList->at(mSelected) == ZF ||
+            mRegNamesList->at(mSelected) == SF ||
+            mRegNamesList->at(mSelected) == TF ||
+            mRegNamesList->at(mSelected) == IF ||
+            mRegNamesList->at(mSelected) == DF ||
+            mRegNamesList->at(mSelected) == OF)
+    { //double clicked a flag
+        setRegister(mRegNamesList->at(mSelected), mRegList->at(mSelected)->text().toInt()^1); //toggle flag (stupid way in fact)
+    }
 }
 
 
@@ -252,7 +277,20 @@ void RegistersView::updateRegistersSlot()
 }
 
 
+void RegistersView::displayEditDialog()
+{
+    WordEditDialog wEditDial;
+    QString wReg = mRegList->at(mSelected)->text();
 
+#ifdef _WIN64
+    wEditDial.setup(QString("Edit"), wReg.toULongLong(0, 16), 8);
+#else
+    wEditDial.setup(QString("Edit"), wReg.toULong(0, 16), 4);
+#endif
+
+    if(wEditDial.exec() == QDialog::Accepted) //OK button clicked
+        setRegister(mRegNamesList->at(mSelected), wEditDial.getVal());
+}
 
 void RegistersView::displayCustomContextMenuSlot(QPoint pos)
 {
@@ -289,20 +327,7 @@ void RegistersView::displayCustomContextMenuSlot(QPoint pos)
 
             if(wAction == wEdit)
             {
-                 WordEditDialog wEditDial;
-                 QString wReg = mRegList->at(mSelected)->text();
-
-                #ifdef _WIN64
-                    wEditDial.setup(QString("Edit"), wReg.toULongLong(0, 16), 8);
-                #else
-                    wEditDial.setup(QString("Edit"), wReg.toULong(0, 16), 4);
-                #endif
-
-                 if(QDialog::Accepted == wEditDial.exec())
-                 {
-                    setRegister(mRegNamesList->at(mSelected), wEditDial.getVal());
-                 }
-
+                displayEditDialog();
             }
             else if(wAction == wSetTo0)
             {
@@ -341,167 +366,165 @@ void RegistersView::displayCustomContextMenuSlot(QPoint pos)
 
 void RegistersView::setRegister(REGISTER_NAME reg, uint_t value)
 {
-    QString wCmd = "";
+    QString wRegName = "";
 
     // Basic registers
     if(reg == CAX)
     {
-        #ifdef _WIN64
-            wCmd += "rax=";
-        #else
-            wCmd += "eax=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rax";
+#else
+        wRegName = "eax";
+#endif
     }
     else if(reg == CCX)
     {
-        #ifdef _WIN64
-            wCmd += "rcx=";
-        #else
-            wCmd += "ecx=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rcx";
+#else
+        wRegName = "ecx";
+#endif
     }
     else if(reg == CDX)
     {
-        #ifdef _WIN64
-            wCmd += "rdx=";
-        #else
-            wCmd += "edx=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rdx";
+#else
+        wRegName = "edx";
+#endif
     }
     else if(reg == CBX)
     {
-        #ifdef _WIN64
-            wCmd += "rbx=";
-        #else
-            wCmd += "ebx=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rbx";
+#else
+        wRegName = "ebx";
+#endif
     }
     else if(reg == CDI)
     {
-        #ifdef _WIN64
-            wCmd += "rdi=";
-        #else
-            wCmd += "edi=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rdi";
+#else
+        wRegName = "edi";
+#endif
     }
     else if(reg == CBP)
     {
-        #ifdef _WIN64
-            wCmd += "rbp=";
-        #else
-            wCmd += "ebp=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rbp";
+#else
+        wRegName = "ebp";
+#endif
     }
     else if(reg == CSI)
     {
-        #ifdef _WIN64
-            wCmd += "rsi=";
-        #else
-            wCmd += "esi=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rsi";
+#else
+        wRegName = "esi";
+#endif
     }
     else if(reg == CSP)
     {
-        #ifdef _WIN64
-            wCmd += "rsp=";
-        #else
-            wCmd += "esp=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rsp";
+#else
+        wRegName = "esp";
+#endif
     }
 
     // General purpose register
     else if(reg == R8)
     {
-        wCmd += "r8=";
+        wRegName = "r8";
     }
     else if(reg == R9)
     {
-        wCmd += "r9=";
+        wRegName = "r9";
     }
     else if(reg == R10)
     {
-        wCmd += "r10=";
+        wRegName = "r10";
     }
     else if(reg == R11)
     {
-        wCmd += "r11=";
+        wRegName = "r11";
     }
     else if(reg == R12)
     {
-        wCmd += "r12=";
+        wRegName = "r12";
     }
     else if(reg == R13)
     {
-        wCmd += "r13=";
+        wRegName = "r13";
     }
     else if(reg == R14)
     {
-        wCmd += "r14=";
+        wRegName = "r14";
     }
     else if(reg == R15)
     {
-        wCmd += "r15=";
+        wRegName = "r15";
     }
 
     // Instruction pointer register
     else if(reg == CIP)
     {
-        #ifdef _WIN64
-            wCmd += "rip=";
-        #else
-            wCmd += "eip=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rip";
+#else
+        wRegName = "eip";
+#endif
     }
 
     // Flags
     else if(reg == CFLAGS)
     {
-        #ifdef _WIN64
-            wCmd += "rflags=";
-        #else
-            wCmd += "eflags=";
-        #endif
+#ifdef _WIN64
+        wRegName = "rflags";
+#else
+        wRegName = "eflags";
+#endif
     }
     else if(reg == CF)
     {
-        wCmd += "!cf=";
+        wRegName = "!cf";
     }
     else if(reg == PF)
     {
-        wCmd += "!pf=";
+        wRegName = "!pf";
     }
     else if(reg == AF)
     {
-        wCmd += "!af=";
+        wRegName = "!af";
     }
     else if(reg == ZF)
     {
-        wCmd += "!zf=";
+        wRegName = "!zf";
     }
     else if(reg == SF)
     {
-        wCmd += "!sf=";
+        wRegName = "!sf";
     }
     else if(reg == TF)
     {
-        wCmd += "!tf=";
+        wRegName = "!tf";
     }
     else if(reg == IF)
     {
-        wCmd += "!if=";
+        wRegName = "!if";
     }
     else if(reg == DF)
     {
-        wCmd += "!df=";
+        wRegName = "!df";
     }
     else if(reg == OF)
     {
-        wCmd += "!of=";
+        wRegName = "!of";
     }
+    else
+        return;
 
-    if(wCmd.isEmpty() == false)
-    {
-        wCmd += QString::number(value, 16);
-        Bridge::getBridge()->execCmd(reinterpret_cast<const char*>(wCmd.toAscii().data()));
-    }
+    Bridge::getBridge()->valToString(wRegName.toUtf8().constData(), value);
 }

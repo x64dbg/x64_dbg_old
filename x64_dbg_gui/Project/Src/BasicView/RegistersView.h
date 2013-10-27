@@ -72,6 +72,7 @@ public slots:
     void setRegister(REGISTER_NAME reg, uint_t value);
     
 private:
+    void displayEditDialog();
     Ui::RegistersView *ui;
     QList<QLabel*>* mRegList;
     QList<REGISTER_NAME>* mRegNamesList;

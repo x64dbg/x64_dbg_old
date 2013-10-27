@@ -57,6 +57,7 @@ typedef bool (*DBGADDRINFOGET)(duint addr, SEGMENTREG segment, ADDRINFO* addrinf
 typedef bool (*DBGADDRINFOSET)(duint addr, ADDRINFO* addrinfo);
 typedef BPXTYPE (*DBGBPGETTYPEAT)(duint addr);
 typedef bool (*DBGGETREGDUMP)(REGDUMP* regdump);
+typedef bool (*DBGVALTOSTRING)(const char* string, duint* value);
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;
@@ -72,5 +73,6 @@ extern DBGADDRINFOGET _dbg_addrinfoget;
 extern DBGADDRINFOSET _dbg_addrinfoset;
 extern DBGBPGETTYPEAT _dbg_bpgettypeat;
 extern DBGGETREGDUMP _dbg_getregdump;
+extern DBGVALTOSTRING _dbg_valtostring;
 
 #endif // _GLOBAL_H

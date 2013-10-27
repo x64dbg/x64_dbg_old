@@ -1086,7 +1086,6 @@ CMDRESULT cbDebugPause(const char* cmd)
 
 CMDRESULT cbMemWrite(const char* cmd)
 {
-    dbg("cbMemWrite");
     char arg1[deflen]="";
     if(!argget(cmd, arg1, 0, false))
         return STATUS_ERROR;

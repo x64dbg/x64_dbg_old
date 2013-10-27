@@ -233,3 +233,8 @@ extern "C" DLL_EXPORT bool _dbg_getregdump(REGDUMP* regdump)
     memcpy(regdump, &r, sizeof(REGDUMP));
     return true;
 }
+
+extern "C" DLL_EXPORT bool _dbg_valtostring(const char* string, duint* value)
+{
+    return valtostring(string, value, true);
+}

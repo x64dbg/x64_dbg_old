@@ -32,6 +32,7 @@ public:
     void Free(void* ptr);
     bool getRegDumpFromDbg(REGDUMP* parRegDump);
     uint_t getValFromString(const char* string);
+    bool valToString(const char* name, uint_t value);
     void emitAddMsgToLog(QString msg);
     void emitClearLog();
     void emitUpdateRegisters();

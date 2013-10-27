@@ -257,7 +257,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="CXRegLabel">
@@ -270,7 +270,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="DXRegLabel">
@@ -283,7 +283,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="BXRegLabel">
@@ -296,7 +296,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="DIRegLabel">
@@ -309,7 +309,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="BPRegLabel">
@@ -322,7 +322,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="SIRegLabel">
@@ -335,7 +335,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="SPRegLabel">
@@ -348,7 +348,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="R9RegLabel">
@@ -361,7 +361,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="FLAGSRegLabel">
@@ -374,7 +374,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="R8RegLabel">
@@ -387,7 +387,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="R10RegLabel">
@@ -400,7 +400,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="IPRegLabel">
@@ -413,7 +413,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="R12RegLabel">
@@ -426,7 +426,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="R13RegLabel">
@@ -439,7 +439,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="R11RegLabel">
@@ -452,7 +452,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="R14RegLabel">
@@ -465,7 +465,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="R15RegLabel">
@@ -478,7 +478,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="GSRegLabel">
@@ -647,7 +647,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="DR0RegLabel">
@@ -660,7 +660,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="DR1Label">
@@ -699,7 +699,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="DR1RegLabel">
@@ -712,7 +712,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="DR2Label">
@@ -764,7 +764,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="DR7Label">
@@ -790,7 +790,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>00000000'00000000</string>
+    <string>0000000000000000</string>
    </property>
   </widget>
   <widget class="QLabel" name="CFLabel">

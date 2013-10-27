@@ -100,6 +100,10 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_getregdump=(DBGGETREGDUMP)GetProcAddress(hInstDbg, "_dbg_getregdump");
     if(!_dbg_getregdump)
         return "Export \"_dbg_getregdump\" could not be found!";
+    //_dbg_valtostring
+    _dbg_valtostring=(DBGVALTOSTRING)GetProcAddress(hInstDbg, "_dbg_valtostring");
+    if(!_dbg_valtostring)
+        return "Export \"_dbg_valtostring\" could not be found!";
     return 0;
 }
 
@@ -182,7 +186,7 @@ bool DLL_IMPEXP DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text) //(mod
     if(!text)
         return false;
     //test code (highlighting.exe)
-    if(addr==0x401020 or addr==0x401022)
+    /*if(addr==0x401020 or addr==0x401022)
     {
         strcpy(text, "highligh.label");
         return true;
@@ -191,7 +195,7 @@ bool DLL_IMPEXP DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text) //(mod
     {
         strcpy(text, "highligh.dataLabel");
         return true;
-    }
+    }*/
     ADDRINFO info;
     memset(&info, 0, sizeof(info));
     info.flags=module|label;
@@ -226,11 +230,11 @@ bool DLL_IMPEXP DbgGetCommentAt(duint addr, char* text) //comment (not live)
     if(!text)
         return false;
     //test code (highlighting.exe)
-    if(addr==0x401000)
+    /*if(addr==0x401000)
     {
         strcpy(text, "test comment");
         return true;
-    }
+    }*/
     ADDRINFO info;
     memset(&info, 0, sizeof(info));
     info.flags=comment;
@@ -268,6 +272,12 @@ duint DLL_IMPEXP DbgValFromString(const char* string)
 bool DLL_IMPEXP DbgGetRegDump(REGDUMP* regdump)
 {
     return _dbg_getregdump(regdump);
+}
+
+bool DLL_IMPEXP DbgValToString(const char* string, duint value)
+{
+    duint valueCopy=value;
+    return _dbg_valtostring(string, &valueCopy);
 }
 
 //GUI

@@ -157,8 +157,6 @@ void MainWindow::displayAboutWidget()
 void MainWindow::on_actionGoto_triggered()
 {
     GotoDialog mGoto;
-    mGoto.setModal(true); //modal window
-    mGoto.setParent(this, Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint);
     if(mGoto.exec()==QDialog::Accepted)
     {
         QString cmd;

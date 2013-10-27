@@ -7,14 +7,16 @@ GotoDialog::GotoDialog(QWidget *parent) :
 {
     //setup UI first
     ui->setupUi(this);
-    this->setFixedSize(this->size()); //fixed size
+    setWindowFlags(Qt::MSWindowsFixedSizeDialogHint);
+    setFixedSize(this->size()); //fixed size
+    setModal(true); //modal window
     //initialize stuff
     if(!DbgIsDebugging()) //not debugging
         ui->labelError->setText("<font color='red'><b>Not debugging...</b></color>");
     else
         ui->labelError->setText("<font color='red'><b>Invalid expression...</b></color>");
     ui->buttonOk->setEnabled(false);
-    this->setFocus();
+    ui->editExpression->setFocus();
 }
 
 GotoDialog::~GotoDialog()
