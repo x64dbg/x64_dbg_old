@@ -30,14 +30,17 @@ public:
     bool getMemMapFromDbg(MEMMAP* parMemMap);
     bool isValidExpression(const char* expression);
     void Free(void* ptr);
+    bool getRegDumpFromDbg(REGDUMP* parRegDump);
     void emitAddMsgToLog(QString msg);
     void emitClearLog();
+    void emitUpdateRegisters();
     
 signals:
     void disassembleAt(uint_t va, uint_t eip);
     void dbgStateChanged(DBGSTATE state);
     void addMsgToLog(QString msg);
     void clearLog();
+    void updateRegisters();
     
 public slots:
 

@@ -79,6 +79,9 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
 
         mRegList->at(wI)->setFont(wFont);
     }
+
+
+    connect(Bridge::getBridge(), SIGNAL(updateRegisters()), this, SLOT(updateRegistersSlot()));
 }
 
 RegistersView::~RegistersView()
@@ -121,6 +124,8 @@ void RegistersView::mousePressEvent(QMouseEvent* event)
     }
 }
 
+
+
 void RegistersView::mouseDoubleClickEvent(QMouseEvent* event)
 {
     int wI = 0;
@@ -142,4 +147,62 @@ void RegistersView::mouseDoubleClickEvent(QMouseEvent* event)
         mRegList->at(wSelected)->setEnabled(false);
     else
         mRegList->at(wSelected)->setEnabled(true);
+}
+
+
+void RegistersView::updateRegistersSlot()
+{
+    REGDUMP wRegDumpStruct;
+    memset(&wRegDumpStruct, 0, sizeof(REGDUMP));
+
+    Bridge::getBridge()->getRegDumpFromDbg(&wRegDumpStruct);
+
+    ui->AXRegLabel->setText(QString("%1").arg(wRegDumpStruct.cax, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    /*
+    ui->CXRegLabel
+    ui->DXRegLabel
+    ui->BXRegLabel
+    ui->DIRegLabel
+    ui->BPRegLabel
+    ui->SIRegLabel
+    ui->SPRegLabel
+
+#ifdef _WIN64
+    ui->R8RegLabel
+    ui->R9RegLabel
+    ui->R10RegLabel
+    ui->R11RegLabel
+    ui->R12RegLabel
+    ui->R13RegLabel
+    ui->R14RegLabel
+    ui->R15RegLabel
+#endif
+
+    ui->IPRegLabel
+
+    ui->FLAGSRegLabel
+    ui->CFRegLabel
+    ui->PFRegLabel
+    ui->AFRegLabel
+    ui->ZFRegLabel
+    ui->SFRegLabel
+    ui->TFRegLabel
+    ui->IFRegLabel
+    ui->DFRegLabel
+    ui->OFRegLabel
+
+    ui->GSRegLabel
+    ui->FSRegLabel
+    ui->ESRegLabel
+    ui->DSRegLabel
+    ui->CSRegLabel
+    ui->SSRegLabel
+
+    ui->DR2RegLabel
+    ui->DR0RegLabel
+    ui->DR7RegLabel
+    ui->DR1RegLabel
+    ui->DR6RegLabel
+    ui->DR5RegLabel
+    */
 }

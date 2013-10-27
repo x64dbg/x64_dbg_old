@@ -84,6 +84,10 @@ void Bridge::emitClearLog()
     emit clearLog();
 }
 
+void Bridge::emitUpdateRegisters()
+{
+    emit updateRegisters();
+}
 
 
 bool Bridge::execCmd(const char* cmd)
@@ -106,6 +110,11 @@ void Bridge::Free(void* ptr)
     BridgeFree(ptr);
 }
 
+
+bool Bridge::getRegDumpFromDbg(REGDUMP* parRegDump)
+{
+    return DbgGetRegDump(parRegDump);
+}
 
 
 /************************************************************************************
@@ -159,6 +168,11 @@ void Bridge::initBridge()
     __declspec(dllexport) void _gui_logclear()
     {
         Bridge::getBridge()->emitClearLog();
+    }
+
+    __declspec(dllexport) void _gui_updateregisters()
+    {
+        Bridge::getBridge()->emitUpdateRegisters();
     }
 #endif
 

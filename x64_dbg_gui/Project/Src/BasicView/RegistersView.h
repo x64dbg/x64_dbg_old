@@ -2,6 +2,7 @@
 #define REGISTERSVIEW_H
 
 #include <QtGui>
+#include "Bridge.h"
 
 namespace Ui {
 class RegistersView;
@@ -16,6 +17,9 @@ public:
     ~RegistersView();
     void mousePressEvent(QMouseEvent* event);
     void mouseDoubleClickEvent(QMouseEvent* event);
+
+public slots:
+    void updateRegistersSlot();
     
 private:
     Ui::RegistersView *ui;
