@@ -23,7 +23,10 @@ CMDRESULT cbBadCmd(const char* cmd)
         {
             if(value>15 and !hexonly)
             {
-                sprintf(format_str, "%%s=%%.%d"fext"X (%%"fext"ud)\n", valsize);
+                if(!valuesignedcalc()) //signed numbers
+                    sprintf(format_str, "%%s=%%.%d"fext"X (%%"fext"ud)\n", valsize);
+                else
+                    sprintf(format_str, "%%s=%%.%d"fext"X (%%"fext"d)\n", valsize);
                 dprintf(format_str, cmd, value, value);
             }
             else
@@ -36,6 +39,10 @@ CMDRESULT cbBadCmd(const char* cmd)
         {
             if(value>15 and !hexonly)
             {
+                if(!valuesignedcalc()) //signed numbers
+                    sprintf(format_str, "%%s=%%.%d"fext"X (%%"fext"ud)\n", valsize);
+                else
+                    sprintf(format_str, "%%s=%%.%d"fext"X (%%"fext"d)\n", valsize);
                 sprintf(format_str, "%%.%d"fext"X (%%"fext"ud)\n", valsize);
                 dprintf(format_str, value, value);
             }

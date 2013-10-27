@@ -1042,9 +1042,16 @@ static bool isdecnumber(const char* string)
 {
     if(*string!='.' or !string[1]) //dec indicator/no number
         return false;
-    int len=strlen(string+1);
+    int decAdd=1;
+    if(string[1]=='-') //minus
+    {
+        if(!string[2]) //no number
+            return false;
+        decAdd++;
+    }
+    int len=strlen(string+decAdd);
     for(int i=0; i<len; i++)
-        if(!isdigit(string[i+1]))
+        if(!isdigit(string[i+decAdd]))
             return false;
     return true;
 }
@@ -1068,8 +1075,27 @@ static bool ishexnumber(const char* string)
 
 bool valfromstring(const char* string, uint* value, int* value_size, bool* isvar, bool silent, bool* hexonly)
 {
+    dbg("valfromstring");
     if(!value)
         return false;
+    else if(*string=='.' and string[1]=='-' and string[2]) //negative decimal number
+    {
+        uint finalMul=1;
+        if(value_size)
+            *value_size=0;
+        if(isvar)
+            *isvar=false;
+        int decAdd=1;
+        if(string[1]=='-') //negative number
+        {
+            decAdd++;
+            finalMul=~0;
+        }
+        uint newValue=0;
+        sscanf(string+decAdd, "%"fext"u", &newValue);
+        *value=newValue*finalMul;
+        return true;
+    }
     else if(!*string)
     {
         *value=0;
