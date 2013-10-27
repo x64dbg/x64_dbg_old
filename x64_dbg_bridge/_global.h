@@ -54,6 +54,7 @@ typedef bool (*DBGISJUMPGOINGTOEXECUTE)(duint addr);
 typedef bool (*DBGADDRINFOGET)(duint addr, SEGMENTREG segment, ADDRINFO* addrinfo);
 typedef bool (*DBGADDRINFOSET)(duint addr, ADDRINFO* addrinfo);
 typedef BPXTYPE (*DBGBPGETTYPEAT)(duint addr);
+typedef bool (*DBGGETREGDUMP)(REGDUMP* regdump);
 
 //DBG functions
 extern DBGDBGINIT _dbg_dbginit;
@@ -68,5 +69,6 @@ extern DBGISJUMPGOINGTOEXECUTE _dbg_isjumpgoingtoexecute;
 extern DBGADDRINFOGET _dbg_addrinfoget;
 extern DBGADDRINFOSET _dbg_addrinfoset;
 extern DBGBPGETTYPEAT _dbg_bpgettypeat;
+extern DBGGETREGDUMP _dbg_getregdump;
 
 #endif // _GLOBAL_H

@@ -19,7 +19,7 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mSelected = -1;
 
     mRegList = new QList<QWidget*>();
-#ifdef _WIN64
+
     mRegList->append(ui->AXRegLabel);
     mRegList->append(ui->CXRegLabel);
     mRegList->append(ui->DXRegLabel);
@@ -28,8 +28,8 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mRegList->append(ui->BPRegLabel);
     mRegList->append(ui->SIRegLabel);
     mRegList->append(ui->SPRegLabel);
-#endif
 
+#ifdef _WIN64
     mRegList->append(ui->R8RegLabel);
     mRegList->append(ui->R9RegLabel);
     mRegList->append(ui->R10RegLabel);
@@ -38,14 +38,12 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mRegList->append(ui->R13RegLabel);
     mRegList->append(ui->R14RegLabel);
     mRegList->append(ui->R15RegLabel);
+#endif
 
-#ifdef _WIN64
     mRegList->append(ui->IPRegLabel);
-#endif
 
-#ifdef _WIN64
     mRegList->append(ui->FLAGSRegLabel);
-#endif
+
     mRegList->append(ui->CFRegLabel);
     mRegList->append(ui->PFRegLabel);
     mRegList->append(ui->AFRegLabel);
@@ -79,7 +77,7 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     ui->BPRegLabel->setAutoFillBackground(true);
     ui->SIRegLabel->setAutoFillBackground(true);
     ui->SPRegLabel->setAutoFillBackground(true);
-
+#ifdef _WIN64
     ui->R8RegLabel->setAutoFillBackground(true);
     ui->R9RegLabel->setAutoFillBackground(true);
     ui->R10RegLabel->setAutoFillBackground(true);
@@ -88,7 +86,7 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     ui->R13RegLabel->setAutoFillBackground(true);
     ui->R14RegLabel->setAutoFillBackground(true);
     ui->R15RegLabel->setAutoFillBackground(true);
-
+#endif
     ui->IPRegLabel->setAutoFillBackground(true);
 
     ui->FLAGSRegLabel->setAutoFillBackground(true);

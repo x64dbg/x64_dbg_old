@@ -90,6 +90,56 @@ struct ADDRINFO
     int flags; //ADDRINFOFLAGS
 };
 
+struct FLAGS
+{
+    unsigned char c;
+    unsigned char p;
+    unsigned char a;
+    unsigned char z;
+    unsigned char s;
+    unsigned char t;
+    unsigned char i;
+    unsigned char d;
+    unsigned char o;
+};
+
+struct REGDUMP
+{
+    duint cax;
+    duint ccx;
+    duint cdx;
+    duint cbx;
+    duint csp;
+    duint cbp;
+    duint csi;
+    duint cdi;
+#ifdef _WIN64
+    duint r8;
+    duint r9;
+    duint r10;
+    duint r11;
+    duint r12;
+    duint r13;
+    duint r14;
+    duint r15;
+#endif //_WIN64
+    duint cip;
+    duint cflags;
+    FLAGS flags;
+    unsigned short gs;
+    unsigned short fs;
+    unsigned short es;
+    unsigned short ds;
+    unsigned short cs;
+    unsigned short ss;
+    duint dr0;
+    duint dr1;
+    duint dr2;
+    duint dr5;
+    duint dr6;
+    duint dr7;
+};
+
 //Debugger functions
 void DLL_IMPEXP DbgMemRead(duint va, unsigned char* dest, duint size);
 duint DLL_IMPEXP DbgMemGetPageSize(duint base);
@@ -105,6 +155,7 @@ bool DLL_IMPEXP DbgGetCommentAt(duint addr, char* text);
 bool DLL_IMPEXP DbgSetCommentAt(duint addr, const char* text);
 BPXTYPE DLL_IMPEXP DbgGetBpxTypeAt(duint addr);
 duint DLL_IMPEXP DbgValFromString(const char* string);
+bool DLL_IMPEXP DbgGetRegDump(REGDUMP* regdump);
 
 //GUI functions
 void DLL_IMPEXP GuiDisasmAt(duint addr, duint cip);

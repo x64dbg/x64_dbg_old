@@ -137,3 +137,9 @@ extern "C" DLL_EXPORT BPXTYPE _dbg_bpgettypeat(duint addr)
     }
     return bpnone;
 }
+
+extern "C" DLL_EXPORT bool _dbg_getregdump(REGDUMP* regdump)
+{
+    memset(regdump, 1, sizeof(REGDUMP));
+    return true;
+}

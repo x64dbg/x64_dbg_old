@@ -24,3 +24,4 @@ DBGISJUMPGOINGTOEXECUTE _dbg_isjumpgoingtoexecute;
 DBGADDRINFOGET _dbg_addrinfoget;
 DBGADDRINFOSET _dbg_addrinfoset;
 DBGBPGETTYPEAT _dbg_bpgettypeat;
+DBGGETREGDUMP _dbg_getregdump;

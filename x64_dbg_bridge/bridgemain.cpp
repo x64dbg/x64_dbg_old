@@ -95,6 +95,10 @@ const char* DLL_IMPEXP BridgeInit()
     _dbg_bpgettypeat=(DBGBPGETTYPEAT)GetProcAddress(hInstDbg, "_dbg_bpgettypeat");
     if(!_dbg_bpgettypeat)
         return "Export \"_dbg_bpgettypeat\" could not be found!";
+    //_dbg_getregdump
+    _dbg_getregdump=(DBGGETREGDUMP)GetProcAddress(hInstDbg, "_dbg_getregdump");
+    if(!_dbg_getregdump)
+        return "Export \"_dbg_getregdump\" could not be found!";
     return 0;
 }
 
@@ -120,8 +124,7 @@ const char* DLL_IMPEXP BridgeStart()
 
 void* DLL_IMPEXP BridgeAlloc(size_t size)
 {
-    void* a=VirtualAlloc(0, size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
-    //unsigned char* a= new unsigned char[size];
+    unsigned char* a= new unsigned char[size];
     if(!a)
     {
         MessageBoxA(0, "Could not allocate memory", "Error", MB_ICONERROR);
@@ -133,8 +136,7 @@ void* DLL_IMPEXP BridgeAlloc(size_t size)
 
 void DLL_IMPEXP BridgeFree(void* ptr)
 {
-    VirtualFree(ptr, 0, MEM_RELEASE);
-    //delete[] (unsigned char*)ptr;
+    delete[] (unsigned char*)ptr;
 }
 
 //Debugger
@@ -268,6 +270,11 @@ duint DLL_IMPEXP DbgValFromString(const char* string)
     duint value=0;
     _dbg_valfromstring(string, &value);
     return value;
+}
+
+bool DLL_IMPEXP DbgGetRegDump(REGDUMP* regdump)
+{
+    return _dbg_getregdump(regdump);
 }
 
 //GUI
