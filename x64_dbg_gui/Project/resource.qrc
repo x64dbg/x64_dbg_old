@@ -16,5 +16,6 @@
         <file>images/memory-map.png</file>
         <file>images/processor-cpu.png</file>
         <file>images/ui-combo-box-edit.png</file>
+        <file>images/scylla.png</file>
     </qresource>
 </RCC>

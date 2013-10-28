@@ -12,10 +12,12 @@
 static PROCESS_INFORMATION g_pi= {0,0,0,0};
 PROCESS_INFORMATION* fdProcessInfo=&g_pi;
 static char szFileName[deflen]="";
-bool bFileIsDll;
+bool bFileIsDll=false;
+uint pDebuggedDllBase=0;
 BREAKPOINT* bplist=0;
 static bool isStepping=false;
 static bool isPausedByUser=false;
+static bool bScyllaLoaded=false;
 
 //static functions
 static void cbStep();
@@ -167,6 +169,7 @@ static void cbMemoryBreakpoint(void* ExceptionAddress)
 
 static void cbEntryBreakpoint()
 {
+    pDebuggedDllBase=GetDebuggedDLLBaseAddress();
     dputs("entry point reached!");
     DebugUpdateGui(GetContextData(UE_CIP));
     GuiSetDebugState(paused);
@@ -1095,5 +1098,44 @@ CMDRESULT cbMemWrite(const char* cmd)
     unsigned char* blub=(unsigned char*)emalloc(0x2123);
     memread(fdProcessInfo->hProcess, (const void*)addr, blub, 0x2123, 0);
     //memwrite(fdProcessInfo->hProcess, (void*)addr, blub, 0x2123, 0);
+    return STATUS_CONTINUE;
+}
+
+DWORD WINAPI scyllaThread(void* lpParam)
+{
+    typedef INT (WINAPI * SCYLLASTARTGUI)(DWORD_PTR pid, HINSTANCE mod);
+    SCYLLASTARTGUI ScyllaStartGui=0;
+    HINSTANCE hScylla=LoadLibraryA("Scylla.dll");
+    if(!hScylla)
+    {
+        dputs("error loading Scylla.dll!");
+        bScyllaLoaded=false;
+        return 0;
+    }
+    ScyllaStartGui=(SCYLLASTARTGUI)GetProcAddress(hScylla, "ScyllaStartGui");
+    if(!ScyllaStartGui)
+    {
+        dputs("could not find export 'ScyllaStartGui' inside Scylla.dll");
+        bScyllaLoaded=false;
+        return 0;
+    }
+    if(bFileIsDll)
+        ScyllaStartGui(fdProcessInfo->dwProcessId, (HINSTANCE)pDebuggedDllBase);
+    else
+        ScyllaStartGui(fdProcessInfo->dwProcessId, 0);
+    FreeLibrary(hScylla);
+    bScyllaLoaded=false;
+    return 0;
+}
+
+CMDRESULT cbStartScylla(const char* cmd)
+{
+    if(bScyllaLoaded)
+    {
+        dputs("Scylla is already loaded");
+        return STATUS_ERROR;
+    }
+    bScyllaLoaded=true;
+    CreateThread(0, 0, scyllaThread, 0, 0, 0);
     return STATUS_CONTINUE;
 }

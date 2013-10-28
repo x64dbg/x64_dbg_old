@@ -36,6 +36,7 @@ public slots:
     void execRtr();
     void openFile();
     void execPause();
+    void startScylla();
     
 private slots:
     void on_actionGoto_triggered();

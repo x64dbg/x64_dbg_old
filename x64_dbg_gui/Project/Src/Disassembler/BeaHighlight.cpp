@@ -60,11 +60,9 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
                 strcpy(segment, "ds");
                 break;
             case FSReg:
-                //TODO: x32 TEB
                 strcpy(segment, "fs");
                 break;
             case GSReg:
-                //TODO: x64 TEB
                 strcpy(segment, "gs");
                 break;
             case CSReg:
@@ -88,12 +86,11 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
             }
 
             //labels
-            duint label_addr=Argument->Memory.Displacement;
+            uint_t label_addr=Argument->Memory.Displacement;
             char label_text[MAX_LABEL_SIZE]="";
             if(DbgGetLabelAt(label_addr, ConvertBeaSeg(segmentReg), label_text))
             {
-                QString displacement;
-                displacement.sprintf("%"fext"X", label_addr);
+                QString displacement=QString("%1").arg(label_addr, 0, 16, QChar('0')).toUpper();
                 argmnemonic.replace(displacement, QString(label_text));
             }
 
@@ -116,12 +113,11 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
         else
         {
             //labels
-            duint label_addr=Instruction->Immediat;
+            uint_t label_addr=Instruction->Immediat;
             char label_text[MAX_LABEL_SIZE]="";
             if(DbgGetLabelAt(label_addr, SEG_DEFAULT, label_text))
             {
-                QString immediat;
-                immediat.sprintf("%"fext"X", label_addr);
+                QString immediat=QString("%1").arg(label_addr, 0, 16, QChar('0')).toUpper();;
                 argmnemonic.replace(immediat, QString(label_text));
             }
 

@@ -70,6 +70,7 @@ static void registercommands()
     cmdnew(cmd, "bench", cbBenchmark, true); //benchmark test (readmem etc)
     cmdnew(cmd, "pause", cbDebugPause, true); //pause debugger
     cmdnew(cmd, "memwrite", cbMemWrite, true); //memwrite test
+    cmdnew(cmd, "StartScylla\1scylla\1imprec", cbStartScylla, false); //start scylla
 }
 
 static bool cbCommandProvider(char* cmd, int maxlen)

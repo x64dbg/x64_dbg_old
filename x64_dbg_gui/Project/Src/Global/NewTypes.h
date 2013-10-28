@@ -14,13 +14,4 @@ typedef dsint int_t;
 
 typedef unsigned char byte_t;
 
-#ifdef _WIN64 //defined by default
-#define fhex "%.16llX"
-#define fext "ll"
-#else
-#define fhex "%.8X"
-#define fext ""
-#endif // _WIN64
-
-
 #endif // NEWTYPES_H

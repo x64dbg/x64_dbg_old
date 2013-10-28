@@ -58,14 +58,16 @@ void Disassembly::paintRichText(QPainter* painter, int x, int y, int w, int h, i
             painter->restore();
             break;
         case FlagBackground: //background only
+            painter->save();
             if(backgroundWidth>0)
                 painter->fillRect(QRect(x+xinc, y, backgroundWidth, h), QBrush(curRichText.textBackground));
             painter->drawText(QRect(x+xinc, y, w-xinc, h), 0, curRichText.text);
+            painter->restore();
             break;
         case FlagAll: //color+background
+            painter->save();
             if(backgroundWidth>0)
                 painter->fillRect(QRect(x+xinc, y, backgroundWidth, h), QBrush(curRichText.textBackground));
-            painter->save();
             painter->setPen(QPen(curRichText.textColor));
             painter->drawText(QRect(x+xinc, y, w-xinc, h), 0, curRichText.text);
             painter->restore();
@@ -122,10 +124,10 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
         else
             *label=0;
         BPXTYPE bpxtype=DbgGetBpxTypeAt(cur_addr);
+        painter->save();
         if(mInstBuffer.at(rowOffset).rva == mCipRva) //cip
         {
             painter->fillRect(QRect(x, y, w, h), QBrush(QColor(0,0,0)));
-            painter->save();
             switch(bpxtype) //breakpoint
             {
             case bpnormal:
@@ -141,10 +143,7 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
             if(*label) //label
             {
                 if(bpxtype==bpnone) //label only
-                {
-                    painter->save();
                     painter->setPen(QPen(QColor("#ff0000"))); //red -> address + label text
-                }
                 else //label+breakpoint
                 {
                     switch(bpxtype)
@@ -155,7 +154,6 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
                     default:
                         break;
                     }
-                    painter->save();
                     painter->setPen(QPen(QColor("#000000"))); //black address
                 }
             }
@@ -163,7 +161,6 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
             {
                 if(bpxtype==bpnone) //no label, no breakpoint
                 {
-                    painter->save();
                     if(isselected)
                         painter->setPen(QPen(QColor("#000000"))); //black address
                     else
@@ -179,7 +176,6 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
                     default:
                         break;
                     }
-                    painter->save();
                     painter->setPen(QPen(QColor("#000000"))); //black address
                 }
             }
@@ -544,7 +540,7 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
  *
  * @return      RVA of count-th instructions before the given instruction RVA.
  */
-int Disassembly::getPreviousInstructionRVA(int rva, int count)
+int Disassembly::getPreviousInstructionRVA(int_t rva, int_t count)
 {
     QByteArray wBuffer;
     int_t wBottomByteRealRVA;
@@ -577,7 +573,7 @@ int Disassembly::getPreviousInstructionRVA(int rva, int count)
  *
  * @return      RVA of count-th instructions after the given instruction RVA.
  */
-int Disassembly::getNextInstructionRVA(int rva, int count)
+int Disassembly::getNextInstructionRVA(int_t rva, int_t count)
 {
     QByteArray wBuffer;
     int_t wVirtualRVA = 0;
@@ -609,7 +605,7 @@ int Disassembly::getNextInstructionRVA(int rva, int count)
 Instruction_t Disassembly::DisassembleAt(uint_t rva)
 {
     QByteArray wBuffer;
-    uint base = mMemPage->getBase();
+    uint_t base = mMemPage->getBase();
     int_t wMaxByteCountToRead = 16 * 2;
     wBuffer.resize(wMaxByteCountToRead);
 

@@ -30,8 +30,8 @@ public:
     void paintGraphicDump(QPainter* painter, int x, int y, int addr);
 
     // Instructions Management
-    int getPreviousInstructionRVA(int rva, int count);
-    int getNextInstructionRVA(int rva, int count);
+    int getPreviousInstructionRVA(int_t rva, int_t count);
+    int getNextInstructionRVA(int_t rva, int_t count);
     Instruction_t DisassembleAt(uint_t rva);
     Instruction_t DisassembleAt(uint_t rva, uint_t count);
 

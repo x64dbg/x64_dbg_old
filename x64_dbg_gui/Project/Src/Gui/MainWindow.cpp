@@ -82,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionAbout,SIGNAL(triggered()),this,SLOT(displayAboutWidget()));
     connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(openFile()));
     connect(ui->actionPause,SIGNAL(triggered()),this,SLOT(execPause()));
+    connect(ui->actionScylla,SIGNAL(triggered()),this,SLOT(startScylla()));
 }
 
 
@@ -181,4 +182,9 @@ void MainWindow::openFile()
 void MainWindow::execPause()
 {
     Bridge::getBridge()->execCmd("pause");
+}
+
+void MainWindow::startScylla()
+{
+    Bridge::getBridge()->execCmd("StartScylla");
 }

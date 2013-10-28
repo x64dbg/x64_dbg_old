@@ -44,6 +44,7 @@ CMDRESULT cbDebugMemset(const char* cmd);
 CMDRESULT cbBenchmark(const char* cmd);
 CMDRESULT cbDebugPause(const char* cmd);
 CMDRESULT cbMemWrite(const char* cmd);
+CMDRESULT cbStartScylla(const char* cmd);
 
 //variables
 extern PROCESS_INFORMATION* fdProcessInfo;

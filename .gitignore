@@ -19,6 +19,7 @@ bin/*/*
 !bin/*/dbghelp.dll
 !bin/*/sqlite.dll
 !bin/*/BeaEngine.dll
+!bin/*/Scylla.dll
 
 #debugger files to ignore
 x64_dbg_dbg/ODbgScript.chm

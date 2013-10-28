@@ -5,10 +5,10 @@
 
 #ifdef _WIN64
 typedef unsigned long long duint;
-typedef long long dsint;
+typedef signed long long dsint;
 #else
 typedef unsigned long duint;
-typedef long dsint;
+typedef signed long dsint;
 #endif //_WIN64
 
 #ifndef DLL_IMPEXP
