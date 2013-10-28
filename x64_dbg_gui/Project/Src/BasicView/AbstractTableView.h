@@ -25,6 +25,7 @@ public:
     void mouseReleaseEvent(QMouseEvent* event);
     void keyPressEvent(QKeyEvent* event);
     void wheelEvent(QWheelEvent* event);
+    void resizeEvent(QResizeEvent* event);
 
     // ScrollBar Management
     virtual int sliderMovedAction(int type, int value, int delta);
@@ -57,6 +58,7 @@ public:
     int getGuiState();
     int getNbrOfLineToPrint();
     void setNbrOfLineToPrint(int parNbrOfLineToPrint);
+    void reloadData();
 
 signals:
     void headerButtonPressed(int col);
@@ -113,6 +115,8 @@ private:
     int mNbrOfLineToPrint;
 
     int mPrevTableOffset;
+
+    bool mShouldRepaint;
 };
 
 #endif // ABSTRACTTABLEVIEW_H

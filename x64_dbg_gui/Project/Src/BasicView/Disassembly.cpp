@@ -729,7 +729,7 @@ void Disassembly::prepareData()
 
     int wCount = 0;
 
-    for(int wI = 0; wI < wViewableRowsCount; wI++)
+    for(int wI = 0; wI < wViewableRowsCount && getRowCount() > 0; wI++)
     {
         wAddrPrev = wAddr;
         wAddr = getNextInstructionRVA(wAddr, 1);
@@ -803,7 +803,7 @@ void Disassembly::disassembleClear()
 {
     //TODO: fix this (also try restarting)
     setRowCount(0);
-    refresh();
+    reloadData();
 }
 
 void Disassembly::debugStateChangedSlot(DBGSTATE state)

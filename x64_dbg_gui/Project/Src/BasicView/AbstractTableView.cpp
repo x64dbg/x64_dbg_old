@@ -31,6 +31,8 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 
     mGuiState = AbstractTableView::NoState;
 
+    mShouldRepaint = true;
+
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
     setMouseTracking(true);
@@ -54,7 +56,7 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
     QPainter wPainter(this->viewport());
     int wViewableRowsCount = getViewableRowsCount();
 
-    if(mPrevTableOffset != mTableOffset)
+    if(mPrevTableOffset != mTableOffset || mShouldRepaint == true)
     {
         prepareData();
         mPrevTableOffset = mTableOffset;
@@ -384,6 +386,16 @@ void AbstractTableView::wheelEvent(QWheelEvent* event)
         moveScrollBar(3);
 }
 
+
+void AbstractTableView::resizeEvent(QResizeEvent* event)
+{
+    if(event->size().height() != event->oldSize().height())
+    {
+        mShouldRepaint = true;
+    }
+
+    QWidget::resizeEvent(event);
+}
 
 /************************************************************************************
                             ScrollBar Management
@@ -732,6 +744,13 @@ int AbstractTableView::getNbrOfLineToPrint()
 void AbstractTableView::setNbrOfLineToPrint(int parNbrOfLineToPrint)
 {
     mNbrOfLineToPrint = parNbrOfLineToPrint;
+}
+
+
+void AbstractTableView::reloadData()
+{
+    mShouldRepaint = true;
+    refresh();
 }
 
 
