@@ -152,9 +152,9 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
                         painter->fillRect(QRect(x, y, w, h), QBrush(QColor("#ff0000"))); //fill red
                         break;
                     default:
+                        painter->setPen(QPen(QColor("#000000"))); //black address
                         break;
-                    }
-                    painter->setPen(QPen(QColor("#000000"))); //black address
+                    }                    
                 }
             }
             else //no label
@@ -174,9 +174,12 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
                         painter->fillRect(QRect(x, y, w, h), QBrush(QColor("#ff0000"))); //fill red
                         break;
                     default:
+                        if(isselected)
+                            painter->setPen(QPen(QColor("#000000"))); //black address
+                        else
+                            painter->setPen(QPen(QColor("#808080")));
                         break;
                     }
-                    painter->setPen(QPen(QColor("#000000"))); //black address
                 }
             }
         }

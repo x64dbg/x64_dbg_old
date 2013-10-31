@@ -124,7 +124,7 @@ struct REGDUMP
     duint r15;
 #endif //_WIN64
     duint cip;
-    duint cflags;
+    unsigned int eflags;
     FLAGS flags;
     unsigned short gs;
     unsigned short fs;
@@ -135,7 +135,7 @@ struct REGDUMP
     duint dr0;
     duint dr1;
     duint dr2;
-    duint dr5;
+    duint dr3;
     duint dr6;
     duint dr7;
 };

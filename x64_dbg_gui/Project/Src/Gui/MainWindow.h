@@ -41,6 +41,8 @@ public slots:
 private slots:
     void on_actionGoto_triggered();
 
+    void on_actionAhmadmansoor_triggered();
+
 private:
     Ui::MainWindow *ui;
     QMdiArea* mdiArea;

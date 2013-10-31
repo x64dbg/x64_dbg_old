@@ -67,7 +67,7 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mRegNamesList->append(CIP);
 
     mRegList->append(ui->FLAGSRegLabel);
-    mRegNamesList->append(CFLAGS);
+    mRegNamesList->append(EFLAGS);
 
     mRegList->append(ui->CFRegLabel);
     mRegNamesList->append(CF);
@@ -107,8 +107,8 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
     mRegNamesList->append(DR1);
     mRegList->append(ui->DR2RegLabel);
     mRegNamesList->append(DR2);
-    mRegList->append(ui->DR5RegLabel);
-    mRegNamesList->append(DR5);
+    mRegList->append(ui->DR3RegLabel);
+    mRegNamesList->append(DR3);
     mRegList->append(ui->DR6RegLabel);
     mRegNamesList->append(DR6);
     mRegList->append(ui->DR7RegLabel);
@@ -202,7 +202,7 @@ void RegistersView::mouseDoubleClickEvent(QMouseEvent* event)
 
             mRegNamesList->at(mSelected) == CIP ||
 
-            mRegNamesList->at(mSelected) == CFLAGS)
+            mRegNamesList->at(mSelected) == EFLAGS)
     { //double clicked general register
         displayEditDialog();
     }
@@ -250,7 +250,7 @@ void RegistersView::updateRegistersSlot()
 
     ui->IPRegLabel->setText(QString("%1").arg(wRegDumpStruct.cip, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
 
-    ui->FLAGSRegLabel->setText(QString("%1").arg(wRegDumpStruct.cflags, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->FLAGSRegLabel->setText(QString("%1").arg(wRegDumpStruct.eflags, sizeof(unsigned int) * 2, 16, QChar('0')).toUpper());
     ui->CFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.c, 1, 16, QChar('0')).toUpper());
     ui->PFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.p, 1, 16, QChar('0')).toUpper());
     ui->AFRegLabel->setText(QString("%1").arg(wRegDumpStruct.flags.a, 1, 16, QChar('0')).toUpper());
@@ -271,7 +271,7 @@ void RegistersView::updateRegistersSlot()
     ui->DR0RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr0, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
     ui->DR1RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr1, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
     ui->DR2RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr2, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
-    ui->DR5RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr5, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
+    ui->DR3RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr3, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
     ui->DR6RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr6, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
     ui->DR7RegLabel->setText(QString("%1").arg(wRegDumpStruct.dr7, sizeof(uint_t) * 2, 16, QChar('0')).toUpper());
 }
@@ -318,7 +318,7 @@ void RegistersView::displayCustomContextMenuSlot(QPoint pos)
 
                 mRegNamesList->at(mSelected) == CIP ||
 
-                mRegNamesList->at(mSelected) == CFLAGS)
+                mRegNamesList->at(mSelected) == EFLAGS)
         {
             QAction* wEdit = wMenu.addAction("Edit");
             QAction* wSetTo0 = wMenu.addAction("Set to 0");
@@ -479,7 +479,7 @@ void RegistersView::setRegister(REGISTER_NAME reg, uint_t value)
     }
 
     // Flags
-    else if(reg == CFLAGS)
+    else if(reg == EFLAGS)
     {
 #ifdef _WIN64
         wRegName = "rflags";

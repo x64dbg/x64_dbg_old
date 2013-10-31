@@ -170,6 +170,7 @@ void MainWindow::openFile()
     QString filename = QFileDialog::getOpenFileName(this, tr("Open file"), 0, tr("Executables (*.exe *.dll)"));
     if(!filename.length())
         return;
+    filename=QDir::toNativeSeparators(filename); //convert to native path format (with backlashes)
     if(DbgIsDebugging())
     {
         Bridge::getBridge()->execCmd("stop"); //close current file (when present)
@@ -184,7 +185,12 @@ void MainWindow::execPause()
     Bridge::getBridge()->execCmd("pause");
 }
 
-void MainWindow::startScylla()
+void MainWindow::startScylla() //this is executed
 {
     Bridge::getBridge()->execCmd("StartScylla");
+}
+
+void MainWindow::on_actionAhmadmansoor_triggered()
+{
+    Bridge::getBridge()->execCmd("ahmadmansoor");
 }

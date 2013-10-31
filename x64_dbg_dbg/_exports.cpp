@@ -207,7 +207,7 @@ extern "C" DLL_EXPORT bool _dbg_getregdump(REGDUMP* regdump)
 #endif // _WIN64
     r.csp=GetContextData(UE_CSP);
     r.cip=GetContextData(UE_CIP);
-    r.cflags=GetContextData(UE_CFLAGS);
+    r.eflags=GetContextData(UE_EFLAGS);
     r.gs=(unsigned short)(GetContextData(UE_SEG_GS)&0xFFFF);
     r.fs=(unsigned short)(GetContextData(UE_SEG_FS)&0xFFFF);
     r.es=(unsigned short)(GetContextData(UE_SEG_ES)&0xFFFF);
@@ -215,12 +215,12 @@ extern "C" DLL_EXPORT bool _dbg_getregdump(REGDUMP* regdump)
     r.cs=(unsigned short)(GetContextData(UE_SEG_CS)&0xFFFF);
     r.ss=(unsigned short)(GetContextData(UE_SEG_SS)&0xFFFF);
     r.dr0=GetContextData(UE_DR0);
-    r.dr1=GetContextData(UE_DR0);
-    r.dr2=GetContextData(UE_DR0);
-    r.dr5=GetContextData(UE_DR0);
-    r.dr6=GetContextData(UE_DR0);
-    r.dr7=GetContextData(UE_DR0);
-    duint cflags=r.cflags;
+    r.dr1=GetContextData(UE_DR1);
+    r.dr2=GetContextData(UE_DR2);
+    r.dr3=GetContextData(UE_DR3);
+    r.dr6=GetContextData(UE_DR6);
+    r.dr7=GetContextData(UE_DR7);
+    duint cflags=r.eflags;
     r.flags.c=valflagfromstring(cflags, "cf");
     r.flags.p=valflagfromstring(cflags, "pf");
     r.flags.a=valflagfromstring(cflags, "af");

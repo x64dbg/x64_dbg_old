@@ -35,7 +35,7 @@ public:
 
         CIP,
 
-        CFLAGS,
+        EFLAGS,
         CF,
         PF,
         AF,
@@ -56,7 +56,7 @@ public:
         DR0,
         DR1,
         DR2,
-        DR5,
+        DR3,
         DR6,
         DR7
     };

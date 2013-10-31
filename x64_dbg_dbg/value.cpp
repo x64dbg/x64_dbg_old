@@ -255,38 +255,38 @@ static bool isregister(const char* string)
     return false;
 }
 
-bool valflagfromstring(uint cflags, const char* string)
+bool valflagfromstring(unsigned int eflags, const char* string)
 {
     if(scmp(string, "cf"))
-        return (bool)((int)(cflags&0x1)!=0);
+        return (bool)((int)(eflags&0x1)!=0);
     if(scmp(string, "pf"))
-        return (bool)((int)(cflags&0x4)!=0);
+        return (bool)((int)(eflags&0x4)!=0);
     if(scmp(string, "af"))
-        return (bool)((int)(cflags&0x10)!=0);
+        return (bool)((int)(eflags&0x10)!=0);
     if(scmp(string, "zf"))
-        return (bool)((int)(cflags&0x40)!=0);
+        return (bool)((int)(eflags&0x40)!=0);
     if(scmp(string, "sf"))
-        return (bool)((int)(cflags&0x80)!=0);
+        return (bool)((int)(eflags&0x80)!=0);
     if(scmp(string, "tf"))
-        return (bool)((int)(cflags&0x100)!=0);
+        return (bool)((int)(eflags&0x100)!=0);
     if(scmp(string, "if"))
-        return (bool)((int)(cflags&0x200)!=0);
+        return (bool)((int)(eflags&0x200)!=0);
     if(scmp(string, "df"))
-        return (bool)((int)(cflags&0x400)!=0);
+        return (bool)((int)(eflags&0x400)!=0);
     if(scmp(string, "of"))
-        return (bool)((int)(cflags&0x800)!=0);
+        return (bool)((int)(eflags&0x800)!=0);
     if(scmp(string, "rf"))
-        return (bool)((int)(cflags&0x10000)!=0);
+        return (bool)((int)(eflags&0x10000)!=0);
     if(scmp(string, "vm"))
-        return (bool)((int)(cflags&0x20000)!=0);
+        return (bool)((int)(eflags&0x20000)!=0);
     if(scmp(string, "ac"))
-        return (bool)((int)(cflags&0x40000)!=0);
+        return (bool)((int)(eflags&0x40000)!=0);
     if(scmp(string, "vif"))
-        return (bool)((int)(cflags&0x80000)!=0);
+        return (bool)((int)(eflags&0x80000)!=0);
     if(scmp(string, "vip"))
-        return (bool)((int)(cflags&0x100000)!=0);
+        return (bool)((int)(eflags&0x100000)!=0);
     if(scmp(string, "id"))
-        return (bool)((int)(cflags&0x200000)!=0);
+        return (bool)((int)(eflags&0x200000)!=0);
     return false;
 }
 
