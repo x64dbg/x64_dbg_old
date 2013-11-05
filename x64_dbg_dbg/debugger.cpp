@@ -69,12 +69,12 @@ bool dbgisrunning()
 void DebugUpdateGui(uint disasm_addr)
 {
     GuiUpdateRegisterView();
-    GuiDisasmAt(disasm_addr, GetContextData(UE_CIP));
+    GuiDisasmAt(disasm_addr, (duint)GetContextData(UE_CIP));
 }
 
 static void cbUserBreakpoint()
 {
-    BREAKPOINT* cur=bpfind(bplist, 0, GetContextData(UE_CIP), 0, BPNORMAL);
+    BREAKPOINT* cur=bpfind(bplist, 0, (uint)GetContextData(UE_CIP), 0, BPNORMAL);
     if(!cur)
         dputs("breakpoint reached not in list!");
     else
@@ -471,7 +471,7 @@ CMDRESULT cbDebugSetBPX(const char* cmd) //bp addr [,name [,type]]
 {
     char argaddr[deflen]="";
     if(!argget(cmd, argaddr, 0, true))
-        if(!strncasecmp(cmd, "bp", 2))
+        if(!_strnicmp(cmd, "bp", 2))
             return cbBadCmd(cmd);
     if(!argget(cmd, argaddr, 0, false))
         return STATUS_ERROR;

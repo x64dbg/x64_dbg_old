@@ -9,8 +9,8 @@ extern "C"
 {
 #endif
 
-const char* DLL_EXPORT _dbg_dbginit();
-bool DLL_EXPORT _dbg_dbgcmdexec(const char* cmd);
+DLL_EXPORT const char* _dbg_dbginit();
+DLL_EXPORT bool _dbg_dbgcmdexec(const char* cmd);
 
 #ifdef __cplusplus
 }

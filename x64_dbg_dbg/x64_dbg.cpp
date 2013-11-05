@@ -85,7 +85,7 @@ static bool cbCommandProvider(char* cmd, int maxlen)
     return true;
 }
 
-extern "C" bool DLL_EXPORT _dbg_dbgcmdexec(const char* cmd)
+extern "C" DLL_EXPORT bool _dbg_dbgcmdexec(const char* cmd)
 {
     int len=strlen(cmd);
     char* newcmd=(char*)emalloc((len+1)*sizeof(char));
@@ -112,7 +112,7 @@ static DWORD WINAPI DbgCommandLoopThread(void* a)
     return 0;
 }
 
-extern "C" const char* DLL_EXPORT _dbg_dbginit()
+extern "C" DLL_EXPORT const char* _dbg_dbginit()
 {
     DeleteFileA("DLLLoader.exe");
     char dir[deflen]="";

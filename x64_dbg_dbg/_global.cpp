@@ -29,13 +29,13 @@ bool arraycontains(const char* cmd_list, const char* cmd)
     for(int i=0; i<len; i++)
         if(temp[i]==1)
             temp[i]=0;
-    if(!strcasecmp(temp, cmd))
+    if(!_stricmp(temp, cmd))
         return true;
     for(int i=strlen(temp); i<len; i++)
     {
         if(!temp[i])
         {
-            if(!strcasecmp(temp+i+1, cmd))
+            if(!_stricmp(temp+i+1, cmd))
                 return true;
             i+=strlen(temp+i+1);
         }
@@ -45,7 +45,7 @@ bool arraycontains(const char* cmd_list, const char* cmd)
 
 bool scmp(const char* a, const char* b)
 {
-    if(strcasecmp(a, b))
+    if(_stricmp(a, b))
         return false;
     return true;
 }
@@ -100,7 +100,7 @@ bool DevicePathToPath(const char* devicepath, char* path, size_t path_size)
         if(!QueryDosDeviceA(curDrive, curDevice, MAX_PATH))
             continue;
         size_t curDevice_len=strlen(curDevice);
-        if(!strncasecmp(devicepath, curDevice, curDevice_len)) //we match the device
+        if(!_strnicmp(devicepath, curDevice, curDevice_len)) //we match the device
         {
             if(strlen(devicepath)-curDevice_len>=path_size)
                 return false;

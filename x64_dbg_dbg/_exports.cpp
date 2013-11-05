@@ -3,7 +3,11 @@
 #include "memory.h"
 #include "debugger.h"
 #include <psapi.h>
+#ifdef __GNUC__
 #include "dbghelp\dbghelp.h"
+#else
+#include <dbghelp.h>
+#endif //__GNUC__
 #include "value.h"
 
 extern "C" DLL_EXPORT duint _dbg_memfindbaseaddr(duint addr, duint* size)
@@ -149,37 +153,37 @@ extern "C" DLL_EXPORT bool _dbg_getregdump(REGDUMP* regdump)
 #ifdef _WIN64
     r.cax=GetContextData(UE_RAX);
 #else
-    r.cax=GetContextData(UE_EAX);
+    r.cax=(duint)GetContextData(UE_EAX);
 #endif // _WIN64
 #ifdef _WIN64
     r.ccx=GetContextData(UE_RCX);
 #else
-    r.ccx=GetContextData(UE_ECX);
+    r.ccx=(duint)GetContextData(UE_ECX);
 #endif // _WIN64
 #ifdef _WIN64
     r.cdx=GetContextData(UE_RDX);
 #else
-    r.cdx=GetContextData(UE_EDX);
+    r.cdx=(duint)GetContextData(UE_EDX);
 #endif // _WIN64
 #ifdef _WIN64
     r.cbx=GetContextData(UE_RBX);
 #else
-    r.cbx=GetContextData(UE_EBX);
+    r.cbx=(duint)GetContextData(UE_EBX);
 #endif // _WIN64
 #ifdef _WIN64
     r.cbp=GetContextData(UE_RBP);
 #else
-    r.cbp=GetContextData(UE_EBP);
+    r.cbp=(duint)GetContextData(UE_EBP);
 #endif // _WIN64
 #ifdef _WIN64
     r.csi=GetContextData(UE_RSI);
 #else
-    r.csi=GetContextData(UE_ESI);
+    r.csi=(duint)GetContextData(UE_ESI);
 #endif // _WIN64
 #ifdef _WIN64
     r.cdi=GetContextData(UE_RDI);
 #else
-    r.cdi=GetContextData(UE_EDI);
+    r.cdi=(duint)GetContextData(UE_EDI);
 #endif // _WIN64
 #ifdef _WIN64
     r.r8=GetContextData(UE_R8);
@@ -205,21 +209,21 @@ extern "C" DLL_EXPORT bool _dbg_getregdump(REGDUMP* regdump)
 #ifdef _WIN64
     r.r15=GetContextData(UE_R15);
 #endif // _WIN64
-    r.csp=GetContextData(UE_CSP);
-    r.cip=GetContextData(UE_CIP);
-    r.eflags=GetContextData(UE_EFLAGS);
+    r.csp=(duint)GetContextData(UE_CSP);
+    r.cip=(duint)GetContextData(UE_CIP);
+    r.eflags=(duint)GetContextData(UE_EFLAGS);
     r.gs=(unsigned short)(GetContextData(UE_SEG_GS)&0xFFFF);
     r.fs=(unsigned short)(GetContextData(UE_SEG_FS)&0xFFFF);
     r.es=(unsigned short)(GetContextData(UE_SEG_ES)&0xFFFF);
     r.ds=(unsigned short)(GetContextData(UE_SEG_DS)&0xFFFF);
     r.cs=(unsigned short)(GetContextData(UE_SEG_CS)&0xFFFF);
     r.ss=(unsigned short)(GetContextData(UE_SEG_SS)&0xFFFF);
-    r.dr0=GetContextData(UE_DR0);
-    r.dr1=GetContextData(UE_DR1);
-    r.dr2=GetContextData(UE_DR2);
-    r.dr3=GetContextData(UE_DR3);
-    r.dr6=GetContextData(UE_DR6);
-    r.dr7=GetContextData(UE_DR7);
+    r.dr0=(duint)GetContextData(UE_DR0);
+    r.dr1=(duint)GetContextData(UE_DR1);
+    r.dr2=(duint)GetContextData(UE_DR2);
+    r.dr3=(duint)GetContextData(UE_DR3);
+    r.dr6=(duint)GetContextData(UE_DR6);
+    r.dr7=(duint)GetContextData(UE_DR7);
     duint cflags=r.eflags;
     r.flags.c=valflagfromstring(cflags, "cf");
     r.flags.p=valflagfromstring(cflags, "pf");

@@ -1,6 +1,9 @@
 #ignore directories
 */obj/
 bin/*/*
+ipch/*
+*/Win32/
+*/x64/
 
 #global filetypes to ignore
 *.depend
@@ -10,6 +13,9 @@ bin/*/*
 *.chw
 *.cbTemp
 *.ini
+*.opensdf
+*.sdf
+*.suo
 
 #whitelisted bin files
 !bin/*/TitanEngine.dll

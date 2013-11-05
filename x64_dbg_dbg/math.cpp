@@ -77,7 +77,7 @@ bool mathcontains(const char* text)
     return false;
 }
 
-#ifdef _WIN64
+#ifdef __MINGW64__
 static inline unsigned long long umulhi(unsigned long long x, unsigned long long y)
 {
     return (unsigned long long)(((__uint128_t)x*y)>>64);
@@ -86,6 +86,21 @@ static inline unsigned long long umulhi(unsigned long long x, unsigned long long
 static inline long long mulhi(long long x, long long y)
 {
     return (long long)(((__int128_t)x*y)>>64);
+}
+#elif _WIN64
+#include <intrin.h>
+static inline unsigned long long umulhi(unsigned long long x, unsigned long long y)
+{
+	unsigned __int64 res;
+	_umul128(x,y,&res);
+	return res;
+}
+
+static inline long long mulhi(long long x, long long y)
+{
+	__int64 res;
+	_mul128(x,y,&res);
+	return res;
 }
 #else
 static inline unsigned int umulhi(unsigned int x, unsigned int y)
@@ -97,7 +112,7 @@ static inline int mulhi(int x, int y)
 {
     return (int)(((long long)x*y)>>32);
 }
-#endif
+#endif //__MINGW64__
 
 bool mathdounsignedoperation(char op, uint left, uint right, uint* result)
 {

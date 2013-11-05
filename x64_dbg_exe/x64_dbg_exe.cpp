@@ -3,7 +3,7 @@
 #include "resource.h"
 #include "..\x64_dbg_bridge\bridgemain.h"
 
-int main()
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     const char* errormsg=BridgeInit();
     if(errormsg)

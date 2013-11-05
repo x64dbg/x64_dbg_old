@@ -1002,7 +1002,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
             FreeLibrary(mod);
             if(addr)
             {
-                if(!strcasecmp(szBaseName, "kernelbase") or !strcasecmp(szBaseName, "kernelbase.dll"))
+                if(!_stricmp(szBaseName, "kernelbase") or !_stricmp(szBaseName, "kernelbase.dll"))
                     kernelbase=found;
                 addrfound[found]=ImporterGetRemoteAPIAddressEx(szBaseName, (char*)name);
                 found++;

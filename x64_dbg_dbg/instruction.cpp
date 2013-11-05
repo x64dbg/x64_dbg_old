@@ -145,11 +145,11 @@ CMDRESULT cbInstrVarList(const char* cmd)
     char arg1[deflen]="";
     argget(cmd, arg1, 0, true);
     int filter=0;
-    if(!strcasecmp(arg1, "USER"))
+    if(!_stricmp(arg1, "USER"))
         filter=VAR_USER;
-    else if(!strcasecmp(arg1, "READONLY"))
+    else if(!_stricmp(arg1, "READONLY"))
         filter=VAR_READONLY;
-    else if(!strcasecmp(arg1, "SYSTEM"))
+    else if(!_stricmp(arg1, "SYSTEM"))
         filter=VAR_SYSTEM;
     VAR* cur=vargetptr();
     if(!cur or !cur->name)
