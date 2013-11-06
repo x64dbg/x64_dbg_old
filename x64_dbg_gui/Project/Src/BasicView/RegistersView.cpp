@@ -119,6 +119,7 @@ RegistersView::RegistersView(QWidget *parent) : QWidget(parent), ui(new Ui::Regi
         QLabel* curLabel=mRegList->at(wI);
         QFont wFont(curLabel->font());
         wFont.setFamily("Monospace");
+        wFont.setStyleHint(QFont::Monospace);
         wFont.setFixedPitch(true);
         curLabel->setAutoFillBackground(true);
         curLabel->setFont(wFont);

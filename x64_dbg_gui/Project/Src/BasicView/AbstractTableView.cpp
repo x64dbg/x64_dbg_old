@@ -16,7 +16,7 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
     //font.setBold(true); //bold
 
     font.setFixedPitch(true);
-    //font.setStyleHint(QFont::Monospace);
+    font.setStyleHint(QFont::Monospace);
     this->setFont(font);
 
 

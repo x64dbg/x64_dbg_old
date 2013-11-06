@@ -3,6 +3,7 @@
 LogView::LogView(QWidget *parent) : QTextEdit(parent)
 {
     QFont wFont("Monospace", 8);
+    wFont.setStyleHint(QFont::Monospace);
     wFont.setFixedPitch(true);
 
     this->setFont(wFont);
