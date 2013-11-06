@@ -1103,7 +1103,7 @@ CMDRESULT cbMemWrite(const char* cmd)
 
 DWORD WINAPI scyllaThread(void* lpParam)
 {
-    typedef INT (WINAPI * SCYLLASTARTGUI)(DWORD_PTR pid, HINSTANCE mod);
+    typedef INT (WINAPI * SCYLLASTARTGUI)(DWORD pid, HINSTANCE mod);
     SCYLLASTARTGUI ScyllaStartGui=0;
     HINSTANCE hScylla=LoadLibraryA("Scylla.dll");
     if(!hScylla)
