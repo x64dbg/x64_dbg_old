@@ -15,7 +15,7 @@ ProcessMemoryMap::ProcessMemoryMap(QString fileName, QObject *parent) : QObject(
 
     if(!CreateProcess((LPCTSTR)target, 0, NULL,NULL,0,CREATE_NEW_CONSOLE,NULL,NULL,&si,&pi))
     {
-        qDebug() << "CreateProcess failed (" << GetLastError() << ").\n";
+        //qDebug() << "CreateProcess failed (" << GetLastError() << ").\n";
     }
     else
     {
@@ -95,10 +95,10 @@ void ProcessMemoryMap::printVirtualMemoryMap(QList<MEMORY_BASIC_INFORMATION> par
     wTmpStr = "Type";
     wStr += wTmpStr + QString(" ").repeated(10 - wTmpStr.length());
 
-    qDebug() << wStr;
+    //qDebug() << wStr;
 
     wStr = "-------------------------------------------------------------------------------------------------";
-    qDebug() << wStr;
+    //qDebug() << wStr;
 
 
     for(wI = 0; wI < parList.size(); wI++)
@@ -200,7 +200,7 @@ void ProcessMemoryMap::printVirtualMemoryMap(QList<MEMORY_BASIC_INFORMATION> par
         wStr += wTmpStr + QString(" ").repeated(10 - wTmpStr.length());
 
 
-        qDebug() << wStr;
+        //qDebug() << wStr;
     }
 }
 

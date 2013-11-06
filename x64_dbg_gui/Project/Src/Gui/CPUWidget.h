@@ -2,6 +2,7 @@
 #define CPUWIDGET_H
 
 #include <QtGui>
+#include <QVBoxLayout>
 #include "Disassembly.h"
 #include "HexDump.h"
 #include "RegistersView.h"

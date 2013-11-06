@@ -2,6 +2,7 @@
 #define LOGVIEW_H
 
 #include <QtGui>
+#include <QTextEdit>
 #include "Bridge.h"
 
 class LogView : public QTextEdit

@@ -2,7 +2,7 @@
 #define DUMP_H
 
 #include <QtGui>
-#include <qdebug.h>
+#include <QtDebug>
 #include "AbstractTableView.h"
 #include "MapViewOfMem.h"
 #include "QBeaEngine.h"

@@ -2,7 +2,7 @@
 #define DISASSEMBLY_H
 
 #include <QtGui>
-#include <qdebug.h>
+#include <QtDebug>
 #include "NewTypes.h"
 #include "AbstractTableView.h"
 #include "QBeaEngine.h"

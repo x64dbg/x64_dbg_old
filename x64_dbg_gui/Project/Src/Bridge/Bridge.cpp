@@ -17,14 +17,14 @@ Bridge::Bridge(QObject *parent) : QObject(parent)
     QFile wFile("AsmCode.bin");
 
     if(wFile.open(QIODevice::ReadOnly) == false)
-         qDebug() << "File has not been opened.";
+         //qDebug() << "File has not been opened.";
 
     *mData = wFile.readAll();
-    qDebug() << "Size: " << mData->size();
+    //qDebug() << "Size: " << mData->size();
 
     if(mData->size() == 0)
     {
-        qDebug() << "No Data";
+        //qDebug() << "No Data";
     }
 }
 

@@ -9,24 +9,27 @@ MapViewOfMem::MapViewOfMem()
 
 MapViewOfMem::MapViewOfMem(QString file)
 {
-    mGuiMemDataCache = (MemDataCacheStruct_t){new QVector<byte_t>(0), 0, 0, false};
+    MemDataCacheStruct_t data;
+    memset(&data, 0, sizeof(MemDataCacheStruct_t));
+    data.memDataCachePtr=new QVector<byte_t>(0);
+    mGuiMemDataCache = data;
 
     mSelectedData.fromIndex = -1;
     mSelectedData.toIndex = -1;
 
-    qDebug() << "MapViewOfMem() Load data from file.";
+    //qDebug() << "MapViewOfMem() Load data from file.";
 
     QFile wFile(file);
 
     if(wFile.open(QIODevice::ReadOnly) == false)
-         qDebug() << "File has not been opened.";
+         //qDebug() << "File has not been opened.";
 
     mData = wFile.readAll();
-    qDebug() << "Size: " << mData.size();
+    //qDebug() << "Size: " << mData.size();
 
     if(mData.size() == 0)
     {
-        qDebug() << "No Data";
+        //qDebug() << "No Data";
     }
 
     mSize = mData.size();

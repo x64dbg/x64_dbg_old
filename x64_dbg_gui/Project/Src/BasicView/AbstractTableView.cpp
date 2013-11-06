@@ -5,7 +5,11 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
     // Class variable initialization
     mTableOffset = 0;
     mPrevTableOffset = mTableOffset + 1;
-    mHeader = (Header_t){true, 20, -1};
+    Header_t data;
+    data.isVisible=true;
+    data.height=20;
+    data.activeButtonIndex=-1;
+    mHeader = data;
 
     QFont font("Monospace", 8);
     //QFont font("Terminal", 6);
@@ -27,7 +31,9 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 
     mNbrOfLineToPrint = 0;
 
-    mColResizeData = (ColumnResizingData_t){false, 0, 0};
+    ColumnResizingData_t temp;
+    memset(&temp, 0, sizeof(ColumnResizingData_t));
+    mColResizeData = temp;
 
     mGuiState = AbstractTableView::NoState;
 
@@ -90,7 +96,7 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
         y = getHeaderHeigth();
     }
 
-    // Iterate over all columns and cells
+    // Iterate over all columns && cells
     for(int j = 0; j < getColumnCount(); j++)
     {
         for(int i = 0; i < wViewableRowsCount; i++)
@@ -131,13 +137,13 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
  */
 void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
 {
-    qDebug() << "mouseMoveEvent";
+    //qDebug() << "mouseMoveEvent";
 
     switch (mGuiState)
     {
         case AbstractTableView::NoState:
         {
-            qDebug() << "State = NoState";
+            //qDebug() << "State = NoState";
 
             int wColIndex = getColumnIndexFromX(event->x());
             int wStartPos = getColumnPosition(wColIndex); // Position X of the start of column
@@ -180,7 +186,7 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
         }
         case AbstractTableView::ReadyToResize:
         {
-            qDebug() << "State = ReadyToResize";
+            //qDebug() << "State = ReadyToResize";
 
             int wColIndex = getColumnIndexFromX(event->x());
             int wStartPos = getColumnPosition(wColIndex); // Position X of the start of column
@@ -210,7 +216,7 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
         }
         case AbstractTableView::ResizeColumnState:
         {
-            qDebug() << "State = ResizeColumnState";
+            //qDebug() << "State = ResizeColumnState";
 
             int delta = event->x() - mColResizeData.lastPosX;
 
@@ -226,7 +232,7 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
         }
         case AbstractTableView::HeaderButtonPressed:
         {
-            qDebug() << "State = HeaderButtonPressed";
+            //qDebug() << "State = HeaderButtonPressed";
 
             int wColIndex = getColumnIndexFromX(event->x());
 
@@ -283,7 +289,7 @@ void AbstractTableView::mousePressEvent(QMouseEvent* event)
         {
             int wColIndex = getColumnIndexFromX(event->x());
 
-            qDebug() << "Button " << wColIndex << "has been pressed.";
+            //qDebug() << "Button " << wColIndex << "has been pressed.";
             emit headerButtonPressed(wColIndex);
 
             mColumnList[wColIndex].header.isPressed = true;
@@ -322,7 +328,7 @@ void AbstractTableView::mouseReleaseEvent(QMouseEvent* event)
         {
             if(mColumnList[mHeader.activeButtonIndex].header.isMouseOver == true)
             {
-                qDebug() << "Button " << mHeader.activeButtonIndex << "has been released.";
+                //qDebug() << "Button " << mHeader.activeButtonIndex << "has been released.";
                 emit headerButtonReleased(mHeader.activeButtonIndex);
             }
             mGuiState = AbstractTableView::NoState;
@@ -376,7 +382,7 @@ void AbstractTableView::keyPressEvent(QKeyEvent* event)
  */
 void AbstractTableView::wheelEvent(QWheelEvent* event)
 {
-    qDebug() << "wheelEvent";
+    //qDebug() << "wheelEvent";
 
     //QAbstractScrollArea::wheelEvent(event);
 
@@ -419,21 +425,21 @@ void AbstractTableView::vertSliderActionSlot(int action)
     // Compute Delta
     wDelta = wSliderPosition - wOldValue;
 
-    qDebug() << "Scroll Action Slot : wSliderPosition: " << wSliderPosition << " mTableOffset: " << mTableOffset << " wDelta: " << wDelta;
+    //qDebug() << "Scroll Action Slot : wSliderPosition: " << wSliderPosition << " mTableOffset: " << mTableOffset << " wDelta: " << wDelta;
 
     // Compute the new table offset
     mTableOffset = sliderMovedAction(action, wOldValue, wDelta);
 
     verticalScrollBar()->setValue(mTableOffset);
 
-    qDebug() << "New mTableOffset: " << mTableOffset;
+    //qDebug() << "New mTableOffset: " << mTableOffset;
 }
 
 
 /**
  * @brief       This virtual method is called at the end of the vertSliderActionSlot(...) method.
  *              It allows changing the slider postion according to the type of action, the new value
- *              of the scrollbar and the scrollbar delta.
+ *              of the scrollbar && the scrollbar delta.
  *
  * @param[in]   type      Type of action (Refer to the QAbstractSlider::SliderAction enum)
  * @param[in]   value     New value of the scrollbar (Index of the top table item)
@@ -448,7 +454,7 @@ int AbstractTableView::sliderMovedAction(int type, int value, int delta)
 
 
 /**
- * @brief       This method set the verticall scrollbar to the given value and triggers the slider action slot with
+ * @brief       This method set the verticall scrollbar to the given value && triggers the slider action slot with
  *              the QAbstractSlider::SliderNoAction type.
  *
  * @param[in]   val      New slider value
@@ -463,7 +469,7 @@ void AbstractTableView::forceScrollBarValue(int val)
 
 
 /**
- * @brief       This method set the verticall scrollbar to the given value and triggers the slider action slot with
+ * @brief       This method set the verticall scrollbar to the given value && triggers the slider action slot with
  *              the QAbstractSlider::SliderSingleStepSub type.
  *
  * @param[in]   val      New slider value

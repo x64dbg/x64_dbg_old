@@ -47,7 +47,7 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
             richText->push_back(comma);
         }
 
-        if(argtype&MEMORY_TYPE) //mov [],a or mov a,[]
+        if(argtype&MEMORY_TYPE) //mov [],a || mov a,[]
         {
             char segment[3]="";
             int segmentReg=Argument->SegmentReg;
@@ -73,11 +73,11 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
                 break;
             }
             int basereg=Argument->Memory.BaseRegister;
-            if(basereg&REG4 || basereg&REG5) //esp or ebp
+            if(basereg&REG4 || basereg&REG5) //esp || ebp
             {
                 argument.textBackground=QColor(0,255,255);
                 argument.flags=FlagBackground;
-                //Highlight ESP or EBP memory move
+                //Highlight ESP || EBP memory move
             }
             else
             {
@@ -123,7 +123,7 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
 
             char shortjmp[100]="\0";
             bool has_shortjmp=false;
-            if(brtype and brtype!=RetType and !(argtype&REGISTER_TYPE))
+            if(brtype && brtype!=RetType && !(argtype&REGISTER_TYPE))
             {
                 argument.flags=FlagBackground;
                 argument.textBackground=QColor(255,255,0);
@@ -135,7 +135,7 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
                     has_shortjmp=true;
                     //short jumps
                 }
-                //Highlight (un)condentional jumps and calls
+                //Highlight (un)condentional jumps && calls
             }
             argument.text.sprintf("%s%s", shortjmp+has_shortjmp, argmnemonic.toUtf8().constData());
         }
@@ -157,11 +157,11 @@ void BeaHighlight::PrintBaseInstruction(QList<CustomRichText_t>* richText, const
     int brtype=MyDisasm->Instruction.BranchType;
     if(brtype) //jump
     {
-        if(brtype==RetType or brtype==CallType)
+        if(brtype==RetType || brtype==CallType)
         {
             mnemonic.flags=FlagBackground;
             mnemonic.textBackground=QColor(0,255,255);
-            //calls and rets
+            //calls && rets
         }
         else if(brtype==JmpType)
         {
@@ -177,13 +177,13 @@ void BeaHighlight::PrintBaseInstruction(QList<CustomRichText_t>* richText, const
             //cond jumps
         }
     }
-    else if(!strcasecmp(mnemonicText, "push") or !strcasecmp(mnemonicText, "pop"))
+    else if(!_stricmp(mnemonicText, "push") || !_stricmp(mnemonicText, "pop"))
     {
         mnemonic.flags=FlagColor;
         mnemonic.textColor=QColor(0,0,255);
         //push/pop
     }
-    else if(!strcasecmp(mnemonicText, "nop"))
+    else if(!_stricmp(mnemonicText, "nop"))
     {
         mnemonic.flags=FlagColor;
         mnemonic.textColor=QColor(128,128,128);

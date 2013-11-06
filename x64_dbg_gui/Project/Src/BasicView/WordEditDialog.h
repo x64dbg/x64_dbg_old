@@ -2,6 +2,8 @@
 #define WORDEDITDIALOG_H
 
 #include <QtGui>
+#include <QDialog>
+#include <QPushButton>
 #include "Bridge.h"
 
 namespace Ui {

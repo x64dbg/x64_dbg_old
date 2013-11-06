@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDebug>
 #include <QtGui>
+#include <QWidget>
 #include "NewTypes.h"
 #include "windows.h"
 

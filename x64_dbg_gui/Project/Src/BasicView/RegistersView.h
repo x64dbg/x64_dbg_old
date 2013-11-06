@@ -2,6 +2,8 @@
 #define REGISTERSVIEW_H
 
 #include <QtGui>
+#include <QLabel>
+#include <QMenu>
 #include "Bridge.h"
 #include "WordEditDialog.h"
 

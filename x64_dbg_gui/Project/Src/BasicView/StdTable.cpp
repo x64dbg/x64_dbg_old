@@ -10,7 +10,9 @@
 
 StdTable::StdTable(QWidget *parent) : AbstractTableView(parent)
 {
-    mSelection = (SelectionData_t){0, 0, 0};
+    SelectionData_t data;
+    memset(&data, 0, sizeof(SelectionData_t));
+    mSelection = data;
 
     mIsMultiSelctionAllowed = false;
 
@@ -41,7 +43,7 @@ void StdTable::mouseMoveEvent(QMouseEvent* event)
 
     if(mGuiState == StdTable::MultiRowsSelectionState)
     {
-        qDebug() << "State = MultiRowsSelectionState";
+        //qDebug() << "State = MultiRowsSelectionState";
 
         if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {

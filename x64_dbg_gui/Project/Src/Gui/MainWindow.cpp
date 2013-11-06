@@ -15,9 +15,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 #endif
 
     //Load application icon
-    HICON hIcon=LoadIcon(GetModuleHandleA(0), MAKEINTRESOURCE(100));
-    setWindowIcon(QIcon(QPixmap::fromWinHICON(hIcon)));
-    DestroyIcon(hIcon);
+    setWindowIcon(QIcon(":/icons/images/bug.ico"));
 
     // Memory Map View
     mMemMapView = new QMdiSubWindow();
@@ -96,7 +94,7 @@ void MainWindow::executeCommand()
 {
     QString wCmd = mCmdLineEdit->text();
 
-    Bridge::getBridge()->execCmd(reinterpret_cast<const char*>(wCmd.toAscii().data()));
+    Bridge::getBridge()->execCmd(wCmd.toUtf8().constData());
 
     mCmdLineEdit->addCmdToHistory(wCmd);
     mCmdLineEdit->setText("");
@@ -152,7 +150,7 @@ void MainWindow::displayAboutWidget()
 #else
     const char* title="About x32_dbg";
 #endif
-    MessageBoxA(MainWindow::winId(), "Created by:\nSigma (GUI)\nMr. eXoDia (DBG)\n\nSpecial Thanks:\nVisualPharm (http://visualpharm.com)\nReversingLabs (http://reversinglabs.com)\nBeatriX (http://beaengine.org)\nQt Project (http://qt-project.org)\nFugue Icons (http://yusukekamiyamane.com)", title, MB_ICONINFORMATION);
+    MessageBoxA((HWND)MainWindow::winId(), "Created by:\nSigma (GUI)\nMr. eXoDia (DBG)\n\nSpecial Thanks:\nVisualPharm (http://visualpharm.com)\nReversingLabs (http://reversinglabs.com)\nBeatriX (http://beaengine.org)\nQt Project (http://qt-project.org)\nFugue Icons (http://yusukekamiyamane.com)", title, MB_ICONINFORMATION);
 }
 
 void MainWindow::on_actionGoto_triggered()
@@ -188,9 +186,4 @@ void MainWindow::execPause()
 void MainWindow::startScylla() //this is executed
 {
     Bridge::getBridge()->execCmd("StartScylla");
-}
-
-void MainWindow::on_actionAhmadmansoor_triggered()
-{
-    Bridge::getBridge()->execCmd("ahmadmansoor");
 }

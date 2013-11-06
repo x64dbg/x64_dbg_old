@@ -4,6 +4,10 @@ bin/*/*
 ipch/*
 */Win32/
 */x64/
+x64_dbg_gui/Project/GeneratedFiles/
+x64_dbg_gui/Project/release/
+x64_dbg_gui/Project/Win32/
+x64_dbg_gui/Project/x64/
 
 #global filetypes to ignore
 *.depend

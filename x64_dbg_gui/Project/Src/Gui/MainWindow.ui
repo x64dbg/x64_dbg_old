@@ -64,18 +64,11 @@
     </property>
     <addaction name="actionScylla"/>
    </widget>
-   <widget class="QMenu" name="menuSpecial_Menu">
-    <property name="title">
-     <string>Special Menu</string>
-    </property>
-    <addaction name="actionAhmadmansoor"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuDebug"/>
    <addaction name="menuPlugins"/>
    <addaction name="menuHelp"/>
-   <addaction name="menuSpecial_Menu"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="movable">
@@ -305,11 +298,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
-   </property>
-  </action>
-  <action name="actionAhmadmansoor">
-   <property name="text">
-    <string>ahmadmansoor</string>
    </property>
   </action>
  </widget>

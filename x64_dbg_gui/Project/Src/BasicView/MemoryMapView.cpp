@@ -70,7 +70,7 @@ void MemoryMapView::stateChangedSlot(DBGSTATE state)
 
         Bridge::getBridge()->getMemMapFromDbg(&wMemMapStruct);
 
-        qDebug() << "count " << wMemMapStruct.count;
+        //qDebug() << "count " << wMemMapStruct.count;
 
         setRowCount(wMemMapStruct.count);
 

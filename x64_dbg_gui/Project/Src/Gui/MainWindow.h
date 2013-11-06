@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <QFileDialog>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 #include "CPUWidget.h"
 #include "CommandLineEdit.h"
 #include "MemoryMapView.h"
@@ -40,8 +42,6 @@ public slots:
     
 private slots:
     void on_actionGoto_triggered();
-
-    void on_actionAhmadmansoor_triggered();
 
 private:
     Ui::MainWindow *ui;

@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QDebug>
+#include <QLineEdit>
 
 class CommandLineEdit : public QLineEdit
 {

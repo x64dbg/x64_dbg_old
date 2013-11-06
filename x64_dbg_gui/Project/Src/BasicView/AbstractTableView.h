@@ -2,6 +2,11 @@
 #define ABSTRACTTABLEVIEW_H
 
 #include <QtGui>
+#include <QAbstractScrollArea>
+#include <QPushButton>
+#include <QStyleOptionButton>
+#include <QStyle>
+#include <QScrollBar>
 #include <qdebug.h>
 #include <NewTypes.h>
 

@@ -4,7 +4,9 @@
 
 HexDump::HexDump(QWidget *parent) :AbstractTableView(parent)
 {
-    mSelection = (SelectionData_t){0, 0, 0};
+    SelectionData_t data;
+    memset(&data, 0, sizeof(SelectionData_t));
+    mSelection = data;
 
     mMemoryView = new MapViewOfMem("AsmCode.bin");
 
@@ -17,7 +19,7 @@ HexDump::HexDump(QWidget *parent) :AbstractTableView(parent)
 
     setRowCount(mMemoryView->size() / 16);
 
-    qDebug() << "size" << getRowCount();
+    //qDebug() << "size" << getRowCount();
 
 
 
@@ -29,13 +31,13 @@ HexDump::HexDump(QWidget *parent) :AbstractTableView(parent)
 
 void HexDump::mouseMoveEvent(QMouseEvent* event)
 {
-    qDebug() << "HexDump::mouseMoveEvent";
+    //qDebug() << "HexDump::mouseMoveEvent";
 
     bool wAccept = true;
 
     if(mGuiState == HexDump::MultiRowsSelectionState)
     {
-        qDebug() << "State = MultiRowsSelectionState";
+        //qDebug() << "State = MultiRowsSelectionState";
 
         if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {
@@ -60,7 +62,7 @@ void HexDump::mouseMoveEvent(QMouseEvent* event)
 
 void HexDump::mousePressEvent(QMouseEvent* event)
 {
-    qDebug() << "HexDump::mousePressEvent";
+    //qDebug() << "HexDump::mousePressEvent";
 
     bool wAccept = false;
 

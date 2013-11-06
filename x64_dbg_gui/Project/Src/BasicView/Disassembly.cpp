@@ -6,7 +6,9 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
 
     mInstBuffer.clear();
 
-    mSelection = (SelectionData_t){0, 0, 0};
+    SelectionData_t data;
+    memset(&data, 0, sizeof(SelectionData_t));
+    mSelection = data;
 
     mCipRva = 0;
 
@@ -18,7 +20,7 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
 
     setRowCount(parMemPage->getSize());
 
-    qDebug() << "size" << parMemPage->getSize();
+    //qDebug() << "size" << parMemPage->getSize();
 
     int charwidth=QFontMetrics(this->font()).width(QChar(' '));
 
@@ -238,13 +240,13 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
  */
 void Disassembly::mouseMoveEvent(QMouseEvent* event)
 {
-    qDebug() << "Disassembly::mouseMoveEvent";
+    //qDebug() << "Disassembly::mouseMoveEvent";
 
     bool wAccept = true;
 
     if(mGuiState == Disassembly::MultiRowsSelectionState)
     {
-        qDebug() << "State = MultiRowsSelectionState";
+        //qDebug() << "State = MultiRowsSelectionState";
 
         if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {
@@ -276,7 +278,7 @@ void Disassembly::mouseMoveEvent(QMouseEvent* event)
  */
 void Disassembly::mousePressEvent(QMouseEvent* event)
 {
-    qDebug() << "Disassembly::mousePressEvent";
+    //qDebug() << "Disassembly::mousePressEvent";
 
     bool wAccept = false;
 
@@ -351,7 +353,7 @@ int Disassembly::sliderMovedAction(int type, int value, int delta)
 
     if(type != QAbstractSlider::SliderNoAction) // QAbstractSlider::SliderNoAction is used print the disassembly at a specifi address
     {
-        if(type == QAbstractSlider::SliderMove) // If it's a slider action, disassemble one instruction back and one instruction next in order to be aligned on a real instruction
+        if(type == QAbstractSlider::SliderMove) // If it's a slider action, disassemble one instruction back && one instruction next in order to be aligned on a real instruction
         {
             if(value + delta > 0)
             {
@@ -782,7 +784,7 @@ void Disassembly::disassambleAt(uint_t parVA, uint_t parCIP)
     uint_t wCipRva = parCIP - wBase;
 
     setRowCount(wSize);
-    mMemPage->setAttributes(wBase, wSize);  // Set base and size (Useful when memory page changed)
+    mMemPage->setAttributes(wBase, wSize);  // Set base && size (Useful when memory page changed)
     setSingleSelection(wRVA);               // Selects disassembled instruction
 
     mCipRva = wCipRva;
