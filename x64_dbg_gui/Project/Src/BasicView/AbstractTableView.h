@@ -28,10 +28,13 @@ public:
     void resizeEvent(QResizeEvent* event);
 
     // ScrollBar Management
-    virtual int sliderMovedAction(int type, int value, int delta);
+    virtual int_t sliderMovedAction(int type, int_t value, int_t delta);
     void forceScrollBarValue(int val);
     void moveScrollBar(int delta);
-    void refresh();
+    int scaleFromUint64ToScrollBarRange(int_t value);
+    int_t scaleFromScrollBarRangeToUint64(int value);
+    bool updateScrollBarRange(int_t range);
+    void repaint();
 
     // Coordinates Utils
     int getIndexOffsetFromY(int y);
@@ -46,8 +49,8 @@ public:
     virtual int addColumnAt(int at, int width, bool isClickable);
 
     // Getter & Setter
-    virtual void setRowCount(int count);
-    int getRowCount();
+    virtual void setRowCount(int_t count);
+    int_t getRowCount();
     int getColumnCount();
     int getRowHeight();
     int getColumnWidth(int index);
@@ -106,17 +109,27 @@ private:
     QList<Column_t> mColumnList;
 
     int mRowHeight;
-    int mRowCount;
+    int_t mRowCount;
 
 
-    int mTableOffset;
+    int_t mTableOffset;
     Header_t mHeader;
 
     int mNbrOfLineToPrint;
 
-    int mPrevTableOffset;
+    int_t mPrevTableOffset;
 
-    bool mShouldRepaint;
+    bool mShouldReload;
+
+    int_t mOldTableOffset;
+
+    typedef struct _ScrollBar64_t
+    {
+        bool is64;
+        int rightShiftCount;
+    } ScrollBar64_t;
+
+    ScrollBar64_t mScrollBarAttributes;
 };
 
 #endif // ABSTRACTTABLEVIEW_H

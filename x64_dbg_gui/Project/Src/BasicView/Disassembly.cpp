@@ -254,7 +254,7 @@ void Disassembly::mouseMoveEvent(QMouseEvent* event)
             {
                 expandSelectionUpTo(wRowIndex);
 
-                refresh();
+                repaint();
 
                 wAccept = false;
             }
@@ -294,7 +294,7 @@ void Disassembly::mousePressEvent(QMouseEvent* event)
 
                     mGuiState = Disassembly::MultiRowsSelectionState;
 
-                    refresh();
+                    repaint();
 
                     wAccept = true;
                 }
@@ -325,7 +325,7 @@ void Disassembly::mouseReleaseEvent(QMouseEvent* event)
         {
             mGuiState = Disassembly::NoState;
 
-            refresh();
+            repaint();
 
             wAccept = false;
         }
@@ -345,7 +345,7 @@ void Disassembly::mouseReleaseEvent(QMouseEvent* event)
  *
  * @return      Nothing.
  */
-int Disassembly::sliderMovedAction(int type, int value, int delta)
+int_t Disassembly::sliderMovedAction(int type, int_t value, int_t delta)
 {
     int newValue;
 
@@ -404,7 +404,7 @@ void Disassembly::keyPressEvent(QKeyEvent* event)
             forceScrollBarValue(getIndexFromCount(getInitialSelection(),-getNbrOfLineToPrint() + 2));
         }
 
-        refresh();
+        repaint();
     }
     else
     {
@@ -789,7 +789,7 @@ void Disassembly::disassambleAt(uint_t parVA, uint_t parCIP)
 
     if(mInstBuffer.size() > 0 && wRVA >= mInstBuffer.first().rva && wRVA < mInstBuffer.last().rva)
     {
-        refresh();
+        repaint();
     }
     else if(mInstBuffer.size() > 0 && wRVA == mInstBuffer.last().rva)
     {
