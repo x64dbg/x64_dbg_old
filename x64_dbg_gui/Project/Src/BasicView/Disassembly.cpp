@@ -22,10 +22,10 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
 
     int charwidth=QFontMetrics(this->font()).width(QChar(' '));
 
-    addColumnAt(getColumnCount(), charwidth*2*sizeof(int_t)+8, false); //address
-    addColumnAt(getColumnCount(), charwidth*2*12+8, false); //bytes
-    addColumnAt(getColumnCount(), charwidth*40, false); //disassembly
-    addColumnAt(getColumnCount(), 100, false); //comments
+    addColumnAt(charwidth*2*sizeof(int_t)+8, false); //address
+    addColumnAt(charwidth*2*12+8, false); //bytes
+    addColumnAt(charwidth*40, false); //disassembly
+    addColumnAt(100, false); //comments
 
     connect(Bridge::getBridge(), SIGNAL(disassembleAt(int_t, int_t)), this, SLOT(disassambleAt(int_t, int_t)));
     connect(Bridge::getBridge(), SIGNAL(dbgStateChanged(DBGSTATE)), this, SLOT(debugStateChangedSlot(DBGSTATE)));
@@ -352,7 +352,7 @@ void Disassembly::mouseReleaseEvent(QMouseEvent* event)
  *
  * @return      Nothing.
  */
-int_t Disassembly::sliderMovedAction(int type, int_t value, int_t delta)
+int_t Disassembly::sliderMovedHook(int type, int_t value, int_t delta)
 {
     int_t newValue;
 
@@ -404,11 +404,11 @@ void Disassembly::keyPressEvent(QKeyEvent* event)
 
         if(getInitialSelection() < botRVA)
         {
-            forceScrollBarValue(getInitialSelection());
+            setTableOffset(getInitialSelection());
         }
         else if(getInitialSelection() >= topRVA)
         {
-            forceScrollBarValue(getIndexFromCount(getInitialSelection(),-getNbrOfLineToPrint() + 2));
+            setTableOffset(getIndexFromCount(getInitialSelection(),-getNbrOfLineToPrint() + 2));
         }
 
         repaint();
@@ -802,11 +802,11 @@ void Disassembly::disassambleAt(int_t parVA, int_t parCIP)
     }
     else if(mInstBuffer.size() > 0 && wRVA == mInstBuffer.last().rva)
     {
-        forceScrollBarValue(mInstBuffer.first().rva + mInstBuffer.first().lentgh);
+        setTableOffset(mInstBuffer.first().rva + mInstBuffer.first().lentgh);
     }
     else
     {
-        forceScrollBarValue(wRVA);
+        setTableOffset(wRVA);
     }
 
 }

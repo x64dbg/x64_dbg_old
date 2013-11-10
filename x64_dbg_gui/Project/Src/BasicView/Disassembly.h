@@ -23,7 +23,7 @@ public:
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
-    int_t sliderMovedAction(int type, int_t value, int_t delta);
+    int_t sliderMovedHook(int type, int_t value, int_t delta);
     void keyPressEvent(QKeyEvent* event);
 
     // Graphic Dump

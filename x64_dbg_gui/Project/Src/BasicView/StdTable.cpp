@@ -193,18 +193,16 @@ bool StdTable::isSelected(int base, int offset)
 /************************************************************************************
                                 Data Management
 ************************************************************************************/
-int StdTable::addColumnAt(int at, int width, bool isClickable)
+void StdTable::addColumnAt(int width, bool isClickable)
 {
-    int wAt =  AbstractTableView::addColumnAt(at, width, isClickable);
+    AbstractTableView::addColumnAt(width, isClickable);
 
-    mData->insert(wAt, new QList<QString>());
+    mData->append(new QList<QString>());
 
-    for(int wI = 0; wI < (getRowCount() - mData->at(wAt)->size()); wI++)
+    for(int wI = 0; wI < (getRowCount() - mData->last()->size()); wI++)
     {
-        mData->at(wAt)->append(QString(""));
+        mData->last()->append(QString(""));
     }
-
-    return wAt;
 }
 
 

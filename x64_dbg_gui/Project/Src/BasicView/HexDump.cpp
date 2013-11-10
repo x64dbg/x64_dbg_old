@@ -21,9 +21,9 @@ HexDump::HexDump(QWidget *parent) :AbstractTableView(parent)
 
 
 
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
+    addColumnAt(100, false);
+    addColumnAt(100, false);
+    addColumnAt(100, false);
 }
 
 

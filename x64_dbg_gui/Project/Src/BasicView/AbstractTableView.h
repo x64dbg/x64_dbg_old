@@ -18,23 +18,22 @@ public:
     // Pure Virtual Methods
     virtual QString paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h) = 0;
 
-    // Reimplemented Functions
+    // Painting Stuff
     void paintEvent(QPaintEvent* event);
+
+    // Mouse Management
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
-    void keyPressEvent(QKeyEvent* event);
     void wheelEvent(QWheelEvent* event);
     void resizeEvent(QResizeEvent* event);
+    void keyPressEvent(QKeyEvent* event);
 
     // ScrollBar Management
-    virtual int_t sliderMovedAction(int type, int_t value, int_t delta);
-    void forceScrollBarValue(int_t val);
-    void moveScrollBar(int delta);
+    virtual int_t sliderMovedHook(int type, int_t value, int_t delta);
     int scaleFromUint64ToScrollBarRange(int_t value);
     int_t scaleFromScrollBarRangeToUint64(int value);
-    bool updateScrollBarRange(int_t range);
-    void repaint();
+    void updateScrollBarRange(int_t range);
 
     // Coordinates Utils
     int getIndexOffsetFromY(int y);
@@ -43,13 +42,12 @@ public:
     int transY(int y);
     int getViewableRowsCount();
     virtual int getLineToPrintcount();
-    virtual void prepareData();
 
-    // New Columns
-    virtual int addColumnAt(int at, int width, bool isClickable);
+    // New Columns/New Size
+    virtual void addColumnAt(int width, bool isClickable);
+    virtual void setRowCount(int_t count);
 
     // Getter & Setter
-    virtual void setRowCount(int_t count);
     int_t getRowCount();
     int getColumnCount();
     int getRowHeight();
@@ -57,18 +55,24 @@ public:
     void setColumnWidth(int index, int width);
     int getHeaderHeigth();
     int getTableHeigth();
-    int_t getTableOffset();
     int getGuiState();
     int getNbrOfLineToPrint();
     void setNbrOfLineToPrint(int parNbrOfLineToPrint);
+
+    // Table Offset Management
+    int_t getTableOffset();
+    void setTableOffset(int_t val);
+
+    // Update/Reload/Refresh/Repaint
     void reloadData();
+    void repaint();
+    virtual void prepareData();
 
 signals:
     void headerButtonPressed(int col);
     void headerButtonReleased(int col);
 
 public slots:
-    // ScrollBar Management
     void vertSliderActionSlot(int action);
 
 private:
@@ -92,13 +96,18 @@ private:
         HeaderButton_t header;
     } Column_t;
 
-
     typedef struct _Header_t
     {
         bool isVisible;
         int height;
         int activeButtonIndex;
     } Header_t;
+
+    typedef struct _ScrollBar64_t
+    {
+        bool is64;
+        int rightShiftCount;
+    } ScrollBar64_t;
 
     GuiState_t mGuiState;
 
@@ -120,14 +129,6 @@ private:
     int_t mPrevTableOffset;
 
     bool mShouldReload;
-
-    int_t mOldTableOffset;
-
-    typedef struct _ScrollBar64_t
-    {
-        bool is64;
-        int rightShiftCount;
-    } ScrollBar64_t;
 
     ScrollBar64_t mScrollBarAttributes;
 };
