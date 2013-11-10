@@ -19,7 +19,7 @@ public:
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
 
-    QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+    QString paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h);
     void paintGraphicDump(QPainter* painter, int x, int y, int addr);
 
     // Selection Management

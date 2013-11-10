@@ -25,7 +25,7 @@ StdTable::StdTable(QWidget *parent) : AbstractTableView(parent)
 }
 
 
-QString StdTable::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
+QString StdTable::paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h)
 {
     if(isSelected(rowBase, rowOffset) == true)
         painter->fillRect(QRect(x, y, w, h), QBrush(QColor(192,192,192)));

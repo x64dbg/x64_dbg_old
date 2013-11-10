@@ -16,7 +16,7 @@ public:
     explicit AbstractTableView(QWidget *parent = 0);
 
     // Pure Virtual Methods
-    virtual QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h) = 0;
+    virtual QString paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h) = 0;
 
     // Reimplemented Functions
     void paintEvent(QPaintEvent* event);
@@ -29,7 +29,7 @@ public:
 
     // ScrollBar Management
     virtual int_t sliderMovedAction(int type, int_t value, int_t delta);
-    void forceScrollBarValue(int val);
+    void forceScrollBarValue(int_t val);
     void moveScrollBar(int delta);
     int scaleFromUint64ToScrollBarRange(int_t value);
     int_t scaleFromScrollBarRangeToUint64(int value);
@@ -57,7 +57,7 @@ public:
     void setColumnWidth(int index, int width);
     int getHeaderHeigth();
     int getTableHeigth();
-    int getTableOffset();
+    int_t getTableOffset();
     int getGuiState();
     int getNbrOfLineToPrint();
     void setNbrOfLineToPrint(int parNbrOfLineToPrint);

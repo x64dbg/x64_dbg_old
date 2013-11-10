@@ -22,12 +22,12 @@ Disassembly::Disassembly(MemoryPage* parMemPage, QWidget *parent) : AbstractTabl
 
     int charwidth=QFontMetrics(this->font()).width(QChar(' '));
 
-    addColumnAt(getColumnCount(), charwidth*2*sizeof(uint_t)+8, false); //address
+    addColumnAt(getColumnCount(), charwidth*2*sizeof(int_t)+8, false); //address
     addColumnAt(getColumnCount(), charwidth*2*12+8, false); //bytes
     addColumnAt(getColumnCount(), charwidth*40, false); //disassembly
     addColumnAt(getColumnCount(), 100, false); //comments
 
-    connect(Bridge::getBridge(), SIGNAL(disassembleAt(uint_t, uint_t)), this, SLOT(disassambleAt(uint_t, uint_t)));
+    connect(Bridge::getBridge(), SIGNAL(disassembleAt(int_t, int_t)), this, SLOT(disassambleAt(int_t, int_t)));
     connect(Bridge::getBridge(), SIGNAL(dbgStateChanged(DBGSTATE)), this, SLOT(debugStateChangedSlot(DBGSTATE)));
 }
 
@@ -96,14 +96,13 @@ void Disassembly::paintRichText(QPainter* painter, int x, int y, int w, int h, i
  *
  * @return      String to paint.
  */
-QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
+QString Disassembly::paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h)
 {
     //return QString("Disassembly: Col:") + QString::number(col) + "Row:" + QString::number(rowBase + rowOffset);
-
     QString wStr = "";
     //int wI = 0;
     //int wLineToPrintcount;
-    uint_t wRVA;
+    int_t wRVA;
     //Instruction_t wInst;
 
     wRVA = mInstBuffer.at(rowOffset).rva;
@@ -117,8 +116,8 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
     case 0: //draw address (+ label)
     {
         char label[MAX_LABEL_SIZE]="";
-        uint_t cur_addr=mInstBuffer.at(rowOffset).rva+mMemPage->getBase();
-        QString addrText=QString("%1").arg(cur_addr, sizeof(uint_t)*2, 16, QChar('0')).toUpper();
+        int_t cur_addr=mInstBuffer.at(rowOffset).rva+mMemPage->getBase();
+        QString addrText=QString("%1").arg(cur_addr, sizeof(int_t)*2, 16, QChar('0')).toUpper();
         if(DbgGetLabelAt(cur_addr, SEG_DEFAULT, label)) //has label
             addrText+=" <"+QString(label)+">";
         else
@@ -199,6 +198,7 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
         painter->drawText(QRect(x + 15, y, getColumnWidth(col) - 15, getRowHeight()), 0, wStr);
 
         wStr = "";
+
         break;
     }
 
@@ -223,6 +223,7 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
     default:
         break;
     }
+
     return wStr;
 }
 
@@ -238,17 +239,23 @@ QString Disassembly::paintContent(QPainter* painter, int rowBase, int rowOffset,
  */
 void Disassembly::mouseMoveEvent(QMouseEvent* event)
 {
-    qDebug() << "Disassembly::mouseMoveEvent";
+    //qDebug() << "Disassembly::mouseMoveEvent";
 
     bool wAccept = true;
 
     if(mGuiState == Disassembly::MultiRowsSelectionState)
     {
-        qDebug() << "State = MultiRowsSelectionState";
+        //qDebug() << "State = MultiRowsSelectionState";
 
         if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {
-            int wRowIndex = mInstBuffer.at(getIndexOffsetFromY(transY(event->y()))).rva;
+            int wI = getIndexOffsetFromY(transY(event->y()));
+
+            // Bound
+            wI = wI >= mInstBuffer.size() ? mInstBuffer.size() - 1 : wI;
+            wI = wI < 0 ? 0 : wI;
+
+            int_t wRowIndex = mInstBuffer.at(wI).rva;
 
             if(wRowIndex < getRowCount())
             {
@@ -276,7 +283,7 @@ void Disassembly::mouseMoveEvent(QMouseEvent* event)
  */
 void Disassembly::mousePressEvent(QMouseEvent* event)
 {
-    qDebug() << "Disassembly::mousePressEvent";
+    //qDebug() << "Disassembly::mousePressEvent";
 
     bool wAccept = false;
 
@@ -286,7 +293,7 @@ void Disassembly::mousePressEvent(QMouseEvent* event)
         {
             if(event->y() > getHeaderHeigth())
             {
-                int wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
+                int_t wRowIndex = getIndexFromCount(getTableOffset(), getIndexOffsetFromY(transY(event->y())));
 
                 if(wRowIndex < getRowCount())
                 {
@@ -347,7 +354,7 @@ void Disassembly::mouseReleaseEvent(QMouseEvent* event)
  */
 int_t Disassembly::sliderMovedAction(int type, int_t value, int_t delta)
 {
-    int newValue;
+    int_t newValue;
 
     if(type != QAbstractSlider::SliderNoAction) // QAbstractSlider::SliderNoAction is used print the disassembly at a specifi address
     {
@@ -387,8 +394,8 @@ void Disassembly::keyPressEvent(QKeyEvent* event)
 
     if(key == Qt::Key_Up || key == Qt::Key_Down)
     {
-        int botRVA = getTableOffset();
-        int topRVA = getIndexFromCount(getTableOffset(), getNbrOfLineToPrint() - 1);
+        int_t botRVA = getTableOffset();
+        int_t topRVA = getIndexFromCount(getTableOffset(), getNbrOfLineToPrint() - 1);
 
         if(key == Qt::Key_Up)
             selectPrevious();
@@ -426,10 +433,10 @@ void Disassembly::keyPressEvent(QKeyEvent* event)
  *
  * @return      Nothing.
  */
-void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
+void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int_t addr)
 {
-    uint_t selHeadRVA = mSelection.fromIndex;
-    uint_t rva = addr;
+    int_t selHeadRVA = mSelection.fromIndex;
+    int_t rva = addr;
     Instruction_t instruction = DisassembleAt(selHeadRVA);
     Int32 branchType = instruction.disasm.Instruction.BranchType;
     GraphicDump_t wPict = GD_Nothing;
@@ -456,11 +463,11 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
             branchType == (Int32)JNG     ||
             branchType == (Int32)JNB)
     {
-        uint_t destRVA = (uint_t)instruction.disasm.Instruction.AddrValue;
+        int_t destRVA = (int_t)instruction.disasm.Instruction.AddrValue;
 
-        if(destRVA > (uint_t)mMemPage->getBase())
+        if(destRVA > (int_t)mMemPage->getBase())
         {
-            destRVA -= (uint_t)mMemPage->getBase();
+            destRVA -= (int_t)mMemPage->getBase();
 
             if(destRVA < selHeadRVA)
             {
@@ -482,13 +489,15 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
             }
         }
     }
-
+//DWORD tick = GetTickCount();
     painter->save() ;
+    /*
     if(DbgIsJumpGoingToExecute(instruction.rva+mMemPage->getBase())) //change pen color when jump is executed
         painter->setPen(QColor(255, 0, 0));
     else
         painter->setPen(QColor(128, 128, 128));
-
+        */
+//qDebug() << "tick count 1" << (GetTickCount()-tick);
     if(wPict == GD_Vert)
     {
         painter->drawLine(x, y, x, y + getRowHeight());
@@ -543,7 +552,7 @@ void Disassembly::paintGraphicDump(QPainter* painter, int x, int y, int addr)
  *
  * @return      RVA of count-th instructions before the given instruction RVA.
  */
-int Disassembly::getPreviousInstructionRVA(int_t rva, int_t count)
+int_t Disassembly::getPreviousInstructionRVA(int_t rva, int_t count)
 {
     QByteArray wBuffer;
     int_t wBottomByteRealRVA;
@@ -560,7 +569,7 @@ int Disassembly::getPreviousInstructionRVA(int_t rva, int_t count)
 
     mMemPage->readOriginalMemory(reinterpret_cast<byte_t*>(wBuffer.data()), wBottomByteRealRVA, wMaxByteCountToRead);
 
-    uint_t addr = mDisasm->DisassembleBack(reinterpret_cast<byte_t*>(wBuffer.data()), 0,  wMaxByteCountToRead, wVirtualRVA, count);
+    int_t addr = mDisasm->DisassembleBack(reinterpret_cast<byte_t*>(wBuffer.data()), 0,  wMaxByteCountToRead, wVirtualRVA, count);
 
     addr += rva - wVirtualRVA;
 
@@ -576,7 +585,7 @@ int Disassembly::getPreviousInstructionRVA(int_t rva, int_t count)
  *
  * @return      RVA of count-th instructions after the given instruction RVA.
  */
-int Disassembly::getNextInstructionRVA(int_t rva, int_t count)
+int_t Disassembly::getNextInstructionRVA(int_t rva, int_t count)
 {
     QByteArray wBuffer;
     int_t wVirtualRVA = 0;
@@ -591,7 +600,7 @@ int Disassembly::getNextInstructionRVA(int_t rva, int_t count)
 
     mMemPage->readOriginalMemory(reinterpret_cast<byte_t*>(wBuffer.data()), rva, wMaxByteCountToRead);
 
-    uint_t addr = mDisasm->DisassembleNext(reinterpret_cast<byte_t*>(wBuffer.data()), 0,  wMaxByteCountToRead, wVirtualRVA, count);
+    int_t addr = mDisasm->DisassembleNext(reinterpret_cast<byte_t*>(wBuffer.data()), 0,  wMaxByteCountToRead, wVirtualRVA, count);
     addr += rva;
 
     return addr;
@@ -605,10 +614,10 @@ int Disassembly::getNextInstructionRVA(int_t rva, int_t count)
  *
  * @return      Return the disassembled instruction.
  */
-Instruction_t Disassembly::DisassembleAt(uint_t rva)
+Instruction_t Disassembly::DisassembleAt(int_t rva)
 {
     QByteArray wBuffer;
-    uint_t base = mMemPage->getBase();
+    int_t base = mMemPage->getBase();
     int_t wMaxByteCountToRead = 16 * 2;
     wBuffer.resize(wMaxByteCountToRead);
 
@@ -627,7 +636,7 @@ Instruction_t Disassembly::DisassembleAt(uint_t rva)
  *
  * @return      Return the disassembled instruction.
  */
-Instruction_t Disassembly::DisassembleAt(uint_t rva, uint_t count)
+Instruction_t Disassembly::DisassembleAt(int_t rva, int_t count)
 {
     rva = getNextInstructionRVA(rva, count);
     return DisassembleAt(rva);
@@ -637,7 +646,7 @@ Instruction_t Disassembly::DisassembleAt(uint_t rva, uint_t count)
 /************************************************************************************
                                 Selection Management
 ************************************************************************************/
-void Disassembly::expandSelectionUpTo(int to)
+void Disassembly::expandSelectionUpTo(int_t to)
 {
     if(to < mSelection.firstSelectedIndex)
     {
@@ -652,7 +661,7 @@ void Disassembly::expandSelectionUpTo(int to)
 }
 
 
-void Disassembly::setSingleSelection(int index)
+void Disassembly::setSingleSelection(int_t index)
 {
     mSelection.firstSelectedIndex = index;
     mSelection.fromIndex = index;
@@ -660,7 +669,7 @@ void Disassembly::setSingleSelection(int index)
 }
 
 
-int Disassembly::getInitialSelection()
+int_t Disassembly::getInitialSelection()
 {
     return mSelection.firstSelectedIndex;
 }
@@ -668,7 +677,7 @@ int Disassembly::getInitialSelection()
 
 void Disassembly::selectNext()
 {
-    int wAddr = getIndexFromCount(getInitialSelection(), 1);
+    int_t wAddr = getIndexFromCount(getInitialSelection(), 1);
 
     setSingleSelection(wAddr);
 }
@@ -676,15 +685,15 @@ void Disassembly::selectNext()
 
 void Disassembly::selectPrevious()
 {
-    int wAddr = getIndexFromCount(getInitialSelection(), -1);
+    int_t wAddr = getIndexFromCount(getInitialSelection(), -1);
 
     setSingleSelection(wAddr);
 }
 
 
-bool Disassembly::isSelected(int base, int offset)
+bool Disassembly::isSelected(int_t base, int_t offset)
 {
-    int wAddr = base;
+    int_t wAddr = base;
 
     if(offset < 0)
         wAddr = getPreviousInstructionRVA(getTableOffset(), offset);
@@ -701,9 +710,9 @@ bool Disassembly::isSelected(int base, int offset)
 /************************************************************************************
                         Index Management
 ************************************************************************************/
-int Disassembly::getIndexFromCount(int index, int count)
+int_t Disassembly::getIndexFromCount(int_t index, int_t count)
 {
-    int wAddr;
+    int_t wAddr;
 
     if(count == 0)
         wAddr = index;
@@ -725,10 +734,10 @@ int Disassembly::getIndexFromCount(int index, int count)
 
 void Disassembly::prepareData()
 {
-    int wViewableRowsCount = getViewableRowsCount();
+    int_t wViewableRowsCount = getViewableRowsCount();
 
-    int wAddrPrev = getTableOffset();
-    int wAddr = wAddrPrev;
+    int_t wAddrPrev = getTableOffset();
+    int_t wAddr = wAddrPrev;
 
     int wCount = 0;
 
@@ -749,7 +758,7 @@ void Disassembly::prepareData()
 
 
     int wI = 0;
-    uint_t wRVA;
+    int_t wRVA;
     Instruction_t wInst;
 
     wRVA = getTableOffset();
@@ -774,12 +783,12 @@ void Disassembly::setMemoryPage(MemoryPage* parMemPage)
 }
 
 
-void Disassembly::disassambleAt(uint_t parVA, uint_t parCIP)
+void Disassembly::disassambleAt(int_t parVA, int_t parCIP)
 {
-    uint_t wBase = Bridge::getBridge()->getBase(parVA);
-    uint_t wSize = Bridge::getBridge()->getSize(wBase);
-    uint_t wRVA = parVA - wBase;
-    uint_t wCipRva = parCIP - wBase;
+    int_t wBase = Bridge::getBridge()->getBase(parVA);
+    int_t wSize = Bridge::getBridge()->getSize(wBase);
+    int_t wRVA = parVA - wBase;
+    int_t wCipRva = parCIP - wBase;
 
     setRowCount(wSize);
     mMemPage->setAttributes(wBase, wSize);  // Set base and size (Useful when memory page changed)

@@ -129,7 +129,7 @@ void HexDump::mouseReleaseEvent(QMouseEvent* event)
 
 
 
-QString HexDump::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
+QString HexDump::paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h)
 {
     //return QString("HexDump: Col:") + QString::number(col) + "Row:" + QString::number(rowBase + rowOffset);
 

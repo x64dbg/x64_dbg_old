@@ -21,7 +21,7 @@ public:
     explicit Bridge(QObject *parent = 0);
     void readProcessMemory(byte_t* dest, uint_t va, uint_t size);
     uint_t getSize(uint_t va);
-    void emitDisassembleAtSignal(uint_t va, uint_t eip);
+    void emitDisassembleAtSignal(int_t va, int_t eip);
     void emitDbgStateChanged(DBGSTATE state);
     uint_t getBase(uint_t addr);
     static Bridge* getBridge();
@@ -38,7 +38,7 @@ public:
     void emitUpdateRegisters();
     
 signals:
-    void disassembleAt(uint_t va, uint_t eip);
+    void disassembleAt(int_t va, int_t eip);
     void dbgStateChanged(DBGSTATE state);
     void addMsgToLog(QString msg);
     void clearLog();

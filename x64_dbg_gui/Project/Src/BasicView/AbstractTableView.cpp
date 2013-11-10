@@ -118,8 +118,6 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
         y = getHeaderHeigth();
         x += getColumnWidth(j);
     }
-
-
 }
 
 
@@ -134,13 +132,13 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
  */
 void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
 {
-    qDebug() << "mouseMoveEvent";
+   // qDebug() << "mouseMoveEvent";
 
     switch (mGuiState)
     {
         case AbstractTableView::NoState:
         {
-            qDebug() << "State = NoState";
+            //qDebug() << "State = NoState";
 
             int wColIndex = getColumnIndexFromX(event->x());
             int wStartPos = getColumnPosition(wColIndex); // Position X of the start of column
@@ -412,12 +410,15 @@ void AbstractTableView::resizeEvent(QResizeEvent* event)
  */
 void AbstractTableView::vertSliderActionSlot(int action)
 {
-    qDebug() << "New mTableOffset: " << mTableOffset;
+    qDebug() << "ScrollBar Action";
+    qDebug() << "RowCount: 0x" + QString("%1").arg(getRowCount(), sizeof(int_t)*2, 16, QChar('0')).toUpper();
 
 #ifdef _WIN64
     int wSliderPosition = verticalScrollBar()->sliderPosition();
+    qDebug() << "New wSliderPosition: 0x" + QString("%1").arg(wSliderPosition, sizeof(int)*2, 16, QChar('0')).toUpper();
     qBound((int)0, (int)wSliderPosition, (int)verticalScrollBar()->maximum());
     int_t wNewTableOffset = scaleFromScrollBarRangeToUint64(wSliderPosition);
+    qDebug() << "wNewTableOffset: 0x" + QString("%1").arg(wNewTableOffset, sizeof(int_t)*2, 16, QChar('0')).toUpper();
 #else
     int wNewTableOffset = verticalScrollBar()->sliderPosition();
     qBound((int)0, (int)wNewTableOffset, (int)verticalScrollBar()->maximum());
@@ -434,7 +435,9 @@ void AbstractTableView::vertSliderActionSlot(int action)
 
     // Scale the new table offset to the scroll bar range
 #ifdef _WIN64
+    qDebug() << "mTableOffset: 0x" + QString("%1").arg(mTableOffset, sizeof(int_t)*2, 16, QChar('0')).toUpper();
     wNewValue = scaleFromUint64ToScrollBarRange(mTableOffset);
+    qDebug() << "wNewValue: 0x" + QString("%1").arg(wNewValue, sizeof(int)*2, 16, QChar('0')).toUpper();
 #else
     wNewValue = mTableOffset;
 #endif
@@ -470,10 +473,19 @@ int_t AbstractTableView::sliderMovedAction(int type, int_t value, int_t delta)
  *
  * @return      Nothing.
  */
-void AbstractTableView::forceScrollBarValue(int val)
+void AbstractTableView::forceScrollBarValue(int_t val)
 {
+    mTableOffset = val;
+    mOldTableOffset = val;
+
+#ifdef _WIN64
+    int wNewValue = scaleFromUint64ToScrollBarRange(mTableOffset);
+    verticalScrollBar()->setValue(wNewValue);
+    verticalScrollBar()->setSliderPosition(wNewValue);
+#else
     verticalScrollBar()->setValue(val);
-    verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
+    verticalScrollBar()->setSliderPosition(val);
+#endif
 }
 
 
@@ -492,6 +504,7 @@ void AbstractTableView::moveScrollBar(int delta)
     verticalScrollBar()->setValue(wSliderPosition + delta);
     verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepSub);
 }
+
 
 
 #ifdef _WIN64
@@ -818,7 +831,7 @@ int AbstractTableView::getTableHeigth()
 }
 
 
-int AbstractTableView::getTableOffset()
+int_t AbstractTableView::getTableOffset()
 {
     return mTableOffset;
 }
