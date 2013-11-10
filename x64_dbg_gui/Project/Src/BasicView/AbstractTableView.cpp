@@ -39,6 +39,7 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 
     setMouseTracking(true);
 
+    // Signals/Slots Connections
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), this, SLOT(vertSliderActionSlot(int)));
 }
 
@@ -486,7 +487,7 @@ void AbstractTableView::vertSliderActionSlot(int action)
  * @param[in]   value     Old table offset
  * @param[in]   delta     Scrollbar value delta compared to the previous state
  *
- * @return      Nothing.
+ * @return      Return the value of the new table offset.
  */
 int_t AbstractTableView::sliderMovedHook(int type, int_t value, int_t delta)
 {

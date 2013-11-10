@@ -15,23 +15,30 @@ class Disassembly : public AbstractTableView
 public:
     explicit Disassembly(MemoryPage *parMemPage, QWidget *parent = 0);
 
-    // Memory page
-    void setMemoryPage(MemoryPage* parMemPage);
+    // Private Functions
+    void paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, const QList<CustomRichText_t>* richText);
 
     // Reimplemented Functions
     QString paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h);
+
+    // Mouse Management
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
-    int_t sliderMovedHook(int type, int_t value, int_t delta);
+
+    // Keyboard Management
     void keyPressEvent(QKeyEvent* event);
 
-    // Graphic Dump
-    void paintGraphicDump(QPainter* painter, int x, int y, int_t addr);
+    // ScrollBar Management
+    int_t sliderMovedHook(int type, int_t value, int_t delta);
+
+    // Jumps Graphic
+    void paintJumpsGraphic(QPainter* painter, int x, int y, int_t addr);
 
     // Instructions Management
-    int_t getPreviousInstructionRVA(int_t rva, int_t count);
-    int_t getNextInstructionRVA(int_t rva, int_t count);
+    int_t getPreviousInstructionRVA(int_t rva, uint_t count);
+    int_t getNextInstructionRVA(int_t rva, uint_t count);
+    int_t getInstructionRVA(int_t index, int_t count);
     Instruction_t DisassembleAt(int_t rva);
     Instruction_t DisassembleAt(int_t rva, int_t count);
 
@@ -43,9 +50,12 @@ public:
     void selectPrevious();
     bool isSelected(int_t base, int_t offset);
 
-    // Index Management
-    int_t getIndexFromCount(int_t index, int_t count);
+    // Update/Reload/Refresh/Repaint
     void prepareData();
+
+    // Public Methods
+    void setMemoryPage(MemoryPage* parMemPage);
+    void disassembleClear();
 
 signals:
     
@@ -54,9 +64,6 @@ public slots:
     void debugStateChangedSlot(DBGSTATE state);
 
 private:
-    void disassembleClear();
-    void paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, const QList<CustomRichText_t>* richText);
-
     enum GuiState_t {NoState, MultiRowsSelectionState};
     enum GraphicDump_t {GD_Nothing, GD_FootToTop, GD_FootToBottom, GD_HeadFromTop, GD_HeadFromBottom, GD_Vert}; // GD_FootToTop = '- , GD_FootToBottom = ,- , GD_HeadFromTop = '-> , GD_HeadFromBottom = ,-> , GD_Vert = |
 
