@@ -147,15 +147,13 @@ void RegistersView::mousePressEvent(QMouseEvent* event)
         return;
     }
 
-
     for(wI = 0; wI < mRegList->size(); wI++)
     {
-        if(mRegList->at(wI)->geometry().contains(event->pos()))
+        if(mRegList->at(wI)->underMouse() == true)
         {
             wSelected = wI;
         }
     }
-
 
     if(wSelected != mSelected)
     {
