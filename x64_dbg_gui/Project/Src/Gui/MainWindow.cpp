@@ -15,7 +15,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 #endif
 
     //Load application icon
-    setWindowIcon(QIcon(":/icons/images/bug.ico"));
+    HICON hIcon=LoadIcon(GetModuleHandleA(0), MAKEINTRESOURCE(100));
+    SendMessageA((HWND)MainWindow::winId(), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+    DestroyIcon(hIcon);
 
     // Memory Map View
     mMemMapView = new QMdiSubWindow();

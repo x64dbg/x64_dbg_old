@@ -109,7 +109,16 @@ extern "C" DLL_EXPORT bool _dbg_isdebugging()
 
 extern "C" DLL_EXPORT bool _dbg_isjumpgoingtoexecute(duint addr)
 {
-    return IsJumpGoingToExecuteEx(fdProcessInfo->hProcess, fdProcessInfo->hThread, (ULONG_PTR)addr, GetContextData(UE_CFLAGS));
+    static unsigned int cacheFlags;
+    static uint cacheAddr;
+    static bool cacheResult;
+    if(cacheAddr!=addr or cacheFlags!=GetContextData(UE_EFLAGS))
+    {
+        cacheFlags=GetContextData(UE_EFLAGS);
+        cacheAddr=addr;
+        cacheResult=IsJumpGoingToExecuteEx(fdProcessInfo->hProcess, fdProcessInfo->hThread, (ULONG_PTR)cacheAddr, cacheFlags);
+    }
+    return cacheResult;
 }
 
 extern "C" DLL_EXPORT bool _dbg_addrinfoget(duint addr, SEGMENTREG segment, ADDRINFO* addrinfo)
