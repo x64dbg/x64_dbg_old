@@ -27,7 +27,7 @@ StdTable::StdTable(QWidget *parent) : AbstractTableView(parent)
 }
 
 
-QString StdTable::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
+QString StdTable::paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h)
 {
     if(isSelected(rowBase, rowOffset) == true)
         painter->fillRect(QRect(x, y, w, h), QBrush(QColor(192,192,192)));
@@ -195,18 +195,16 @@ bool StdTable::isSelected(int base, int offset)
 /************************************************************************************
                                 Data Management
 ************************************************************************************/
-int StdTable::addColumnAt(int at, int width, bool isClickable)
+void StdTable::addColumnAt(int width, bool isClickable)
 {
-    int wAt =  AbstractTableView::addColumnAt(at, width, isClickable);
+    AbstractTableView::addColumnAt(width, isClickable);
 
-    mData->insert(wAt, new QList<QString>());
+    mData->append(new QList<QString>());
 
-    for(int wI = 0; wI < (getRowCount() - mData->at(wAt)->size()); wI++)
+    for(int wI = 0; wI < (getRowCount() - mData->last()->size()); wI++)
     {
-        mData->at(wAt)->append(QString(""));
+        mData->last()->append(QString(""));
     }
-
-    return wAt;
 }
 
 

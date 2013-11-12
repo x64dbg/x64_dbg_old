@@ -15,56 +15,63 @@ class Disassembly : public AbstractTableView
 public:
     explicit Disassembly(MemoryPage *parMemPage, QWidget *parent = 0);
 
-    // Memory page
-    void setMemoryPage(MemoryPage* parMemPage);
+    // Private Functions
+    void paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, const QList<CustomRichText_t>* richText);
 
     // Reimplemented Functions
-    QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+    QString paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h);
+
+    // Mouse Management
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
-    int sliderMovedAction(int type, int value, int delta);
+
+    // Keyboard Management
     void keyPressEvent(QKeyEvent* event);
 
-    // Graphic Dump
-    void paintGraphicDump(QPainter* painter, int x, int y, int addr);
+    // ScrollBar Management
+    int_t sliderMovedHook(int type, int_t value, int_t delta);
+
+    // Jumps Graphic
+    void paintJumpsGraphic(QPainter* painter, int x, int y, int_t addr);
 
     // Instructions Management
-    int getPreviousInstructionRVA(int_t rva, int_t count);
-    int getNextInstructionRVA(int_t rva, int_t count);
-    Instruction_t DisassembleAt(uint_t rva);
-    Instruction_t DisassembleAt(uint_t rva, uint_t count);
+    int_t getPreviousInstructionRVA(int_t rva, uint_t count);
+    int_t getNextInstructionRVA(int_t rva, uint_t count);
+    int_t getInstructionRVA(int_t index, int_t count);
+    Instruction_t DisassembleAt(int_t rva);
+    Instruction_t DisassembleAt(int_t rva, int_t count);
 
     // Selection Management
-    void expandSelectionUpTo(int to);
-    void setSingleSelection(int index);
-    int getInitialSelection();
+    void expandSelectionUpTo(int_t to);
+    void setSingleSelection(int_t index);
+    int_t getInitialSelection();
     void selectNext();
     void selectPrevious();
-    bool isSelected(int base, int offset);
+    bool isSelected(int_t base, int_t offset);
 
-    // Index Management
-    int getIndexFromCount(int index, int count);
+    // Update/Reload/Refresh/Repaint
     void prepareData();
+
+    // Public Methods
+    void setMemoryPage(MemoryPage* parMemPage);
+    void disassembleClear();
 
 signals:
     
 public slots:
-    void disassambleAt(uint_t parVA, uint_t parCIP);
+    void disassambleAt(int_t parVA, int_t parCIP);
     void debugStateChangedSlot(DBGSTATE state);
 
 private:
-    void disassembleClear();
-    void paintRichText(QPainter* painter, int x, int y, int w, int h, int xinc, const QList<CustomRichText_t>* richText);
-
     enum GuiState_t {NoState, MultiRowsSelectionState};
     enum GraphicDump_t {GD_Nothing, GD_FootToTop, GD_FootToBottom, GD_HeadFromTop, GD_HeadFromBottom, GD_Vert}; // GD_FootToTop = '- , GD_FootToBottom = ,- , GD_HeadFromTop = '-> , GD_HeadFromBottom = ,-> , GD_Vert = |
 
     typedef struct _SelectionData_t
     {
-        int firstSelectedIndex;
-        int fromIndex;
-        int toIndex;
+        int_t firstSelectedIndex;
+        int_t fromIndex;
+        int_t toIndex;
     } SelectionData_t;
 
     QBeaEngine* mDisasm;
@@ -77,7 +84,7 @@ private:
 
     MemoryPage* mMemPage;
 
-    uint_t mCipRva;
+    int_t mCipRva;
 
     QList<Instruction_t> mInstBuffer;
 };

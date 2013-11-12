@@ -39,7 +39,7 @@ void Bridge::readProcessMemory(byte_t* dest, uint_t va, uint_t size)
 #endif
 }
 
-void Bridge::emitDisassembleAtSignal(uint_t va, uint_t eip)
+void Bridge::emitDisassembleAtSignal(int_t va, int_t eip)
 {
 #ifdef BUILD_LIB
     emit disassembleAt(va, eip);
@@ -159,7 +159,7 @@ void Bridge::initBridge()
 
     __declspec(dllexport) void _gui_disassembleat(duint va, duint eip)
     {
-        Bridge::getBridge()->emitDisassembleAtSignal(va, eip);
+        Bridge::getBridge()->emitDisassembleAtSignal((int_t)va, (int_t)eip);
     }
 
 

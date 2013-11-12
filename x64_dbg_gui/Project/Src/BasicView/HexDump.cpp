@@ -8,36 +8,44 @@ HexDump::HexDump(QWidget *parent) :AbstractTableView(parent)
     memset(&data, 0, sizeof(SelectionData_t));
     mSelection = data;
 
-    mMemoryView = new MapViewOfMem("AsmCode.bin");
-
-
     mGuiState = HexDump::NoState;
 
 
     mByteWidth = QFontMetrics(this->font()).width(QChar('L')) + 4;
     mDumpByteWidth = 16;
 
-    setRowCount(mMemoryView->size() / 16);
+    setRowCount(0);
 
-    //qDebug() << "size" << getRowCount();
+    mMemPage = new MemoryPage(0, 0);
 
+    addColumnAt(100, false);
+    addColumnAt(100, false);
+    addColumnAt(100, false);
 
-
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
-    addColumnAt(getColumnCount(), 100, false);
+    connect(Bridge::getBridge(), SIGNAL(disassembleAt(int_t, int_t)), this, SLOT(printDumpAt(int_t)));
 }
 
 
+void HexDump::printDumpAt(int_t parVA)
+{
+    int_t wBase = Bridge::getBridge()->getBase(parVA);
+    int_t wSize = Bridge::getBridge()->getSize(wBase);
+    int_t wRVA = parVA - wBase;
+
+    setRowCount(wSize/mDumpByteWidth);
+    mMemPage->setAttributes(wBase, wSize);  // Set base and size (Useful when memory page changed)
+    setTableOffset(wRVA/mDumpByteWidth);
+}
+
 void HexDump::mouseMoveEvent(QMouseEvent* event)
 {
-    //qDebug() << "HexDump::mouseMoveEvent";
+    qDebug() << "HexDump::mouseMoveEvent";
 
     bool wAccept = true;
 
     if(mGuiState == HexDump::MultiRowsSelectionState)
     {
-        //qDebug() << "State = MultiRowsSelectionState";
+        qDebug() << "State = MultiRowsSelectionState";
 
         if((transY(event->y()) >= 0) && (transY(event->y()) <= this->getTableHeigth()))
         {
@@ -62,7 +70,7 @@ void HexDump::mouseMoveEvent(QMouseEvent* event)
 
 void HexDump::mousePressEvent(QMouseEvent* event)
 {
-    //qDebug() << "HexDump::mousePressEvent";
+    qDebug() << "HexDump::mousePressEvent";
 
     bool wAccept = false;
 
@@ -131,12 +139,12 @@ void HexDump::mouseReleaseEvent(QMouseEvent* event)
 
 
 
-QString HexDump::paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h)
+QString HexDump::paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h)
 {
     //return QString("HexDump: Col:") + QString::number(col) + "Row:" + QString::number(rowBase + rowOffset);
 
     QString wStr = "";
-    int wRva = (rowBase + rowOffset) * mDumpByteWidth;
+    int_t wRva = (rowBase + rowOffset) * mDumpByteWidth;
 
 
     //if(isSelected(rowBase, rowOffset) == true)
@@ -154,8 +162,13 @@ QString HexDump::paintContent(QPainter* painter, int rowBase, int rowOffset, int
 
         case 1:
         {
+            QByteArray wBuffer;
+            wBuffer.resize(mDumpByteWidth);
+            mMemPage->readOriginalMemory(reinterpret_cast<byte_t*>(wBuffer.data()), wRva, mDumpByteWidth);
+
             for(int i = 0; i < mDumpByteWidth; i++)
-                wStr += QString("%1").arg(mMemoryView->data()[wRva + i], 2, 16, QChar('0')).toUpper() + " ";
+                wStr += QString("%1").arg((unsigned char)wBuffer.at(i), 2, 16, QChar('0')).toUpper() + " ";
+
             break;
         }
 

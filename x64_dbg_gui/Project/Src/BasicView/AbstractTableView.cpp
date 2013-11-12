@@ -16,7 +16,7 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
     //font.setBold(true); //bold
 
     font.setFixedPitch(true);
-    font.setStyleHint(QFont::Monospace);
+    //font.setStyleHint(QFont::Monospace);
     this->setFont(font);
 
 
@@ -31,24 +31,25 @@ AbstractTableView::AbstractTableView(QWidget *parent) : QAbstractScrollArea(pare
 
     mNbrOfLineToPrint = 0;
 
-    ColumnResizingData_t temp;
-    memset(&temp, 0, sizeof(ColumnResizingData_t));
-    mColResizeData = temp;
+    mColResizeData = (ColumnResizingData_t){false, 0, 0};
 
     mGuiState = AbstractTableView::NoState;
 
-    mShouldRepaint = true;
+    mShouldReload = true;
 
+    // ScrollBar Init
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    mScrollBarAttributes = (ScrollBar64_t){false, 0};
 
     setMouseTracking(true);
 
+    // Signals/Slots Connections
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), this, SLOT(vertSliderActionSlot(int)));
 }
 
 
 /************************************************************************************
-                            Reimplemented Functions
+                            Painting Stuff
 ************************************************************************************/
 /**
  * @brief       This method has been reimplemented. It paints the whole table.
@@ -62,19 +63,20 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
     QPainter wPainter(this->viewport());
     int wViewableRowsCount = getViewableRowsCount();
 
-    if(mPrevTableOffset != mTableOffset || mShouldRepaint == true)
+    int x = 0;
+    int y = 0;
+
+    // Reload data if needed
+    if(mPrevTableOffset != mTableOffset || mShouldReload == true)
     {
         prepareData();
         mPrevTableOffset = mTableOffset;
     }
 
-    int x = 0;
-    int y = 0;
-
-    // Paint background
+    // Paints background
     wPainter.fillRect(wPainter.viewport(), QBrush(QColor(255, 251, 240)));
 
-    // Draw header
+    // Paints header
     if(mHeader.isVisible == true)
     {
         for(int i = 0; i < getColumnCount(); i++)
@@ -96,19 +98,19 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
         y = getHeaderHeigth();
     }
 
-    // Iterate over all columns && cells
+    // Iterate over all columns and cells
     for(int j = 0; j < getColumnCount(); j++)
     {
         for(int i = 0; i < wViewableRowsCount; i++)
         {
-            //  Draw cells content
+            //  Paints cell contents
             if(i < mNbrOfLineToPrint)
             {
                QString wStr = paintContent(&wPainter, mTableOffset, i, j, x, y, getColumnWidth(j), getRowHeight());
                wPainter.drawText(QRect(x + 4, y, getColumnWidth(j) - 4, getRowHeight()), Qt::AlignVCenter | Qt::AlignLeft, wStr);
             }
 
-            // Draw cell right border
+            // Paints cell right borders
             wPainter.save() ;
             wPainter.setPen(QColor(128, 128, 128));
             wPainter.drawLine(x + getColumnWidth(j) - 1, y, x + getColumnWidth(j) - 1, y + getRowHeight() - 1);
@@ -121,11 +123,12 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
         y = getHeaderHeigth();
         x += getColumnWidth(j);
     }
-
-
 }
 
 
+/************************************************************************************
+                            Mouse Management
+************************************************************************************/
 /**
  * @brief       This method has been reimplemented. It manages the following actions:
  *               - Column resizing
@@ -137,7 +140,7 @@ void AbstractTableView::paintEvent(QPaintEvent* event)
  */
 void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
 {
-    //qDebug() << "mouseMoveEvent";
+   // qDebug() << "mouseMoveEvent";
 
     switch (mGuiState)
     {
@@ -226,7 +229,7 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
 
             mColResizeData.lastPosX = event->x();
 
-            refresh();
+            repaint();
 
             break;
         }
@@ -245,7 +248,7 @@ void AbstractTableView::mouseMoveEvent(QMouseEvent* event)
                 mColumnList[mHeader.activeButtonIndex].header.isMouseOver = false;
             }
 
-            refresh();
+            repaint();
         }
         default:
             break;
@@ -266,7 +269,6 @@ void AbstractTableView::mousePressEvent(QMouseEvent* event)
 {
     if(((event->buttons() & Qt::LeftButton) != 0) && ((event->buttons() & Qt::RightButton) == 0))
     {
-
         if(mColResizeData.splitHandle == true)
         {
             int wColIndex = getColumnIndexFromX(event->x());
@@ -289,7 +291,7 @@ void AbstractTableView::mousePressEvent(QMouseEvent* event)
         {
             int wColIndex = getColumnIndexFromX(event->x());
 
-            //qDebug() << "Button " << wColIndex << "has been pressed.";
+            qDebug() << "Button " << wColIndex << "has been pressed.";
             emit headerButtonPressed(wColIndex);
 
             mColumnList[wColIndex].header.isPressed = true;
@@ -299,7 +301,7 @@ void AbstractTableView::mousePressEvent(QMouseEvent* event)
 
             mGuiState = AbstractTableView::HeaderButtonPressed;
 
-            refresh();
+            repaint();
         }
     }
 
@@ -328,7 +330,7 @@ void AbstractTableView::mouseReleaseEvent(QMouseEvent* event)
         {
             if(mColumnList[mHeader.activeButtonIndex].header.isMouseOver == true)
             {
-                //qDebug() << "Button " << mHeader.activeButtonIndex << "has been released.";
+                qDebug() << "Button " << mHeader.activeButtonIndex << "has been released.";
                 emit headerButtonReleased(mHeader.activeButtonIndex);
             }
             mGuiState = AbstractTableView::NoState;
@@ -338,36 +340,13 @@ void AbstractTableView::mouseReleaseEvent(QMouseEvent* event)
             QWidget::mouseReleaseEvent(event);
         }
 
-
+        // Release all buttons
         for(int i = 0; i < getColumnCount(); i++)
         {
             mColumnList[i].header.isPressed = false;
         }
 
-        refresh();
-    }
-}
-
-
-/**
- * @brief       This method has been reimplemented. It manages the following actions:
- *               - Pressed keys
- *
- * @param[in]   event       Key event
- *
- * @return      Nothing.
- */
-void AbstractTableView::keyPressEvent(QKeyEvent* event)
-{
-    int key = event->key();
-
-    if(key == Qt::Key_Up)
-    {
-        moveScrollBar(-1);
-    }
-    else if(key == Qt::Key_Down)
-    {
-        moveScrollBar(1);
+        repaint();
     }
 }
 
@@ -384,24 +363,58 @@ void AbstractTableView::wheelEvent(QWheelEvent* event)
 {
     //qDebug() << "wheelEvent";
 
-    //QAbstractScrollArea::wheelEvent(event);
-
     if(event->delta() > 0)
-        moveScrollBar(-3);
+        verticalScrollBar()->triggerAction(QAbstractSlider::SliderPageStepSub);
     else
-        moveScrollBar(3);
+        verticalScrollBar()->triggerAction(QAbstractSlider::SliderPageStepAdd);
+
+    //QAbstractScrollArea::wheelEvent(event);
 }
 
 
+/**
+ * @brief       This method has been reimplemented. It repaints the table when the height changes.
+ *
+ * @param[in]   event       Resize event
+ *
+ * @return      Nothing.
+ */
 void AbstractTableView::resizeEvent(QResizeEvent* event)
 {
     if(event->size().height() != event->oldSize().height())
     {
-        mShouldRepaint = true;
+        mShouldReload = true;
     }
 
     QWidget::resizeEvent(event);
 }
+
+
+/************************************************************************************
+                            Keyboard Management
+************************************************************************************/
+/**
+ * @brief       This method has been reimplemented. It manages the following actions:
+ *               - Pressed keys
+ *
+ * @param[in]   event       Key event
+ *
+ * @return      Nothing.
+ */
+void AbstractTableView::keyPressEvent(QKeyEvent* event)
+{
+    int wKey = event->key();
+
+    if(wKey == Qt::Key_Up)
+    {
+        verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepSub);
+    }
+    else if(wKey == Qt::Key_Down)
+    {
+        verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepAdd);
+    }
+}
+
 
 /************************************************************************************
                             ScrollBar Management
@@ -415,88 +428,193 @@ void AbstractTableView::resizeEvent(QResizeEvent* event)
  */
 void AbstractTableView::vertSliderActionSlot(int action)
 {
-    int wSliderPosition = verticalScrollBar()->sliderPosition();
-    int wOldValue = mTableOffset;
-    int wDelta;
+    int_t wDelta;
+    int wSliderPos = verticalScrollBar()->sliderPosition();
+    int wNewScrollBarValue;
 
-    // Saturate slider postion value
-    qBound((int)0, wSliderPosition, getRowCount() - 1);
+    // Bounding
+    wSliderPos = wSliderPos > verticalScrollBar()->maximum() ? verticalScrollBar()->maximum() : wSliderPos;
+    wSliderPos = wSliderPos < 0 ? 0 : wSliderPos;
 
-    // Compute Delta
-    wDelta = wSliderPosition - wOldValue;
+    // Determine the delta
+    switch(action)
+    {
+        case QAbstractSlider::SliderNoAction:
+            break;
+        case QAbstractSlider::SliderSingleStepAdd:
+            wDelta = 1;
+            break;
+        case QAbstractSlider::SliderSingleStepSub:
+            wDelta = -1;
+            break;
+        case QAbstractSlider::SliderPageStepAdd:
+            wDelta = 3;
+            break;
+        case QAbstractSlider::SliderPageStepSub:
+            wDelta = -3;
+            break;
+        case QAbstractSlider::SliderToMinimum:
+        case QAbstractSlider::SliderToMaximum:
+        case QAbstractSlider::SliderMove:
+#ifdef _WIN64
+            wDelta = scaleFromScrollBarRangeToUint64(wSliderPos) - mTableOffset;
+#else
+            wDelta = wSliderPos - mTableOffset;
+#endif
+            break;
+        default:
+            break;
+    }
 
-    //qDebug() << "Scroll Action Slot : wSliderPosition: " << wSliderPosition << " mTableOffset: " << mTableOffset << " wDelta: " << wDelta;
+    // Call the hook (Usefull for disassembly)
+    mTableOffset = sliderMovedHook(action, mTableOffset, wDelta);
 
-    // Compute the new table offset
-    mTableOffset = sliderMovedAction(action, wOldValue, wDelta);
+    // Scale the new table offset to the 32bits scrollbar range
+#ifdef _WIN64
+    wNewScrollBarValue = scaleFromUint64ToScrollBarRange(mTableOffset);
+#else
+    wNewScrollBarValue = mTableOffset;
+#endif
 
-    verticalScrollBar()->setValue(mTableOffset);
-
-    //qDebug() << "New mTableOffset: " << mTableOffset;
+    // Update scrollbar attributes
+    verticalScrollBar()->setValue(wNewScrollBarValue);
+    verticalScrollBar()->setSliderPosition(wNewScrollBarValue);
 }
 
 
 /**
  * @brief       This virtual method is called at the end of the vertSliderActionSlot(...) method.
- *              It allows changing the slider postion according to the type of action, the new value
- *              of the scrollbar && the scrollbar delta.
+ *              It allows changing the table offset according to the action type, the old table offset
+ *              and delta between the old and the new table offset.
  *
  * @param[in]   type      Type of action (Refer to the QAbstractSlider::SliderAction enum)
- * @param[in]   value     New value of the scrollbar (Index of the top table item)
+ * @param[in]   value     Old table offset
  * @param[in]   delta     Scrollbar value delta compared to the previous state
  *
- * @return      Nothing.
+ * @return      Return the value of the new table offset.
  */
-int AbstractTableView::sliderMovedAction(int type, int value, int delta)
+int_t AbstractTableView::sliderMovedHook(int type, int_t value, int_t delta)
 {
-    return value + delta;
+    int_t wValue = value + delta;
+    int_t wMax = getRowCount() - 1;
+
+    // Bounding
+    wValue = wValue > wMax ? wMax : wValue;
+    wValue = wValue < 0 ? 0 : wValue;
+
+    return wValue;
 }
 
 
 /**
- * @brief       This method set the verticall scrollbar to the given value && triggers the slider action slot with
- *              the QAbstractSlider::SliderNoAction type.
+ * @brief       This method scale the given 64bits integer to the scrollbar range (32bits).
  *
- * @param[in]   val      New slider value
+ * @param[in]   value      64bits integer to rescale
  *
- * @return      Nothing.
+ * @return      32bits integer.
  */
-void AbstractTableView::forceScrollBarValue(int val)
+#ifdef _WIN64
+int AbstractTableView::scaleFromUint64ToScrollBarRange(int_t value)
 {
-    verticalScrollBar()->setValue(val);
-    verticalScrollBar()->triggerAction(QAbstractSlider::SliderNoAction);
+    if(mScrollBarAttributes.is64 == true)
+    {
+        int_t wValue = ((int_t)value) >> mScrollBarAttributes.rightShiftCount;
+        int_t wValueMax = ((int_t)getRowCount() - 1) >> mScrollBarAttributes.rightShiftCount;
+
+        if(value == ((int_t)getRowCount() - 1))
+            return (int)(verticalScrollBar()->maximum());
+        else
+            return (int)((int_t)((int_t)verticalScrollBar()->maximum() * (int_t)wValue) / (int_t)wValueMax);
+    }
+    else
+    {
+        return (int)value;
+    }
 }
+#endif
 
 
 /**
- * @brief       This method set the verticall scrollbar to the given value && triggers the slider action slot with
- *              the QAbstractSlider::SliderSingleStepSub type.
+ * @brief       This method scale the given 32bits integer to the table range (64bits).
  *
- * @param[in]   val      New slider value
+ * @param[in]   value      32bits integer to rescale
  *
- * @return      Nothing.
+ * @return      64bits integer.
  */
-void AbstractTableView::moveScrollBar(int delta)
+#ifdef _WIN64
+int_t AbstractTableView::scaleFromScrollBarRangeToUint64(int value)
 {
-    int wSliderPosition = verticalScrollBar()->sliderPosition();
+    if(mScrollBarAttributes.is64 == true)
+    {
+        int_t wValueMax = ((int_t)getRowCount() - 1) >> mScrollBarAttributes.rightShiftCount;
 
-    verticalScrollBar()->setValue(wSliderPosition + delta);
-    verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepSub);
+        if(value == (int)0x7FFFFFFF)
+            return (int_t)(getRowCount() - 1);
+        else
+            return (int_t)(((int_t)((int_t)wValueMax * (int_t)value) / (int_t)0x7FFFFFFF) << mScrollBarAttributes.rightShiftCount);
+    }
+    else
+    {
+        return (int_t)value;
+    }
 }
+#endif
 
 
-void AbstractTableView::refresh()
+/**
+ * @brief       This method updates the scrollbar range and pre-computes some attributes for the 32<->64bits conversion methods.
+ *
+ * @param[in]   range New table range (size)
+ *
+ * @return      32bits integer.
+ */
+void AbstractTableView::updateScrollBarRange(int_t range)
 {
-    this->viewport()->repaint();
-}
+    int_t wMax = range--;
 
+    if(wMax > 0)
+    {
+#ifdef _WIN64
+        if((uint_t)wMax < (uint_t)0x0000000080000000)
+        {
+            mScrollBarAttributes.is64 = false;
+            mScrollBarAttributes.rightShiftCount = 0;
+            verticalScrollBar()->setRange(0, wMax);
+        }
+        else
+        {
+            uint_t wMask = 0x8000000000000000;
+            int wLeadingZeroCount;
+
+            // Count leading zeros
+            for(wLeadingZeroCount = 0; wLeadingZeroCount < 64; wLeadingZeroCount++)
+            {
+                if((uint_t)wMax < wMask)
+                {
+                    wMask = wMask >> 1;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            mScrollBarAttributes.is64 = true;
+            mScrollBarAttributes.rightShiftCount = 32 - wLeadingZeroCount;
+            verticalScrollBar()->setRange(0, 0x7FFFFFFF);
+        }
+#else
+        verticalScrollBar()->setRange(0, wMax);
+#endif
+    }
+}
 
 
 /************************************************************************************
                             Coordinates Utils
 ************************************************************************************/
 /**
- * @brief       Returns the index offset corresponding to the given y coordinate.
+ * @brief       Returns the index offset (relative to the table offset) corresponding to the given y coordinate.
  *
  * @param[in]   y      Pixel offset starting from the top of the table (without the header)
  *
@@ -565,7 +683,7 @@ int AbstractTableView::getColumnPosition(int index)
 
 
 /**
- * @brief       Substract the header heigth from the given y.
+ * @brief       Substracts the header heigth from the given y.
  *
  * @param[in]   y      y coordinate
  *
@@ -594,45 +712,31 @@ int AbstractTableView::getViewableRowsCount()
 
 
 /**
- * @brief       Returns the number of remaining lines to print.
+ * @brief       This virtual method returns the number of remaining lines to print.
  *
  * @return      Number of remaining lines to print.
  */
 int AbstractTableView::getLineToPrintcount()
 {
     int wViewableRowsCount = getViewableRowsCount();
-    int wRemainingRowsCount = getRowCount() - mTableOffset;
-    int wCount = wRemainingRowsCount > wViewableRowsCount ? wViewableRowsCount : wRemainingRowsCount;
+    int_t wRemainingRowsCount = getRowCount() - mTableOffset;
+    int wCount = (int_t)wRemainingRowsCount > (int_t)wViewableRowsCount ? (int)wViewableRowsCount : (int)wRemainingRowsCount;
     return wCount;
 }
 
 
-/**
- * @brief       This method is called every time the table offset changes.
- *
- * @param[in]   parTableOffset      New table offset
- *
- * @return      Returns the number of remaining lines to print.
- */
-void AbstractTableView::prepareData()
-{
-    int wViewableRowsCount = getViewableRowsCount();
-    int wRemainingRowsCount = getRowCount() - mTableOffset;
-    mNbrOfLineToPrint = wRemainingRowsCount > wViewableRowsCount ? wViewableRowsCount : wRemainingRowsCount;
-}
-
-
 /************************************************************************************
-                                New Columns
+                                New Columns/New Size
 ************************************************************************************/
 /**
- * @brief       Substract the header heigth from the given y.
+ * @brief       This mehtod adds a new column to the table.
  *
- * @param[in]   y      y coordinate
+ * @param[in]   width           Width of the column in pixel
+ * @param[in]   isClickable     Boolean that tells whether the header is clickable or not
  *
- * @return      y - getHeaderHeigth().
+ * @return      Nothing.
  */
-int AbstractTableView::addColumnAt(int at, int width, bool isClickable)
+void AbstractTableView::addColumnAt(int width, bool isClickable)
 {
     HeaderButton_t wHeaderButton;
     Column_t wColumn;
@@ -644,29 +748,20 @@ int AbstractTableView::addColumnAt(int at, int width, bool isClickable)
     wColumn.header = wHeaderButton;
     wColumn.width = width;
 
-    if(at < 0)
-        at = 0;
-
-    if(at > mColumnList.size())
-        at = mColumnList.size();
-
-    mColumnList.insert(at, wColumn);
-
-    return at;
+    mColumnList.append(wColumn);
 }
 
+
+void AbstractTableView::setRowCount(int_t count)
+{
+    updateScrollBarRange(count);
+    mRowCount = count;
+}
 
 /************************************************************************************
                                 Getter & Setter
 ************************************************************************************/
-void AbstractTableView::setRowCount(int count)
-{
-    mRowCount = count > 0 ? count : 0;
-    verticalScrollBar()->setRange(0, count > 0 ? count - 1 : 0);
-}
-
-
-int AbstractTableView::getRowCount()
+int_t AbstractTableView::getRowCount()
 {
     return mRowCount;
 }
@@ -690,8 +785,7 @@ int AbstractTableView::getColumnWidth(int index)
     {
         return -1;
     }
-
-    if(index < (getColumnCount() - 1))
+    else if(index < (getColumnCount() - 1))
     {
         return mColumnList.at(index).width;
     }
@@ -730,12 +824,6 @@ int AbstractTableView::getTableHeigth()
 }
 
 
-int AbstractTableView::getTableOffset()
-{
-    return mTableOffset;
-}
-
-
 int AbstractTableView::getGuiState()
 {
     return mGuiState;
@@ -747,16 +835,61 @@ int AbstractTableView::getNbrOfLineToPrint()
     return mNbrOfLineToPrint;
 }
 
+
 void AbstractTableView::setNbrOfLineToPrint(int parNbrOfLineToPrint)
 {
     mNbrOfLineToPrint = parNbrOfLineToPrint;
 }
 
 
-void AbstractTableView::reloadData()
+/************************************************************************************
+                           Table Offset Management
+************************************************************************************/
+int_t AbstractTableView::getTableOffset()
 {
-    mShouldRepaint = true;
-    refresh();
+    return mTableOffset;
 }
 
 
+void AbstractTableView::setTableOffset(int_t val)
+{
+    mTableOffset = val;
+
+#ifdef _WIN64
+    int wNewValue = scaleFromUint64ToScrollBarRange(mTableOffset);
+    verticalScrollBar()->setValue(wNewValue);
+    verticalScrollBar()->setSliderPosition(wNewValue);
+#else
+    verticalScrollBar()->setValue(val);
+    verticalScrollBar()->setSliderPosition(val);
+#endif
+}
+
+
+/************************************************************************************
+                         Update/Reload/Refresh/Repaint
+************************************************************************************/
+void AbstractTableView::reloadData()
+{
+    mShouldReload = true;
+    repaint();
+}
+
+
+void AbstractTableView::repaint()
+{
+    this->viewport()->repaint();
+}
+
+
+/**
+ * @brief       This method is called when data have to be reloaded (e.g. When table offset changes).
+ *
+ * @return      Nothing.
+ */
+void AbstractTableView::prepareData()
+{
+    int wViewableRowsCount = getViewableRowsCount();
+    int_t wRemainingRowsCount = getRowCount() - mTableOffset;
+    mNbrOfLineToPrint = (int_t)wRemainingRowsCount > (int_t)wViewableRowsCount ? (int)wViewableRowsCount : (int)wRemainingRowsCount;
+}

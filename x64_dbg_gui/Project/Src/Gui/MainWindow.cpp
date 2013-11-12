@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Create QMdiSubWindow
     QMdiSubWindow* subWindow = new QMdiSubWindow();
     subWindow->setWindowTitle("CPU");
+    subWindow->showMaximized();
 
     mCpuWin = new CPUWidget();
     mCpuWin->setWindowIcon(QIcon(":/icons/images/processor-cpu.png"));
@@ -53,9 +54,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mdiArea->addSubWindow(mMemMapView);
     mdiArea->addSubWindow(mLogView);
 
-    //Window sizes
     setCentralWidget(mdiArea);
-    setCentralWidget(subWindow);
 
     // Setup the command bar
     mCmdLineEdit = new CommandLineEdit(ui->cmdBar);
