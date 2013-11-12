@@ -3,7 +3,6 @@
 
 #include "_global.h"
 
-void moduleload(uint base, const char* name);
-void moduleunload(uint base);
+bool modnamefromaddr(uint addr, char* modname);
 
 #endif // _ADDRINFO_H

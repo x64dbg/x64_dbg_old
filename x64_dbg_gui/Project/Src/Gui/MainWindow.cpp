@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mMemMapView->setWidget(new MemoryMapView());
     mMemMapView->setWindowIcon(QIcon(":/icons/images/memory-map.png"));
     mMemMapView->hide();
-    mMemMapView->setGeometry(10, 10, 600, 400);
+    mMemMapView->setGeometry(10, 10, 625, 500);
 
     // Log View
     mLogView = new QMdiSubWindow();

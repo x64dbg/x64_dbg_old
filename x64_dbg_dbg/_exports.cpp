@@ -1,13 +1,6 @@
 #include "_exports.h"
-#include <vector>
 #include "memory.h"
 #include "debugger.h"
-#include <psapi.h>
-#ifdef __GNUC__
-#include "dbghelp\dbghelp.h"
-#else
-#include <dbghelp.h>
-#endif //__GNUC__
 #include "value.h"
 
 extern "C" DLL_EXPORT duint _dbg_memfindbaseaddr(duint addr, duint* size)
@@ -29,8 +22,7 @@ extern "C" DLL_EXPORT bool _dbg_memmap(MEMMAP* memmap)
 
     MEMORY_BASIC_INFORMATION mbi;
     DWORD numBytes;
-    uint MyAddress=0, newAddress=0, curmod=0, curmodsize=0;
-    char curmodname[20]="";
+    uint MyAddress=0, newAddress=0;
     SymInitialize(fdProcessInfo->hProcess, 0, true);
     std::vector<MEMPAGE> pageVector;
     do
@@ -38,36 +30,14 @@ extern "C" DLL_EXPORT bool _dbg_memmap(MEMMAP* memmap)
         numBytes=VirtualQueryEx(fdProcessInfo->hProcess, (LPCVOID)MyAddress, &mbi, sizeof(mbi));
         if(mbi.State==MEM_COMMIT)
         {
+            MEMPAGE curPage;
             IMAGEHLP_MODULE64 nfo;
             nfo.SizeOfStruct=sizeof(IMAGEHLP_MODULE64);
             if(SymGetModuleInfo64(fdProcessInfo->hProcess, MyAddress, &nfo))
-            {
-                curmod=MyAddress;
-                curmodsize=nfo.ImageSize;
-                char szBaseName[256]="";
-                int len=GetModuleBaseName(fdProcessInfo->hProcess, (HMODULE)MyAddress, szBaseName, 256);
-                if(len)
-                {
-                    len--;
-                    while(szBaseName[len]!='.')
-                        len--;
-                    if(len)
-                        szBaseName[len]=0;
-                    szBaseName[16]=0;
-                    _strlwr(szBaseName);
-                    memset(curmodname, ' ', 16);
-                    memcpy(curmodname, szBaseName, strlen(szBaseName));
-                }
-            }
-            char mod[20]="                ";
-            if(mbi.Type==MEM_IMAGE) //image
-            {
-                if(MyAddress>=curmod and MyAddress<(curmod+curmodsize))
-                    memcpy(mod, curmodname, 16);
-            }
-            MEMPAGE curPage;
+                memcpy(curPage.mod, nfo.ModuleName, sizeof(curPage.mod));
+            else
+                memset(curPage.mod, 0, sizeof(curPage.mod));
             memcpy(&curPage.mbi, &mbi, sizeof(mbi));
-            memcpy(&curPage.mod, mod, 16);
             pageVector.push_back(curPage);
             memmap->count++;
         }

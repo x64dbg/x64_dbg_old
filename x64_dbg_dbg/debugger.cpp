@@ -180,17 +180,6 @@ static void cbEntryBreakpoint()
 
 static int ecount=0;
 
-static void cbAfterException(void* ExceptionData)
-{
-    EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
-    uint addr=(uint)edi->ExceptionRecord.ExceptionAddress;
-    SetNextDbgContinueStatus(DBG_CONTINUE);
-    char msg[50]="";
-    ecount++;
-    sprintf(msg, "exception %d passed "fhex" (%.8X)", ecount, addr, edi->ExceptionRecord.ExceptionCode);
-    dputs(msg);
-}
-
 static void cbException(void* ExceptionData)
 {
     EXCEPTION_DEBUG_INFO* edi=(EXCEPTION_DEBUG_INFO*)ExceptionData;
@@ -233,24 +222,40 @@ static void cbException(void* ExceptionData)
 
 static void cbLoadDll(LOAD_DLL_DEBUG_INFO* LoadDll)
 {
+    void* base=LoadDll->lpBaseOfDll;
     char DLLDebugFileName[deflen]="";
-    if(!GetMappedFileNameA(fdProcessInfo->hProcess, LoadDll->lpBaseOfDll, DLLDebugFileName, deflen))
+    if(!GetMappedFileNameA(fdProcessInfo->hProcess, base, DLLDebugFileName, deflen))
         strcpy(DLLDebugFileName, "??? (GetMappedFileName failed)");
     else
         DevicePathToPath(DLLDebugFileName, DLLDebugFileName, deflen);
-    dprintf("DLL Loaded: "fhex" %s\n", LoadDll->lpBaseOfDll, DLLDebugFileName);
-    moduleload((uint)LoadDll->lpBaseOfDll, 0);
+    dprintf("DLL Loaded: "fhex" %s\n", base, DLLDebugFileName);
+    SymLoadModuleEx(fdProcessInfo->hProcess, LoadDll->hFile, DLLDebugFileName, 0, (DWORD64)base, 0, 0, 0);
 }
 
 static void cbUnloadDll(UNLOAD_DLL_DEBUG_INFO* UnloadDll)
 {
+    void* base=UnloadDll->lpBaseOfDll;
     char DLLDebugFileName[deflen]="";
-    if(!GetMappedFileNameA(fdProcessInfo->hProcess, UnloadDll->lpBaseOfDll, DLLDebugFileName, deflen))
+    if(!GetMappedFileNameA(fdProcessInfo->hProcess, base, DLLDebugFileName, deflen))
         strcpy(DLLDebugFileName, "??? (GetMappedFileName failed)");
     else
         DevicePathToPath(DLLDebugFileName, DLLDebugFileName, deflen);
-    dprintf("DLL Unloaded: "fhex" %s\n", UnloadDll->lpBaseOfDll, DLLDebugFileName);
-    moduleunload((uint)UnloadDll->lpBaseOfDll);
+    dprintf("DLL Unloaded: "fhex" %s\n", base, DLLDebugFileName);
+    SymUnloadModule64(fdProcessInfo->hProcess, (DWORD64)base);
+}
+
+static void cbCreateProcess(CREATE_PROCESS_DEBUG_INFO* CreateProcessInfo)
+{
+    void* base=CreateProcessInfo->lpBaseOfImage;
+    char DebugFileName[deflen]="";
+    if(!GetMappedFileNameA(fdProcessInfo->hProcess, base, DebugFileName, deflen))
+        strcpy(DebugFileName, "??? (GetMappedFileName failed)");
+    else
+        DevicePathToPath(DebugFileName, DebugFileName, deflen);
+    dprintf("Process Started: "fhex" %s\n", base, DebugFileName);
+
+    SymInitialize(fdProcessInfo->hProcess, 0, false); //initialize symbols
+    SymLoadModuleEx(fdProcessInfo->hProcess, CreateProcessInfo->hFile, DebugFileName, 0, (DWORD64)base, 0, 0, 0);
 }
 
 static void cbSystemBreakpoint(void* ExceptionData)
@@ -347,6 +352,7 @@ static DWORD WINAPI threadDebugLoop(void* lpParameter)
     ecount=0;
     bplist=bpinit(bplist);
     //NOTE: set custom handlers
+    SetCustomHandler(UE_CH_CREATEPROCESS, (void*)cbCreateProcess);
     SetCustomHandler(UE_CH_SYSTEMBREAKPOINT, (void*)cbSystemBreakpoint);
     SetCustomHandler(UE_CH_UNHANDLEDEXCEPTION, (void*)cbException);
     SetCustomHandler(UE_CH_LOADDLL, (void*)cbLoadDll);

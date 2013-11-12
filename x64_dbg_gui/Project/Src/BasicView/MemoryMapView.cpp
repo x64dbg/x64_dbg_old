@@ -6,9 +6,9 @@ MemoryMapView::MemoryMapView(StdTable *parent) : StdTable(parent)
 
     int charwidth=QFontMetrics(this->font()).width(QChar(' '));
 
-    addColumnAt(8+charwidth*2*sizeof(uint_t), false);
-    addColumnAt(8+charwidth*2*sizeof(uint_t), false);
-    addColumnAt(8+charwidth*16, false);
+    addColumnAt(8+charwidth*2*sizeof(uint_t), false); //addr
+    addColumnAt(8+charwidth*2*sizeof(uint_t), false); //size
+    addColumnAt(8+charwidth*32, false); //module
     addColumnAt(8+charwidth*3, false);
     addColumnAt(8+charwidth*5, false);
     addColumnAt(8+charwidth*5, false);
@@ -88,7 +88,9 @@ void MemoryMapView::stateChangedSlot(DBGSTATE state)
             setCellContent(wI, 1, wS);
 
             // Module Name
-            wS = QString((wMemMapStruct.page)[wI].mod);
+            char newMod[17]="";
+            memcpy(newMod, (wMemMapStruct.page)[wI].mod, 16);
+            wS = QString(newMod);
             setCellContent(wI, 2, wS);
 
             // State

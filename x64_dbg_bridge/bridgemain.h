@@ -73,7 +73,7 @@ enum BPXTYPE
 struct MEMPAGE
 {
     MEMORY_BASIC_INFORMATION mbi;
-    char mod[16];
+    char mod[32];
 };
 
 struct MEMMAP
@@ -84,7 +84,7 @@ struct MEMMAP
 
 struct ADDRINFO
 {
-    char module[16]; //module the address is in
+    char module[32]; //module the address is in
     char label[MAX_LABEL_SIZE];
     char comment[MAX_COMMENT_SIZE];
     int flags; //ADDRINFOFLAGS
