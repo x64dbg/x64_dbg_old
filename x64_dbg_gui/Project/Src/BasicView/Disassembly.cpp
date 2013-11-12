@@ -492,15 +492,14 @@ void Disassembly::paintJumpsGraphic(QPainter* painter, int x, int y, int_t addr)
             }
         }
     }
-//DWORD tick = GetTickCount();
+
     painter->save() ;
-    /*
+
     if(DbgIsJumpGoingToExecute(instruction.rva+mMemPage->getBase())) //change pen color when jump is executed
         painter->setPen(QColor(255, 0, 0));
     else
         painter->setPen(QColor(128, 128, 128));
-        */
-//qDebug() << "tick count 1" << (GetTickCount()-tick);
+
     if(wPict == GD_Vert)
     {
         painter->drawLine(x, y, x, y + getRowHeight());
