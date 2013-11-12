@@ -9,8 +9,7 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # Removes all debug output when defined
-DEFINES += QT_NO_DEBUG_OUTPUT
-DEFINES += QT_NO_DEBUG_STREAM #no debug output in release mode (finally)
+#DEFINES += QT_NO_DEBUG_OUTPUT
 
 QMAKE_CFLAGS_RELEASE += -O3
 QMAKE_CXXFLAGS_RELEASE += -O3
