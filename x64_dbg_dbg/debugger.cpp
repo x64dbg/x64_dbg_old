@@ -6,8 +6,8 @@
 #include "value.h"
 #include "instruction.h"
 #include "memory.h"
-#include <psapi.h>
 #include "_exports.h"
+#include "addrinfo.h"
 
 static PROCESS_INFORMATION g_pi= {0,0,0,0};
 PROCESS_INFORMATION* fdProcessInfo=&g_pi;
@@ -239,6 +239,7 @@ static void cbLoadDll(LOAD_DLL_DEBUG_INFO* LoadDll)
     else
         DevicePathToPath(DLLDebugFileName, DLLDebugFileName, deflen);
     dprintf("DLL Loaded: "fhex" %s\n", LoadDll->lpBaseOfDll, DLLDebugFileName);
+    moduleload((uint)LoadDll->lpBaseOfDll, 0);
 }
 
 static void cbUnloadDll(UNLOAD_DLL_DEBUG_INFO* UnloadDll)
@@ -249,6 +250,7 @@ static void cbUnloadDll(UNLOAD_DLL_DEBUG_INFO* UnloadDll)
     else
         DevicePathToPath(DLLDebugFileName, DLLDebugFileName, deflen);
     dprintf("DLL Unloaded: "fhex" %s\n", UnloadDll->lpBaseOfDll, DLLDebugFileName);
+    moduleunload((uint)UnloadDll->lpBaseOfDll);
 }
 
 static void cbSystemBreakpoint(void* ExceptionData)

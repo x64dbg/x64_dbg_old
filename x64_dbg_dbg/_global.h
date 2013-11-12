@@ -13,6 +13,7 @@
 #include <windows.h>
 #include <shlwapi.h>
 #include <stdarg.h>
+#include <psapi.h>
 #include "..\x64_dbg_bridge\bridgemain.h"
 
 #ifndef __GNUC__
