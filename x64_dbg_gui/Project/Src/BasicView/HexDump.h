@@ -3,9 +3,11 @@
 
 #include <QtGui>
 #include <QtDebug>
+#include "NewTypes.h"
 #include "AbstractTableView.h"
-#include "MapViewOfMem.h"
+#include "MemoryPage.h"
 #include "QBeaEngine.h"
+#include "Bridge.h"
 
 class HexDump : public AbstractTableView
 {
@@ -13,13 +15,12 @@ class HexDump : public AbstractTableView
 public:
     explicit HexDump(QWidget *parent = 0);
 
-
     //QString getStringToPrint(int rowBase, int rowOffset, int col);
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
 
-    QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+    QString paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h);
     void paintGraphicDump(QPainter* painter, int x, int y, int addr);
 
     // Selection Management
@@ -32,6 +33,7 @@ public:
 signals:
     
 public slots:
+    void printDumpAt(int_t parVA);
 
 private:
     enum GuiState_t {NoState, MultiRowsSelectionState};
@@ -43,8 +45,6 @@ private:
         int toIndex;
     } SelectionData_t;
 
-    MapViewOfMem* mMemoryView;
-
     SelectionData_t mSelection;
     
     GuiState_t mGuiState;
@@ -52,6 +52,8 @@ private:
     int mByteWidth;
 
     int mDumpByteWidth;
+
+    MemoryPage* mMemPage;
 };
 
 #endif // DUMP_H

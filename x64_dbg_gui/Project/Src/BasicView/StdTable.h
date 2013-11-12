@@ -10,7 +10,7 @@ class StdTable : public AbstractTableView
     Q_OBJECT
 public:
     explicit StdTable(QWidget *parent = 0);
-    QString paintContent(QPainter* painter, int rowBase, int rowOffset, int col, int x, int y, int w, int h);
+    QString paintContent(QPainter* painter, int_t rowBase, int rowOffset, int col, int x, int y, int w, int h);
 
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
@@ -27,7 +27,7 @@ public:
     bool isSelected(int base, int offset);
 
     // Data Management
-    int addColumnAt(int at, int width, bool isClickable);
+    void addColumnAt(int width, bool isClickable);
     void setRowCount(int count);
     void setCellContent(int r, int c, QString s);
 

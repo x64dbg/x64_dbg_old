@@ -12,7 +12,7 @@ typedef struct _Instruction_t
 {
     QString instStr;
     QByteArray dump;
-    ulong rva;
+    uint_t rva;
     int lentgh;
     DISASM disasm;
 } Instruction_t;
