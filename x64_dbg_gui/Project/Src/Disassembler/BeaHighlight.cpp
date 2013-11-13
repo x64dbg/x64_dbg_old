@@ -90,10 +90,10 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
             char label_text[MAX_LABEL_SIZE]="";
             if(DbgGetLabelAt(label_addr, ConvertBeaSeg(segmentReg), label_text))
             {
-                QString displacement=QString("%1").arg(label_addr, 0, 16, QChar('0')).toUpper();
-                if(argmnemonic.indexOf(displacement)!=-1)
+                QString label_addr_text=QString("%1").arg(label_addr, 0, 16, QChar('0')).toUpper();
+                if(argmnemonic.indexOf(label_addr_text)!=-1)
                 {
-                    argmnemonic.replace(displacement, "<"+QString(label_text)+">");
+                    argmnemonic.replace(label_addr_text, "<"+QString(label_text)+">");
                 }
             }
 

@@ -55,6 +55,10 @@ private:
 
     StatusLabel* mStatusLabel;
     StatusLabel* mLastLogLabel;
+
+protected:
+    void dragEnterEvent(QDragEnterEvent* pEvent);
+    void dropEvent(QDropEvent* pEvent);
 };
 
 #endif // MAINWINDOW_H

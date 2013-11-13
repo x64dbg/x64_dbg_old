@@ -19,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     SendMessageA((HWND)MainWindow::winId(), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
     DestroyIcon(hIcon);
 
+    //Accept drops
+    setAcceptDrops(true);
+
     // Memory Map View
     mMemMapView = new QMdiSubWindow();
     mMemMapView->setWindowTitle("Memory Map");
@@ -152,7 +155,7 @@ void MainWindow::displayAboutWidget()
 #else
     const char* title="About x32_dbg";
 #endif
-    MessageBoxA((HWND)MainWindow::winId(), "Created by:\nSigma (GUI)\nMr. eXoDia (DBG)\n\nSpecial Thanks:\nVisualPharm (http://visualpharm.com)\nReversingLabs (http://reversinglabs.com)\nBeatriX (http://beaengine.org)\nQt Project (http://qt-project.org)\nFugue Icons (http://yusukekamiyamane.com)", title, MB_ICONINFORMATION);
+    MessageBoxA((HWND)MainWindow::winId(), "Created by:\nSigma (GUI)\nMr. eXoDia (DBG)\n\nSpecial Thanks:\nVisualPharm (http://visualpharm.com)\nReversingLabs (http://reversinglabs.com)\nBeatriX (http://beaengine.org)\nQt Project (http://qt-project.org)\nFugue Icons (http://yusukekamiyamane.com)\nNanomite (https://github.com/zer0fl4g/Nanomite)", title, MB_ICONINFORMATION);
 }
 
 void MainWindow::on_actionGoto_triggered()
@@ -188,4 +191,31 @@ void MainWindow::execPause()
 void MainWindow::startScylla() //this is executed
 {
     Bridge::getBridge()->execCmd("StartScylla");
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* pEvent)
+{
+    if(pEvent->mimeData()->hasUrls())
+    {
+        pEvent->acceptProposedAction();
+    }
+}
+
+void MainWindow::dropEvent(QDropEvent* pEvent)
+{
+    if(pEvent->mimeData()->hasUrls())
+    {
+        QString filename = QString(pEvent->mimeData()->data("FileName"));
+        if(filename.contains(".exe", Qt::CaseInsensitive) or filename.contains(".dll", Qt::CaseInsensitive))
+        {
+            if(DbgIsDebugging())
+            {
+                Bridge::getBridge()->execCmd("stop"); //close current file (when present)
+                Sleep(400);
+            }
+            QString cmd;
+            Bridge::getBridge()->execCmd(cmd.sprintf("init \"%s\"", filename.toUtf8().constData()).toUtf8().constData());
+        }
+        pEvent->acceptProposedAction();
+    }
 }
