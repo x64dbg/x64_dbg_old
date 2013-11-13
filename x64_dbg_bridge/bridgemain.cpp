@@ -183,7 +183,7 @@ DLL_IMPEXP bool DbgIsJumpGoingToExecute(duint addr)
 
 DLL_IMPEXP bool DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text) //(module.)+label
 {
-    if(!text)
+    if(!text or !addr)
         return false;
     //test code (highlighting.exe|x32)
     /*if(addr==0x40102b)
@@ -203,23 +203,16 @@ DLL_IMPEXP bool DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text) //(mod
     }*/
     ADDRINFO info;
     memset(&info, 0, sizeof(info));
-    info.flags=module|label;
+    info.flags=label;
     if(!_dbg_addrinfoget(addr, segment, &info))
         return false;
-    if(!*info.module && !*info.label) //no module, no label
-        return false;
-    else if(!*info.module) //no module
-        strcpy(text, info.label);
-    else if(!*info.label) //module only
-        return false;
-    else //module+label
-        sprintf(text, "%s.%s", info.module, info.label);
+    strcpy(text, info.label);
     return true;
 }
 
 DLL_IMPEXP bool DbgSetLabelAt(duint addr, const char* text)
 {
-    if(!text || strlen(text)>=MAX_LABEL_SIZE)
+    if(!text or strlen(text)>=MAX_LABEL_SIZE or !addr)
         return false;
     ADDRINFO info;
     memset(&info, 0, sizeof(info));
@@ -232,7 +225,7 @@ DLL_IMPEXP bool DbgSetLabelAt(duint addr, const char* text)
 
 DLL_IMPEXP bool DbgGetCommentAt(duint addr, char* text) //comment (not live)
 {
-    if(!text)
+    if(!text or !addr)
         return false;
     //test code (highlighting.exe)
     /*if(addr==0x401000)
@@ -251,7 +244,7 @@ DLL_IMPEXP bool DbgGetCommentAt(duint addr, char* text) //comment (not live)
 
 DLL_IMPEXP bool DbgSetCommentAt(duint addr, const char* text)
 {
-    if(!text || strlen(text)>=MAX_COMMENT_SIZE)
+    if(!text or strlen(text)>=MAX_COMMENT_SIZE or !addr)
         return false;
     ADDRINFO info;
     memset(&info, 0, sizeof(info));
@@ -259,6 +252,19 @@ DLL_IMPEXP bool DbgSetCommentAt(duint addr, const char* text)
     strcpy(info.comment, text);
     if(!_dbg_addrinfoset(addr, &info))
         return false;
+    return true;
+}
+
+DLL_IMPEXP bool DbgGetModuleAt(duint addr, char* text)
+{
+    if(!text or !addr)
+        return false;
+    ADDRINFO info;
+    memset(&info, 0, sizeof(info));
+    info.flags=module;
+    if(!_dbg_addrinfoget(addr, SEG_DEFAULT, &info))
+        return false;
+    strcpy(text, info.module);
     return true;
 }
 

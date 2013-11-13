@@ -982,7 +982,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
     HMODULE hMods[256];
     uint addrfound[256];
     int found=0;
-    int kernelbase=0;
+    int kernelbase=-1;
     if(EnumProcessModules(fdProcessInfo->hProcess, hMods, sizeof(hMods), &cbNeeded))
     {
         for(unsigned int i=0; i<(cbNeeded/sizeof(HMODULE)); i++)
@@ -1015,7 +1015,7 @@ bool valapifromstring(const char* name, uint* value, int* value_size, bool print
         *value_size=sizeof(uint);
     if(hexonly)
         *hexonly=true;
-    if(kernelbase)
+    if(kernelbase!=-1)
     {
         *value=addrfound[kernelbase];
         if(!printall)

@@ -104,6 +104,14 @@ extern "C" DLL_EXPORT bool _dbg_addrinfoget(duint addr, SEGMENTREG segment, ADDR
             retval=true;
         }
     }
+    if(addrinfo->flags&label) //TODO: get label
+    {
+        //TODO: label exports
+    }
+    if(addrinfo->flags&comment) //TODO: get comment
+    {
+        //TODO: auto-comments
+    }
     return retval;
 }
 

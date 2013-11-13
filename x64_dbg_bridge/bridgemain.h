@@ -153,6 +153,7 @@ DLL_IMPEXP bool DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text);
 DLL_IMPEXP bool DbgSetLabelAt(duint addr, const char* text);
 DLL_IMPEXP bool DbgGetCommentAt(duint addr, char* text);
 DLL_IMPEXP bool DbgSetCommentAt(duint addr, const char* text);
+DLL_IMPEXP bool DbgGetModuleAt(duint addr, char* text);
 DLL_IMPEXP BPXTYPE DbgGetBpxTypeAt(duint addr);
 DLL_IMPEXP duint DbgValFromString(const char* string);
 DLL_IMPEXP bool DbgGetRegDump(REGDUMP* regdump);

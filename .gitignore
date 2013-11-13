@@ -25,7 +25,6 @@ x64_dbg_gui/Project/x64/
 !bin/*/TitanEngine.dll
 !bin/*/test.dll
 !bin/*/test.exe
-!bin/*/gui.dll
 !bin/*/dbghelp.dll
 !bin/*/sqlite.dll
 !bin/*/BeaEngine.dll

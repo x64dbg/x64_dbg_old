@@ -91,7 +91,10 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
             if(DbgGetLabelAt(label_addr, ConvertBeaSeg(segmentReg), label_text))
             {
                 QString displacement=QString("%1").arg(label_addr, 0, 16, QChar('0')).toUpper();
-                argmnemonic.replace(displacement, QString(label_text));
+                if(argmnemonic.indexOf(displacement)!=-1)
+                {
+                    argmnemonic.replace(displacement, "<"+QString(label_text)+">");
+                }
             }
 
             switch(Argument->ArgSize)
@@ -117,12 +120,41 @@ bool BeaHighlight::PrintArgument(QList<CustomRichText_t>* richText, const ARGTYP
             if(!label_addr)
                 label_addr=Instruction->AddrValue;
             char label_text[MAX_LABEL_SIZE]="";
-            if(DbgGetLabelAt(label_addr, SEG_DEFAULT, label_text))
+            char module_text[33]="";
+            bool hasLabel=DbgGetLabelAt(label_addr, SEG_DEFAULT, label_text);
+            bool hasModule=DbgGetModuleAt(label_addr, module_text);
+            QString label_addr_text=QString("%1").arg(label_addr, 0, 16, QChar('0')).toUpper();;
+            QString newText;
+            if(hasLabel && hasModule) //<module.label>
             {
-                QString immediat=QString("%1").arg(label_addr, 0, 16, QChar('0')).toUpper();;
-                argmnemonic.replace(immediat, QString(label_text));
+                newText="<"+QString(module_text)+"."+QString(label_text)+">";
+                if(argmnemonic.indexOf(label_addr_text)!=-1)
+                {
+                    argument.flags=FlagBackground;
+                    argument.textBackground=QColor(255,255,0);
+                    argmnemonic.replace(label_addr_text, newText);
+                }
+            }
+            else if(hasModule) //module.%llX
+            {
+                newText=QString(module_text)+"."+QString(label_addr_text);
+                if(argmnemonic.indexOf(label_addr_text)!=-1)
+                {
+                    argument.flags=FlagBackground;
+                    argument.textBackground=QColor(255,255,0);
+                    argmnemonic.replace(label_addr_text, newText);
+                }
+            }
+            else if(hasLabel) //<label>
+            {
+                newText="<"+QString(label_text)+">";
+                if(argmnemonic.indexOf(label_addr_text)!=-1)
+                {
+                    argmnemonic.replace(label_addr_text, newText);
+                }
             }
 
+            //jumps
             char shortjmp[100]="\0";
             bool has_shortjmp=false;
             if(brtype && brtype!=RetType && !(argtype&REGISTER_TYPE))
