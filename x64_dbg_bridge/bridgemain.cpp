@@ -185,15 +185,20 @@ DLL_IMPEXP bool DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text) //(mod
 {
     if(!text)
         return false;
-    //test code (highlighting.exe)
-    /*if(addr==0x401020 || addr==0x401022)
+    //test code (highlighting.exe|x32)
+    /*if(addr==0x40102b)
     {
-        strcpy(text, "highligh.label");
+        strcpy(text, "highlighting.retn");
+        return true;
+    }
+    else if(addr==0x401020 || addr==0x401022)
+    {
+        strcpy(text, "highlighting.label");
         return true;
     }
     else if(addr==0x402000)
     {
-        strcpy(text, "highligh.dataLabel");
+        strcpy(text, "highlighting.dataLabel");
         return true;
     }*/
     ADDRINFO info;
@@ -202,11 +207,11 @@ DLL_IMPEXP bool DbgGetLabelAt(duint addr, SEGMENTREG segment, char* text) //(mod
     if(!_dbg_addrinfoget(addr, segment, &info))
         return false;
     if(!*info.module && !*info.label) //no module, no label
-        sprintf(text, "%"fext"X", addr);
+        return false;
     else if(!*info.module) //no module
         strcpy(text, info.label);
     else if(!*info.label) //module only
-        sprintf(text, "%s.%"fext"X", info.module, addr);
+        return false;
     else //module+label
         sprintf(text, "%s.%s", info.module, info.label);
     return true;

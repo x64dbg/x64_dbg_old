@@ -15,4 +15,6 @@ section .text
 	XOR EDX,EDX
 	DIV EBX
 	MOV EAX,DWORD [EAX*4]
+	JMP SHORT @next
+@next:
 	RET

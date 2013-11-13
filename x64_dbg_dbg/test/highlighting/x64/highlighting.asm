@@ -15,4 +15,6 @@ section .text
 	XOR RDX,RDX
 	DIV RBX
 	MOV RAX,QWORD [RAX*4]
+	JMP SHORT @next
+@next:
 	RET

@@ -8,6 +8,7 @@ bool modnamefromaddr(uint addr, char* modname)
     modInfo.SizeOfStruct=sizeof(IMAGEHLP_MODULE64);
     if(!SymGetModuleInfo64(fdProcessInfo->hProcess, (DWORD64)addr, &modInfo) or !modname)
         return false;
+    _strlwr(modInfo.ModuleName);
     strcpy(modname, modInfo.ModuleName);
     return true;
 }

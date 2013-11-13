@@ -2,6 +2,7 @@
 #include "memory.h"
 #include "debugger.h"
 #include "value.h"
+#include "addrinfo.h"
 
 extern "C" DLL_EXPORT duint _dbg_memfindbaseaddr(duint addr, duint* size)
 {
@@ -93,7 +94,17 @@ extern "C" DLL_EXPORT bool _dbg_isjumpgoingtoexecute(duint addr)
 
 extern "C" DLL_EXPORT bool _dbg_addrinfoget(duint addr, SEGMENTREG segment, ADDRINFO* addrinfo)
 {
-    return false;
+    bool retval=false;
+    if(addrinfo->flags&module) //get module
+    {
+        char module[64]="";
+        if(modnamefromaddr(addr, module) and strlen(module)<32) //get module name
+        {
+            strcpy(addrinfo->module, module);
+            retval=true;
+        }
+    }
+    return retval;
 }
 
 extern "C" DLL_EXPORT bool _dbg_addrinfoset(duint addr, ADDRINFO* addrinfo)
